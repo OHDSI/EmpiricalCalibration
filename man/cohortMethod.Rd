@@ -25,7 +25,7 @@ claims and was defined broadly on the basis of codes associated with hepatic dys
 used in prior observational database studies. The time at risk was defined as the length of exposure + 30
 days, and we determined whether subjects experienced an acute liver injury during their time at risk.
 Using propensity score stratification, the cohorts were divided over 20 strata, and an odds ratio over
-all strata was computed using a Mantel–Haenszel test. The propensity score was estimated using Bayesian
+all strata was computed using a Mantel-Haenszel test. The propensity score was estimated using Bayesian
 logistic regression using all available drug, condition, and procedure covariates occurring in the 180
 days prior to first exposure, in addition to age, sex, calendar year of first exposure, Charlson index,
 number of drugs, number of visit days, and number of procedures.
