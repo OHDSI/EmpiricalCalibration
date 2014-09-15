@@ -67,14 +67,14 @@ fitNull <- function(logRr,seLogRr){
     result
   }
   theta <- c(0,0)
-  fit <- nlm(LL,theta,estimate = logRr, se = seLogRr, hessian = TRUE, iterlim =10000)
+  fit <- optim(theta,LL, estimate = logRr, se = seLogRr,hessian=TRUE)
   fisher_info <- solve(fit$hessian)
   prop_sigma <- sqrt(diag(fisher_info))
-  null <- fit$estimate
+  null <- fit$par
   null[2] <- exp(null[2])
   names(null) = c("mean","sd")
-  attr(null,"LB95CI") <- c(fit$estimate[1] + qnorm(0.025) * prop_sigma[1],exp(fit$estimate[2] + qnorm(0.025) * prop_sigma[2]))
-  attr(null,"UB95CI") <- c(fit$estimate[1] + qnorm(0.975) * prop_sigma[1],exp(fit$estimate[2] + qnorm(0.975) * prop_sigma[2]))
+  attr(null,"LB95CI") <- c(fit$par[1] + qnorm(0.025) * prop_sigma[1],exp(fit$par[2] + qnorm(0.025) * prop_sigma[2]))
+  attr(null,"UB95CI") <- c(fit$par[1] + qnorm(0.975) * prop_sigma[1],exp(fit$par[2] + qnorm(0.975) * prop_sigma[2]))
   class(null) <- "null"
   null
 }
