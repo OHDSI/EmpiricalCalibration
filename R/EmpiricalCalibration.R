@@ -75,6 +75,7 @@ fitNull <- function(logRr,seLogRr){
   names(null) = c("mean","sd")
   attr(null,"LB95CI") <- c(fit$par[1] + qnorm(0.025) * prop_sigma[1],exp(fit$par[2] + qnorm(0.025) * prop_sigma[2]))
   attr(null,"UB95CI") <- c(fit$par[1] + qnorm(0.975) * prop_sigma[1],exp(fit$par[2] + qnorm(0.975) * prop_sigma[2]))
+  attr(null,"CovarianceMatrix") <- fisher_info
   class(null) <- "null"
   null
 }
@@ -91,9 +92,10 @@ fitNull <- function(logRr,seLogRr){
 #' @param logRr     A numeric vector of one or more effect estimates on the log scale
 #' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard 
 #' error = (log(<lower bound 95 percent confidence interval>) - log(<effect estimate>))/qnorm(0.025) 
+#' @param null      An object of class \code{null} created using the \code{fitNull} function
+#' @param pValueConfidenceInterval    If true, computes the 95 percent confidence interval of the calibrated p-value
 #'  
-#' @return An object of type \code{null} containing the mean and standard deviation (both on the log scale) of the
-#' null distribution.
+#' @return A two-sided calibrated p-value.
 #' 
 #' @examples 
 #' data(sccs)
@@ -107,7 +109,7 @@ fitNull <- function(logRr,seLogRr){
 #' calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 #' 
 #' @export
-calibrateP <- function(logRr,seLogRr,null){
+calibrateP <- function(logRr,seLogRr,null, pValueConfidenceInterval = FALSE){
   
   oneAdjustedP <- function(logRR, se, null){
     P_upper_bound = pnorm((null[1]-logRR)/sqrt(null[2]^2+se^2)) 
@@ -118,10 +120,21 @@ calibrateP <- function(logRr,seLogRr,null){
   adjustedP <- vector(length=length(logRr))
   for (i in 1:length(logRr))
     adjustedP[i] = oneAdjustedP(logRr[i],seLogRr[i],null)
-
+  
+  if (pValueConfidenceInterval){
+    adjustedP <- data.frame(p = adjustedP, lb95ci = 0,ub95ci = 0)
+    rand <- mvrnorm(1000000,c(null[1], log(null[2])),attr(null,"CovarianceMatrix"))
+    for (i in 1:length(logRr)){
+      P_upper_bound = pnorm((rand[,1]-logRr[i])/sqrt(exp(rand[,2])^2+seLogRr[i]^2)) 
+      P_lower_bound = pnorm((logRr[i]-rand[,1])/sqrt(exp(rand[,2])^2+seLogRr[i]^2)) 
+      #Take min:
+      p <- P_upper_bound
+      p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
+      p <- p * 2
+      
+      adjustedP$lb95ci <- quantile(p,0.025)
+      adjustedP$ub95ci <- quantile(p,0.975)
+    }
+  }
   adjustedP
 }
-
-
-
-

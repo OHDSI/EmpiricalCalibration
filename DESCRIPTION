@@ -7,7 +7,13 @@ Date: 2014-07-18
 Author: Martijn Schuemie
 Maintainer: Martijn Schuemie <schuemie@ohdsi.org>
 Description: Routines for performing empirical calibration of observational
-    study estimates
+    study estimates. By using a set of negative control hypotheses we can
+    estimate the empirical null distribution of a particular observational
+    study setup. This empirical null distribution can be used to compute a
+    calibrated p-value, which reflects the probability of observing an
+    estimated effect size when the null hypothesis is true taking both random
+    and systematic error into account.
 Depends:
-    ggplot2
+    ggplot2,
+    MASS
 License: Apache License
