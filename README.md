@@ -23,7 +23,12 @@ Screenshots and examples
 data(sccs) #Load one of the included data sets
 negatives <- sccs[sccs$groundTruth == 0,] #Select the negative controls
 null <- fitNull(negatives$logRr,negatives$seLogRr) #Fit the null distribution
-positive <- sccs[sccs$groundTruth == 1,]  #Select the positive control / hypothesis of interest
+positive <- sccs[sccs$groundTruth == 1,]  #Select the positive control
+
+#Create the plot above:
+plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr,null)
+
+#Compute the calibrated p-value:
 calibrateP(positive$logRr,positive$seLogRr, null) #Compute calibrated p-value
 [1] 0.8390598
 ```
