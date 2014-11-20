@@ -123,7 +123,7 @@ calibrateP <- function(logRr,seLogRr,null, pValueConfidenceInterval = FALSE){
   
   if (pValueConfidenceInterval){
     adjustedP <- data.frame(p = adjustedP, lb95ci = 0,ub95ci = 0)
-    rand <- mvrnorm(1000000,c(null[1], log(null[2])),attr(null,"CovarianceMatrix"))
+    rand <- mvrnorm(10000,c(null[1], log(null[2])),attr(null,"CovarianceMatrix"))
     for (i in 1:length(logRr)){
       P_upper_bound = pnorm((rand[,1]-logRr[i])/sqrt(exp(rand[,2])^2+seLogRr[i]^2)) 
       P_lower_bound = pnorm((logRr[i]-rand[,1])/sqrt(exp(rand[,2])^2+seLogRr[i]^2)) 
@@ -132,8 +132,8 @@ calibrateP <- function(logRr,seLogRr,null, pValueConfidenceInterval = FALSE){
       p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
       p <- p * 2
       
-      adjustedP$lb95ci <- quantile(p,0.025)
-      adjustedP$ub95ci <- quantile(p,0.975)
+      adjustedP$lb95ci[i] <- quantile(p,0.025)
+      adjustedP$ub95ci[i] <- quantile(p,0.975)
     }
   }
   adjustedP
