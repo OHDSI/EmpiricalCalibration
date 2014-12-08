@@ -1,4 +1,4 @@
-simulation <- function(){
+.simulation <- function(){
   
   n = 5000
   mu = 0
@@ -23,7 +23,7 @@ simulation <- function(){
 }
 
 
-simulationForSusan <- function(){
+.simulationForSusan <- function(){
   
   n = 50
   theta <- runif(n,min = log(0.4), max = log(0.8))
@@ -35,7 +35,7 @@ simulationForSusan <- function(){
   plotCalibration(data$LOGRR, data$SE)
 }
 
-simulationSusan <- function(){
+.simulationSusan <- function(){
   getNegCtrl <- function(n, niter = 1, a = 0, b = 0) {
     res <- matrix(NA, ncol =3, nrow = niter)
     colnames(res) = c("logOR", "SE", "p-value")

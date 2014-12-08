@@ -33,6 +33,6 @@ data(sccs)
 negatives <- sccs[sccs$groundTruth == 0,]
 positive <- sccs[sccs$groundTruth == 1,]
 null <- fitNull(negatives$logRr,negatives$seLogRr)
-plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr,null)
+plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr)
 }
 

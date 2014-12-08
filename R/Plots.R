@@ -54,26 +54,26 @@ forestPlot <- function(logRr,seLogRr,names,xLabel="Relative risk"){
   data$SIGNIFICANT <- data$LOGLB95RR > 0 | data$LOGUB95RR < 0 
   data$DRUG_NAME<-factor(data$DRUG_NAME, levels=rev(levels(data$DRUG_NAME))) 
   
-  ggplot2::ggplot(data, aes(x= DRUG_NAME , y=exp(LOGRR), ymin=exp(LOGLB95RR), ymax=exp(LOGUB95RR),colour=SIGNIFICANT, fill=SIGNIFICANT), environment=environment()) +
-    geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.2) +
-    geom_hline(yintercept=1, lw=0.5) + 
-    geom_pointrange(shape=23) +
-    scale_colour_manual(values=col) +
-    scale_fill_manual(values=colFill) +
-    coord_flip(ylim=c(0.25,10)) + 
-    scale_y_continuous(xLabel,trans="log10", breaks=breaks, labels = breaks) +
-    theme(
-      panel.grid.minor = element_blank(),
-      panel.background= element_rect(fill="#FAFAFA", colour = NA),
-      panel.grid.major = element_line(colour = "#EEEEEE"),
-      axis.ticks = element_blank(),
-      axis.title.y = element_blank(), 
-      axis.title.x = element_blank(), 
+  ggplot2::ggplot(data, ggplot2::aes(x= DRUG_NAME , y=exp(LOGRR), ymin=exp(LOGLB95RR), ymax=exp(LOGUB95RR),colour=SIGNIFICANT, fill=SIGNIFICANT), environment=environment()) +
+    ggplot2::geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.2) +
+    ggplot2::geom_hline(yintercept=1, lw=0.5) + 
+    ggplot2::geom_pointrange(shape=23) +
+    ggplot2::scale_colour_manual(values=col) +
+    ggplot2::scale_fill_manual(values=colFill) +
+    ggplot2::coord_flip(ylim=c(0.25,10)) + 
+    ggplot2::scale_y_continuous(xLabel,trans="log10", breaks=breaks, labels = breaks) +
+    ggplot2:: theme(
+      panel.grid.minor = ggplot2::element_blank(),
+      panel.background= ggplot2::element_rect(fill="#FAFAFA", colour = NA),
+      panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"),
+      axis.ticks = ggplot2::element_blank(),
+      axis.title.y = ggplot2::element_blank(), 
+      axis.title.x = ggplot2::element_blank(), 
       axis.text.y = themeRA,
       axis.text.x = theme,
-      legend.key= element_blank(),
+      legend.key= ggplot2::element_blank(),
       strip.text.x = theme,
-      strip.background = element_blank(),
+      strip.background = ggplot2::element_blank(),
       legend.position = "none"
     ) 	
 }
@@ -121,7 +121,7 @@ logRRtoSE <- function(logRR,p,null) {
 #' negatives <- sccs[sccs$groundTruth == 0,]
 #' positive <- sccs[sccs$groundTruth == 1,]
 #' null <- fitNull(negatives$logRr,negatives$seLogRr)
-#' plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr,null)
+#' plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr)
 #' 
 #' @export
 plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositives, seLogRrPositives,xLabel="Relative risk"){
@@ -132,27 +132,27 @@ plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositiv
   theme <- ggplot2::element_text(colour="#000000", size=12) 
   themeRA <- ggplot2::element_text(colour="#000000", size=12,hjust=1) 
   themeLA <- ggplot2::element_text(colour="#000000", size=12,hjust=0) 
-  ggplot2::ggplot(data.frame(x,y,seTheoretical),aes(x=x,y=y), environment=environment())+
-    geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.5) +
-    geom_vline(xintercept=1, lw=1) + 			
-    geom_area(fill=rgb(1,0.5,0,alpha = 0.5),color=rgb(1,0.5,0),size=1,alpha=0.5) +
-    geom_area(aes(y=seTheoretical),fill=rgb(0,0,0),colour=rgb(0,0,0,alpha=0.1),alpha = 0.1)+
-    geom_line(aes(y=seTheoretical),colour=rgb(0,0,0), linetype="dashed", size=1,alpha=0.5)+
-    geom_point(shape=23,aes(x,y),data=data.frame(x=exp(logRrPositives), y=seLogRrPositives), size=4,fill=rgb(1,1,0),alpha=0.8) +
-    geom_point(shape=21,aes(x,y),data=data.frame(x=exp(logRrNegatives), y=seLogRrNegatives), size=2,fill=rgb(0,0,1,alpha=0.5),colour=rgb(0,0,0.8)) +
-    geom_hline(yintercept=0) +
-    scale_x_continuous(xLabel,trans="log10",limits = c(0.25,10), breaks=breaks,labels=breaks) + 
-    scale_y_continuous("Standard Error",limits = c(0,1.5)) +
-    theme(
-      panel.grid.minor = element_blank(),
-      panel.background= element_rect(fill="#FAFAFA", colour = NA),
-      panel.grid.major= element_blank(),
-      axis.ticks = element_blank(),
+  ggplot2::ggplot(data.frame(x,y,seTheoretical),ggplot2::aes(x=x,y=y), environment=environment())+
+    ggplot2::geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.5) +
+    ggplot2::geom_vline(xintercept=1, lw=1) + 			
+    ggplot2::geom_area(fill=rgb(1,0.5,0,alpha = 0.5),color=rgb(1,0.5,0),size=1,alpha=0.5) +
+    ggplot2::geom_area(ggplot2::aes(y=seTheoretical),fill=rgb(0,0,0),colour=rgb(0,0,0,alpha=0.1),alpha = 0.1)+
+    ggplot2::geom_line(ggplot2::aes(y=seTheoretical),colour=rgb(0,0,0), linetype="dashed", size=1,alpha=0.5)+
+    ggplot2::geom_point(shape=23,ggplot2::aes(x,y),data=data.frame(x=exp(logRrPositives), y=seLogRrPositives), size=4,fill=rgb(1,1,0),alpha=0.8) +
+    ggplot2::geom_point(shape=21,ggplot2::aes(x,y),data=data.frame(x=exp(logRrNegatives), y=seLogRrNegatives), size=2,fill=rgb(0,0,1,alpha=0.5),colour=rgb(0,0,0.8)) +
+    ggplot2::geom_hline(yintercept=0) +
+    ggplot2::scale_x_continuous(xLabel,trans="log10",limits = c(0.25,10), breaks=breaks,labels=breaks) + 
+    ggplot2::scale_y_continuous("Standard Error",limits = c(0,1.5)) +
+    ggplot2::theme(
+      panel.grid.minor = ggplot2::element_blank(),
+      panel.background= ggplot2::element_rect(fill="#FAFAFA", colour = NA),
+      panel.grid.major= ggplot2::element_blank(),
+      axis.ticks = ggplot2::element_blank(),
       axis.text.y = themeRA,
       axis.text.x = theme,
-      legend.key= element_blank(),
+      legend.key= ggplot2::element_blank(),
       strip.text.x = theme,
-      strip.background = element_blank(),
+      strip.background = ggplot2::element_blank(),
       legend.position = "none"
     ) 
 }
@@ -206,25 +206,25 @@ plotCalibration <- function(logRr,seLogRr){
   theme <- ggplot2::element_text(colour="#000000", size=10) 
   themeRA <- ggplot2::element_text(colour="#000000", size=10,hjust=1) 
   themeLA <- ggplot2::element_text(colour="#000000", size=10,hjust=0) 
-  ggplot2::ggplot(catData, aes(x=x,y=y,colour=`P-value calculation`,linetype=`P-value calculation`), environment=environment()) +
-    geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
-    geom_vline(xintercept=0.05, colour ="#888888", linetype="dashed", lw=1) +
-    geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
-    geom_abline(colour ="#AAAAAA", lty=1, lw=0.3) + 
-    geom_step(direction="hv", size=1) +
-    scale_colour_manual(values=c(rgb(0,0,0),rgb(0,0,0),rgb(0.5,0.5,0.5))) +
-    scale_linetype_manual(values=c("solid","twodash")) +
-    scale_x_continuous("Alpha",limits = c(0,1), breaks=c(breaks,0.05),labels=c("",".25",".50",".75","1",".05")) + 
-    scale_y_continuous("Fraction with p < alpha",limits = c(0,1), breaks=breaks,labels=c("0",".25",".50",".75","1")) +
-    theme(
-      panel.grid.minor = element_blank(),
-      panel.background= element_rect(fill="#FAFAFA", colour = NA),
-      panel.grid.major= element_blank(),
-      axis.ticks = element_blank(),
+  ggplot2::ggplot(catData, ggplot2::aes(x=x,y=y,colour=`P-value calculation`,linetype=`P-value calculation`), environment=environment()) +
+    ggplot2::geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
+    ggplot2::geom_vline(xintercept=0.05, colour ="#888888", linetype="dashed", lw=1) +
+    ggplot2::geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
+    ggplot2::geom_abline(colour ="#AAAAAA", lty=1, lw=0.3) + 
+    ggplot2::geom_step(direction="hv", size=1) +
+    ggplot2::scale_colour_manual(values=c(rgb(0,0,0),rgb(0,0,0),rgb(0.5,0.5,0.5))) +
+    ggplot2::scale_linetype_manual(values=c("solid","twodash")) +
+    ggplot2::scale_x_continuous("Alpha",limits = c(0,1), breaks=c(breaks,0.05),labels=c("",".25",".50",".75","1",".05")) + 
+    ggplot2::scale_y_continuous("Fraction with p < alpha",limits = c(0,1), breaks=breaks,labels=c("0",".25",".50",".75","1")) +
+    ggplot2::theme(
+      panel.grid.minor = ggplot2::element_blank(),
+      panel.background= ggplot2::element_rect(fill="#FAFAFA", colour = NA),
+      panel.grid.major= ggplot2::element_blank(),
+      axis.ticks = ggplot2::element_blank(),
       axis.text.y = themeRA,
       axis.text.x = theme,
       strip.text.x = theme,
-      strip.background = element_blank(),
+      strip.background = ggplot2::element_blank(),
       legend.position = "right"
     )
   
