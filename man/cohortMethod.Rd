@@ -3,7 +3,13 @@
 \name{cohortMethod}
 \alias{cohortMethod}
 \title{Relative risks from a new-user cohort design}
-\format{A data frame with 31 rows and 4 variables}
+\format{A data frame with 31 rows and 4 variables:
+\describe{
+  \item{drugName}{Name of the drug}
+  \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control}
+  \item{logRr}{The log of the incidence rate ratio}
+  \item{seLogRr}{The standard error of the log of the incidence rate ratio}
+}}
 \usage{
 data(cohortMethod)
 }
@@ -29,15 +35,6 @@ all strata was computed using a Mantel-Haenszel test. The propensity score was e
 logistic regression using all available drug, condition, and procedure covariates occurring in the 180
 days prior to first exposure, in addition to age, sex, calendar year of first exposure, Charlson index,
 number of drugs, number of visit days, and number of procedures.
-
-The variables are as follows:
-
-\itemize{
-  \item drugName. Name of the drug
-  \item groundTruth. Whether the drug is a positive (1) or negative (0) control
-  \item logRr. The log of the relative risk
-  \item seLogRr. The standard error of the log of the relative risk
-}
 
 For more information on this set see Schuemie et al (2014).
 }

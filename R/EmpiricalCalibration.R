@@ -15,16 +15,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# @author Observational Health Data Sciences and Informatics
-# @author Martijn Schuemie
-
-#' Empirical calibration
-#'
-#' @name EmpiricalCalibration
-#' @docType package
-#' @import ggplot2
-NULL
 
 #' Fit the null distribution
 #'
@@ -123,7 +113,7 @@ calibrateP <- function(logRr,seLogRr,null, pValueConfidenceInterval = FALSE){
   
   if (pValueConfidenceInterval){
     adjustedP <- data.frame(p = adjustedP, lb95ci = 0,ub95ci = 0)
-    rand <- mvrnorm(10000,c(null[1], log(null[2])),attr(null,"CovarianceMatrix"))
+    rand <- MASS::mvrnorm(10000,c(null[1], log(null[2])),attr(null,"CovarianceMatrix"))
     for (i in 1:length(logRr)){
       P_upper_bound = pnorm((rand[,1]-logRr[i])/sqrt(exp(rand[,2])^2+seLogRr[i]^2)) 
       P_lower_bound = pnorm((logRr[i]-rand[,1])/sqrt(exp(rand[,2])^2+seLogRr[i]^2)) 

@@ -15,9 +15,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# @author Observational Health Data Sciences and Informatics
-# @author Martijn Schuemie
 
 #' Create a forest plot
 #'
@@ -45,9 +42,9 @@
 #' @export
 forestPlot <- function(logRr,seLogRr,names,xLabel="Relative risk"){
   breaks <- c(0.25,0.5,1,2,4,6,8,10) 
-  theme <- element_text(colour="#000000", size=6) 
-  themeRA <- element_text(colour="#000000", size=5,hjust=1) 
-  themeLA <- element_text(colour="#000000", size=10,hjust=0) 
+  theme <- ggplot2::element_text(colour="#000000", size=6) 
+  themeRA <- ggplot2::element_text(colour="#000000", size=5,hjust=1) 
+  themeLA <- ggplot2::element_text(colour="#000000", size=10,hjust=0) 
   col <- c(rgb(0,0,0.8,alpha=1),rgb(0.8,0.4,0,alpha=1))
   colFill <- c(rgb(0,0,1,alpha=0.5),rgb(1,0.4,0,alpha=0.5))
   data <- data.frame(DRUG_NAME = as.factor(names), 
@@ -57,7 +54,7 @@ forestPlot <- function(logRr,seLogRr,names,xLabel="Relative risk"){
   data$SIGNIFICANT <- data$LOGLB95RR > 0 | data$LOGUB95RR < 0 
   data$DRUG_NAME<-factor(data$DRUG_NAME, levels=rev(levels(data$DRUG_NAME))) 
   
-  ggplot(data, aes(x= DRUG_NAME , y=exp(LOGRR), ymin=exp(LOGLB95RR), ymax=exp(LOGUB95RR),colour=SIGNIFICANT, fill=SIGNIFICANT), environment=environment()) +
+  ggplot2::ggplot(data, aes(x= DRUG_NAME , y=exp(LOGRR), ymin=exp(LOGLB95RR), ymax=exp(LOGUB95RR),colour=SIGNIFICANT, fill=SIGNIFICANT), environment=environment()) +
     geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.2) +
     geom_hline(yintercept=1, lw=0.5) + 
     geom_pointrange(shape=23) +
@@ -111,7 +108,6 @@ logRRtoSE <- function(logRR,p,null) {
 #' controls are shown as blue dots, positive controls as yellow diamonds. The area below the dashed line
 #' indicated estimates with p < 0.05. The orange area indicates estimates with calibrated p < 0.05.
 #' 
-#' 
 #' @param logRrNegatives     A numeric vector of effect estimates of the negative controls on the log scale
 #' @param seLogRrNegatives   The standard error of the log of the effect estimates of the negative controls
 #' @param logRrPositives     A numeric vector of effect estimates of the positive controls on the log scale
@@ -128,15 +124,15 @@ logRRtoSE <- function(logRR,p,null) {
 #' plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr,null)
 #' 
 #' @export
-plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositives, seLogRrPositives,null,xLabel="Relative risk"){
+plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositives, seLogRrPositives,xLabel="Relative risk"){
   x <- exp(seq(log(0.25),log(10),by=0.01))
   y <- logRRtoSE(log(x),0.05,null)
   seTheoretical <- sapply(x,FUN=function(x){abs(log(x))/qnorm(0.975)})
   breaks <- c(0.25,0.5,1,2,4,6,8,10) 
-  theme <- element_text(colour="#000000", size=12) 
-  themeRA <- element_text(colour="#000000", size=12,hjust=1) 
-  themeLA <- element_text(colour="#000000", size=12,hjust=0) 
-  ggplot(data.frame(x,y,seTheoretical),aes(x=x,y=y), environment=environment())+
+  theme <- ggplot2::element_text(colour="#000000", size=12) 
+  themeRA <- ggplot2::element_text(colour="#000000", size=12,hjust=1) 
+  themeLA <- ggplot2::element_text(colour="#000000", size=12,hjust=0) 
+  ggplot2::ggplot(data.frame(x,y,seTheoretical),aes(x=x,y=y), environment=environment())+
     geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.5) +
     geom_vline(xintercept=1, lw=1) + 			
     geom_area(fill=rgb(1,0.5,0,alpha = 0.5),color=rgb(1,0.5,0),size=1,alpha=0.5) +
@@ -196,22 +192,21 @@ plotCalibration <- function(logRr,seLogRr){
     null <- fitNull(dataLeaveOneOut$LOGRR, dataLeaveOneOut$SE)
     data$calibratedP[i] = calibrateP(data$LOGRR[i],data$SE[i],null)
   }
-
+  
   data$AdjustedY <- sapply(data$calibratedP,FUN <- function(x){sum(data$calibratedP < x)/nrow(data)})
   
-  catData <- data.frame(
-  x = c(data$P,data$calibratedP),
-  y = c(data$Y,data$AdjustedY), 
-  label = factor(c(rep("Theoretical",times=nrow(data)),rep("Empirical",times=nrow(data)))))
+  catData <- data.frame(x = c(data$P,data$calibratedP),
+                        y = c(data$Y,data$AdjustedY), 
+                        label = factor(c(rep("Theoretical",times=nrow(data)),rep("Empirical",times=nrow(data)))))
   catData$label <- factor(catData$label, levels = c("Empirical", "Theoretical"))
   
   names(catData) <- c("x","y","P-value calculation")
   
   breaks <- c(0,0.25,0.5,0.75,1) 
-  theme <- element_text(colour="#000000", size=10) 
-  themeRA <- element_text(colour="#000000", size=10,hjust=1) 
-  themeLA <- element_text(colour="#000000", size=10,hjust=0) 
-  ggplot(catData, aes(x=x,y=y,colour=`P-value calculation`,linetype=`P-value calculation`), environment=environment()) +
+  theme <- ggplot2::element_text(colour="#000000", size=10) 
+  themeRA <- ggplot2::element_text(colour="#000000", size=10,hjust=1) 
+  themeLA <- ggplot2::element_text(colour="#000000", size=10,hjust=0) 
+  ggplot2::ggplot(catData, aes(x=x,y=y,colour=`P-value calculation`,linetype=`P-value calculation`), environment=environment()) +
     geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
     geom_vline(xintercept=0.05, colour ="#888888", linetype="dashed", lw=1) +
     geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +

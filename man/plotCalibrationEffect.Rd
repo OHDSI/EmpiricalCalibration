@@ -4,7 +4,7 @@
 \title{Plot the effect of the calibration}
 \usage{
 plotCalibrationEffect(logRrNegatives, seLogRrNegatives, logRrPositives,
-  seLogRrPositives, null, xLabel = "Relative risk")
+  seLogRrPositives, xLabel = "Relative risk")
 }
 \arguments{
 \item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log scale}

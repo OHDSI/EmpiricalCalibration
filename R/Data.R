@@ -15,9 +15,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# @author Observational Health Data Sciences and Informatics
-# @author Martijn Schuemie
 
 #' Incidence rate ratios from Self-Controlled Case Series
 #'
@@ -34,22 +31,19 @@
 #' problem list. These codes pertain to esophageal, gastric, duodenal, peptic, and gastrojejunal ulceration, 
 #' perforation, and hemorrhage, as well as gastritis and non-specific gastrointestinal hemorrhage.
 #' 
-#' The variables are as follows:
-#'
-#' \itemize{
-#'   \item drugName. Name of the drug
-#'   \item groundTruth. Whether the drug is a positive (1) or negative (0) control
-#'   \item logRr. The log of the incidence rate ratio
-#'   \item seLogRr. The standard error of the log of the incidence rate ratio
-#' }
-#' 
 #' For more information on this set see Schuemie et al (2014).
 #'
 #' @docType data
 #' @keywords datasets
 #' @name sccs
 #' @usage data(sccs)
-#' @format A data frame with 46 rows and 4 variables
+#' @format A data frame with 46 rows and 4 variables:
+#' \describe{
+#'   \item{drugName}{Name of the drug}
+#'   \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control}
+#'   \item{logRr}{The log of the incidence rate ratio}
+#'   \item{seLogRr}{The standard error of the log of the incidence rate ratio}
+#' }
 #' @references
 #' Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why empirical
 #' calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
@@ -71,22 +65,19 @@ NULL
 #' duodenal, peptic, and gastrojejunal ulceration, perforation, and hemorrhage, as well as gastritis 
 #' and non-specific gastrointestinal hemorrhage.
 #' 
-#' The variables are as follows:
-#'
-#' \itemize{
-#'   \item drugName. Name of the drug
-#'   \item groundTruth. Whether the drug is a positive (1) or negative (0) control
-#'   \item logRr. The log of the odds ratio
-#'   \item seLogRr. The standard error of the log of the odds ratio
-#' }
-#' 
 #' For more information on this set see Schuemie et al (2014).
 #'
 #' @docType data
 #' @keywords datasets
 #' @name caseControl
 #' @usage data(caseControl)
-#' @format A data frame with 47 rows and 4 variables
+#' @format A data frame with 47 rows and 4 variables:
+#' \describe{
+#'   \item{drugName}{Name of the drug}
+#'   \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control}
+#'   \item{logRr}{The log of the incidence rate ratio}
+#'   \item{seLogRr}{The standard error of the log of the incidence rate ratio}
+#' }
 #' @references
 #' Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why empirical
 #' calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
@@ -115,22 +106,19 @@ NULL
 #' days prior to first exposure, in addition to age, sex, calendar year of first exposure, Charlson index,
 #' number of drugs, number of visit days, and number of procedures.
 #' 
-#' The variables are as follows:
-#'
-#' \itemize{
-#'   \item drugName. Name of the drug
-#'   \item groundTruth. Whether the drug is a positive (1) or negative (0) control
-#'   \item logRr. The log of the relative risk
-#'   \item seLogRr. The standard error of the log of the relative risk
-#' }
-#' 
 #' For more information on this set see Schuemie et al (2014).
 #'
 #' @docType data
 #' @keywords datasets
 #' @name cohortMethod
 #' @usage data(cohortMethod)
-#' @format A data frame with 31 rows and 4 variables
+#' @format A data frame with 31 rows and 4 variables:
+#' \describe{
+#'   \item{drugName}{Name of the drug}
+#'   \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control}
+#'   \item{logRr}{The log of the incidence rate ratio}
+#'   \item{seLogRr}{The standard error of the log of the incidence rate ratio}
+#' }
 #' @references
 #' Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why empirical
 #' calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014

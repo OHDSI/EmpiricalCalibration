@@ -3,7 +3,13 @@
 \name{caseControl}
 \alias{caseControl}
 \title{Odds ratios from a case-control design}
-\format{A data frame with 47 rows and 4 variables}
+\format{A data frame with 47 rows and 4 variables:
+\describe{
+  \item{drugName}{Name of the drug}
+  \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control}
+  \item{logRr}{The log of the incidence rate ratio}
+  \item{seLogRr}{The standard error of the log of the incidence rate ratio}
+}}
 \usage{
 data(caseControl)
 }
@@ -22,15 +28,6 @@ Controls were matched on age and sex. Cases of upper GI bleeding were identified
 occurrence of ICD-9 diagnosis codes in the problem list. These codes pertain to esophageal, gastric,
 duodenal, peptic, and gastrojejunal ulceration, perforation, and hemorrhage, as well as gastritis
 and non-specific gastrointestinal hemorrhage.
-
-The variables are as follows:
-
-\itemize{
-  \item drugName. Name of the drug
-  \item groundTruth. Whether the drug is a positive (1) or negative (0) control
-  \item logRr. The log of the odds ratio
-  \item seLogRr. The standard error of the log of the odds ratio
-}
 
 For more information on this set see Schuemie et al (2014).
 }

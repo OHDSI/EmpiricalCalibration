@@ -3,7 +3,13 @@
 \name{sccs}
 \alias{sccs}
 \title{Incidence rate ratios from Self-Controlled Case Series}
-\format{A data frame with 46 rows and 4 variables}
+\format{A data frame with 46 rows and 4 variables:
+\describe{
+  \item{drugName}{Name of the drug}
+  \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control}
+  \item{logRr}{The log of the incidence rate ratio}
+  \item{seLogRr}{The standard error of the log of the incidence rate ratio}
+}}
 \usage{
 data(sccs)
 }
@@ -21,15 +27,6 @@ We used a database of medical records from general practices in the USA, the Gen
 Time 30 days prior to the first prescription was removed to account for possible contra-indications. Cases of upper GI bleeding were identified on the basis of the occurrence of ICD-9 diagnosis codes in the
 problem list. These codes pertain to esophageal, gastric, duodenal, peptic, and gastrojejunal ulceration,
 perforation, and hemorrhage, as well as gastritis and non-specific gastrointestinal hemorrhage.
-
-The variables are as follows:
-
-\itemize{
-  \item drugName. Name of the drug
-  \item groundTruth. Whether the drug is a positive (1) or negative (0) control
-  \item logRr. The log of the incidence rate ratio
-  \item seLogRr. The standard error of the log of the incidence rate ratio
-}
 
 For more information on this set see Schuemie et al (2014).
 }
