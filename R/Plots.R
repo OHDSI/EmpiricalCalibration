@@ -19,7 +19,7 @@
 #' Create a forest plot
 #'
 #' @description
-#' \code{forestPlot} creates a forest plot of effect size estimates.
+#' \code{plotForest} creates a forest plot of effect size estimates.
 #'
 #' @details
 #' Creates a forest plot of effect size estimates (ratios). Estimates that are significantly
@@ -37,10 +37,10 @@
 #' @examples 
 #' data(sccs)
 #' negatives <- sccs[sccs$groundTruth == 0,]
-#' forestPlot(negatives$logRr,negatives$seLogRr, negatives$drugName)
+#' plotForest(negatives$logRr,negatives$seLogRr, negatives$drugName)
 #' 
 #' @export
-forestPlot <- function(logRr,seLogRr,names,xLabel="Relative risk"){
+plotForest <- function(logRr,seLogRr,names,xLabel="Relative risk"){
   breaks <- c(0.25,0.5,1,2,4,6,8,10) 
   theme <- ggplot2::element_text(colour="#000000", size=6) 
   themeRA <- ggplot2::element_text(colour="#000000", size=5,hjust=1) 
@@ -112,6 +112,7 @@ logRRtoSE <- function(logRR,p,null) {
 #' @param seLogRrNegatives   The standard error of the log of the effect estimates of the negative controls
 #' @param logRrPositives     A numeric vector of effect estimates of the positive controls on the log scale
 #' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive controls
+#' @param null               An object representing the fitted null distribution as created by the \code{fitNull} function
 #' @param xLabel    The label on the x-axis: the name of the effect estimate
 #' 
 #' @return A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -120,11 +121,12 @@ logRRtoSE <- function(logRR,p,null) {
 #' data(sccs)
 #' negatives <- sccs[sccs$groundTruth == 0,]
 #' positive <- sccs[sccs$groundTruth == 1,]
-#' null <- fitNull(negatives$logRr,negatives$seLogRr)
 #' plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr)
 #' 
 #' @export
-plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositives, seLogRrPositives,xLabel="Relative risk"){
+plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositives, seLogRrPositives, null = NULL, xLabel="Relative risk"){
+  if (is.null(null))
+    null <- fitNull(logRrNegatives, seLogRrNegatives)
   x <- exp(seq(log(0.25),log(10),by=0.01))
   y <- logRRtoSE(log(x),0.05,null)
   seTheoretical <- sapply(x,FUN=function(x){abs(log(x))/qnorm(0.975)})
@@ -132,13 +134,12 @@ plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositiv
   theme <- ggplot2::element_text(colour="#000000", size=12) 
   themeRA <- ggplot2::element_text(colour="#000000", size=12,hjust=1) 
   themeLA <- ggplot2::element_text(colour="#000000", size=12,hjust=0) 
-  ggplot2::ggplot(data.frame(x,y,seTheoretical),ggplot2::aes(x=x,y=y), environment=environment())+
+  plot <- ggplot2::ggplot(data.frame(x,y,seTheoretical),ggplot2::aes(x=x,y=y), environment=environment())+
     ggplot2::geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.5) +
     ggplot2::geom_vline(xintercept=1, lw=1) + 			
     ggplot2::geom_area(fill=rgb(1,0.5,0,alpha = 0.5),color=rgb(1,0.5,0),size=1,alpha=0.5) +
     ggplot2::geom_area(ggplot2::aes(y=seTheoretical),fill=rgb(0,0,0),colour=rgb(0,0,0,alpha=0.1),alpha = 0.1)+
     ggplot2::geom_line(ggplot2::aes(y=seTheoretical),colour=rgb(0,0,0), linetype="dashed", size=1,alpha=0.5)+
-    ggplot2::geom_point(shape=23,ggplot2::aes(x,y),data=data.frame(x=exp(logRrPositives), y=seLogRrPositives), size=4,fill=rgb(1,1,0),alpha=0.8) +
     ggplot2::geom_point(shape=21,ggplot2::aes(x,y),data=data.frame(x=exp(logRrNegatives), y=seLogRrNegatives), size=2,fill=rgb(0,0,1,alpha=0.5),colour=rgb(0,0,0.8)) +
     ggplot2::geom_hline(yintercept=0) +
     ggplot2::scale_x_continuous(xLabel,trans="log10",limits = c(0.25,10), breaks=breaks,labels=breaks) + 
@@ -155,6 +156,9 @@ plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositiv
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
     ) 
+  if (!missing(logRrPositives))
+    plot = plot + ggplot2::geom_point(shape=23,ggplot2::aes(x,y),data=data.frame(x=exp(logRrPositives), y=seLogRrPositives), size=4,fill=rgb(1,1,0),alpha=0.8)
+  return(plot)
 }
 
 #' Create a calibration plot
@@ -227,7 +231,6 @@ plotCalibration <- function(logRr,seLogRr){
       strip.background = ggplot2::element_blank(),
       legend.position = "right"
     )
-  
 }
 
 

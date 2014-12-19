@@ -2,6 +2,6 @@
 
 export(calibrateP)
 export(fitNull)
-export(forestPlot)
 export(plotCalibration)
 export(plotCalibrationEffect)
+export(plotForest)

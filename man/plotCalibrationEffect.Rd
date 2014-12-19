@@ -4,7 +4,7 @@
 \title{Plot the effect of the calibration}
 \usage{
 plotCalibrationEffect(logRrNegatives, seLogRrNegatives, logRrPositives,
-  seLogRrPositives, xLabel = "Relative risk")
+  seLogRrPositives, null = NULL, xLabel = "Relative risk")
 }
 \arguments{
 \item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log scale}
@@ -14,6 +14,8 @@ plotCalibrationEffect(logRrNegatives, seLogRrNegatives, logRrPositives,
 \item{logRrPositives}{A numeric vector of effect estimates of the positive controls on the log scale}
 
 \item{seLogRrPositives}{The standard error of the log of the effect estimates of the positive controls}
+
+\item{null}{An object representing the fitted null distribution as created by the \code{fitNull} function}
 
 \item{xLabel}{The label on the x-axis: the name of the effect estimate}
 }
@@ -32,7 +34,6 @@ indicated estimates with p < 0.05. The orange area indicates estimates with cali
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0,]
 positive <- sccs[sccs$groundTruth == 1,]
-null <- fitNull(negatives$logRr,negatives$seLogRr)
 plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr)
 }
 
