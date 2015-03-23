@@ -54,6 +54,7 @@ plotForest <- function(logRr,seLogRr,names,xLabel="Relative risk"){
   data$SIGNIFICANT <- data$LOGLB95RR > 0 | data$LOGUB95RR < 0 
   data$DRUG_NAME<-factor(data$DRUG_NAME, levels=rev(levels(data$DRUG_NAME))) 
   
+  with(data, 
   ggplot2::ggplot(data, ggplot2::aes(x= DRUG_NAME , y=exp(LOGRR), ymin=exp(LOGLB95RR), ymax=exp(LOGUB95RR),colour=SIGNIFICANT, fill=SIGNIFICANT), environment=environment()) +
     ggplot2::geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.2) +
     ggplot2::geom_hline(yintercept=1, lw=0.5) + 
@@ -75,7 +76,7 @@ plotForest <- function(logRr,seLogRr,names,xLabel="Relative risk"){
       strip.text.x = theme,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
-    ) 	
+    )) 	
 }
 
 logRRtoSE <- function(logRR,p,null) {
@@ -210,6 +211,7 @@ plotCalibration <- function(logRr,seLogRr){
   theme <- ggplot2::element_text(colour="#000000", size=10) 
   themeRA <- ggplot2::element_text(colour="#000000", size=10,hjust=1) 
   themeLA <- ggplot2::element_text(colour="#000000", size=10,hjust=0) 
+  with(catData, 
   ggplot2::ggplot(catData, ggplot2::aes(x=x,y=y,colour=`P-value calculation`,linetype=`P-value calculation`), environment=environment()) +
     ggplot2::geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
     ggplot2::geom_vline(xintercept=0.05, colour ="#888888", linetype="dashed", lw=1) +
@@ -230,7 +232,7 @@ plotCalibration <- function(logRr,seLogRr){
       strip.text.x = theme,
       strip.background = ggplot2::element_blank(),
       legend.position = "right"
-    )
+    ))
 }
 
 
