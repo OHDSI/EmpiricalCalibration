@@ -13,7 +13,11 @@ Description: Routines for performing empirical calibration of observational
     calibrated p-value, which reflects the probability of observing an
     estimated effect size when the null hypothesis is true taking both random
     and systematic error into account.
+VignetteBuilder: knitr
 Imports:
     ggplot2,
     MASS
+Suggests:
+    knitr,
+    rmarkdown    
 License: Apache License

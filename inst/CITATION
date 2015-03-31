@@ -1,0 +1,17 @@
+citHeader("To cite EmpiricalCalibration in publications use:")
+
+bibentry(bibtype = "Article",
+        author = personList(as.person("M. J. Schuemie"),
+		                    as.person("P. B. Ryan"),
+		                    as.person("W. DuMouchel"),
+		                    as.person("M. A. Suchard"),
+                            as.person("D. Madigan")),
+        title = "Interpreting observational studies: 
+		why empirical calibration is needed to correct p-values",
+        journal = "Statistics in Medicine",
+        volume = "33",
+		number = "2",
+        pages = "209-218",
+        year = "2014",
+        url = "http://onlinelibrary.wiley.com/doi/10.1002/sim.5925/abstract"
+)

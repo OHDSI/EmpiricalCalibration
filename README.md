@@ -51,6 +51,7 @@ install_github("ohdsi/EmpiricalCalibration")
   
 Getting Involved
 ================
+* Vignette: [Empirical calibration](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/man/EmpiricalCalibration.pdf)
 * Package manual: [EmpiricalCalibration.pdf](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/man/EmpiricalCalibration.pdf) 
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
 * We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements

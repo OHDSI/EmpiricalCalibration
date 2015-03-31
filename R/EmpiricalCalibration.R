@@ -70,6 +70,17 @@ fitNull <- function(logRr,seLogRr){
   null
 }
 
+#' @export
+print.null <- function(x, ...) {
+  writeLines("Estimated null distribution\n")
+  output <- data.frame(Estimate = c(x[1], x[2]), 
+                       lb95 = attr(x,"LB95CI"),
+                       ub95 = attr(x,"UB95CI"))
+  colnames(output) <- c("Estimate", "lower .95", "upper .95")
+  rownames(output) <- c("Mean", "SD")
+  printCoefmat(output)
+}
+
 
 #' Calibrate the p-value
 #'
@@ -99,7 +110,7 @@ fitNull <- function(logRr,seLogRr){
 #' calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 #' 
 #' @export
-calibrateP <- function(logRr,seLogRr,null, pValueConfidenceInterval = FALSE){
+calibrateP <- function(logRr, seLogRr, null, pValueConfidenceInterval = FALSE){
   
   oneAdjustedP <- function(logRR, se, null){
     P_upper_bound = pnorm((null[1]-logRR)/sqrt(null[2]^2+se^2)) 
@@ -127,4 +138,27 @@ calibrateP <- function(logRr,seLogRr,null, pValueConfidenceInterval = FALSE){
     }
   }
   adjustedP
+}
+
+#' Compute the (traditional) p-value
+#'
+#' @description
+#' \code{computeTraditionalP} computes the traditional two-sided p-value based on the log of the 
+#' relative risk and the standerd error of the log of the relative risk.
+#'
+#' @param logRr     A numeric vector of one or more effect estimates on the log scale
+#' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard 
+#' error = (log(<lower bound 95 percent confidence interval>) - log(<effect estimate>))/qnorm(0.025) 
+#'
+#' @return A two-sided (traditional) p-value.
+#' 
+#' @examples 
+#' data(sccs)
+#' positive <- sccs[sccs$groundTruth == 1,]
+#' computeTraditionalP(positive$logRr, positive$seLogRr)
+#' 
+#' @export
+computeTraditionalP <- function(logRr, seLogRr) {
+  z <- logRr / seLogRr
+  return(2*pmin(pnorm(z),1-pnorm(z))) # 2-sided p-value  
 }

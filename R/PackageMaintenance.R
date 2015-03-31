@@ -21,6 +21,6 @@
   shell("rm man/EmpiricalCalibration.pdf")
   shell("R CMD Rd2pdf ./ --output=man/EmpiricalCalibration.pdf")
 
-  #require(rmarkdown)
-  #render("vignettes/SingleStudies.Rmd", pdf_document(latex_engine = "pdflatex",toc = TRUE,number_sections = TRUE))
+  require(rmarkdown)
+  render("vignettes/EmpiricalCalibration.Rmd", pdf_document(latex_engine = "pdflatex",toc = TRUE,number_sections = TRUE))
 }
