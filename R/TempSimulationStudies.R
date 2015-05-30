@@ -31,7 +31,7 @@
   y <- rnorm(n,mean=0 + theta,sd=se)
   data <- data.frame(LOGRR = y, SE = se)
   data$GROUND_TRUTH <- 0
-  forestPlot(data$LOGRR, data$SE,1:nrow(data))
+  plotForest(data$LOGRR, data$SE,1:nrow(data))
   plotCalibration(data$LOGRR, data$SE)
 }
 

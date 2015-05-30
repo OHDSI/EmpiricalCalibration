@@ -44,7 +44,6 @@ plotForest <- function(logRr,seLogRr,names,xLabel="Relative risk"){
   breaks <- c(0.25,0.5,1,2,4,6,8,10) 
   theme <- ggplot2::element_text(colour="#000000", size=6) 
   themeRA <- ggplot2::element_text(colour="#000000", size=5,hjust=1) 
-  themeLA <- ggplot2::element_text(colour="#000000", size=10,hjust=0) 
   col <- c(rgb(0,0,0.8,alpha=1),rgb(0.8,0.4,0,alpha=1))
   colFill <- c(rgb(0,0,1,alpha=0.5),rgb(1,0.4,0,alpha=0.5))
   data <- data.frame(DRUG_NAME = as.factor(names), 
@@ -54,7 +53,6 @@ plotForest <- function(logRr,seLogRr,names,xLabel="Relative risk"){
   data$SIGNIFICANT <- data$LOGLB95RR > 0 | data$LOGUB95RR < 0 
   data$DRUG_NAME<-factor(data$DRUG_NAME, levels=rev(levels(data$DRUG_NAME))) 
   
-  with(data, 
   ggplot2::ggplot(data, ggplot2::aes(x= DRUG_NAME , y=exp(LOGRR), ymin=exp(LOGLB95RR), ymax=exp(LOGUB95RR),colour=SIGNIFICANT, fill=SIGNIFICANT), environment=environment()) +
     ggplot2::geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.2) +
     ggplot2::geom_hline(yintercept=1, lw=0.5) + 
@@ -76,11 +74,11 @@ plotForest <- function(logRr,seLogRr,names,xLabel="Relative risk"){
       strip.text.x = theme,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
-    )) 	
+    )
 }
 
 logRRtoSE <- function(logRR,p,null) {
-  sapply(logRR, FUN = function(logRR){
+  sapply(logRR, function(logRR){
     precision <- 0.001
     if (calibrateP(logRR,precision,null) > p)
       return(0)
@@ -134,7 +132,6 @@ plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositiv
   breaks <- c(0.25,0.5,1,2,4,6,8,10) 
   theme <- ggplot2::element_text(colour="#000000", size=12) 
   themeRA <- ggplot2::element_text(colour="#000000", size=12,hjust=1) 
-  themeLA <- ggplot2::element_text(colour="#000000", size=12,hjust=0) 
   plot <- ggplot2::ggplot(data.frame(x,y,seTheoretical),ggplot2::aes(x=x,y=y), environment=environment())+
     ggplot2::geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.5) +
     ggplot2::geom_vline(xintercept=1, lw=1) + 			
@@ -189,7 +186,7 @@ plotCalibration <- function(logRr,seLogRr){
   data <- data.frame(LOGRR = logRr, SE = seLogRr)
   data$Z <- data$LOGRR / data$SE
   data$P <- 2*pmin(pnorm(data$Z),1-pnorm(data$Z)) # 2-sided p-value   
-  data$Y <- sapply(data$P,FUN <- function(x){sum(data$P < x)/nrow(data)})
+  data$Y <- sapply(data$P, function(x){sum(data$P < x)/nrow(data)})
   
   data$calibratedP <- vector(length=nrow(data))
   for (i in 1:nrow(data)){
@@ -198,7 +195,7 @@ plotCalibration <- function(logRr,seLogRr){
     data$calibratedP[i] = calibrateP(data$LOGRR[i],data$SE[i],null)
   }
   
-  data$AdjustedY <- sapply(data$calibratedP,FUN <- function(x){sum(data$calibratedP < x)/nrow(data)})
+  data$AdjustedY <- sapply(data$calibratedP, function(x){sum(data$calibratedP < x)/nrow(data)})
   
   catData <- data.frame(x = c(data$P,data$calibratedP),
                         y = c(data$Y,data$AdjustedY), 
@@ -210,8 +207,6 @@ plotCalibration <- function(logRr,seLogRr){
   breaks <- c(0,0.25,0.5,0.75,1) 
   theme <- ggplot2::element_text(colour="#000000", size=10) 
   themeRA <- ggplot2::element_text(colour="#000000", size=10,hjust=1) 
-  themeLA <- ggplot2::element_text(colour="#000000", size=10,hjust=0) 
-  with(catData, 
   ggplot2::ggplot(catData, ggplot2::aes(x=x,y=y,colour=`P-value calculation`,linetype=`P-value calculation`), environment=environment()) +
     ggplot2::geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
     ggplot2::geom_vline(xintercept=0.05, colour ="#888888", linetype="dashed", lw=1) +
@@ -232,7 +227,7 @@ plotCalibration <- function(logRr,seLogRr){
       strip.text.x = theme,
       strip.background = ggplot2::element_blank(),
       legend.position = "right"
-    ))
+    )
 }
 
 

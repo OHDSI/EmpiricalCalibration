@@ -19,5 +19,6 @@ Imports:
     MASS
 Suggests:
     knitr,
-    rmarkdown    
+    rmarkdown,
+    Hmisc
 License: Apache License

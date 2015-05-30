@@ -73,7 +73,7 @@ TempDataFetch <- function(){
   data <- loadData(method,analysisSourceID,HOI)
   data <- data[data$GROUND_TRUTH == 0 | data$DRUG_CONCEPT_ID == doi,]
   #require(Hmisc)
-  data$DRUG_CONCEPT_NAME <- capitalize(data$DRUG_CONCEPT_NAME)
+  data$DRUG_CONCEPT_NAME <- Hmisc::capitalize(data$DRUG_CONCEPT_NAME)
   data$DRUG_CONCEPT_NAME[data$DRUG_CONCEPT_NAME == "Sodium Phosphate, Monobasic"] <- "Sodium Phosphate"
   data <- data[!is.na(data$Z) & data$Z != 0 & !is.infinite(data$Z),]
   data <- data[,c("DRUG_CONCEPT_NAME","GROUND_TRUTH","LOGRR","SE")]
