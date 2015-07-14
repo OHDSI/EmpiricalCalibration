@@ -1,8 +1,8 @@
 # @file PackageMaintenance
 #
-# Copyright 2014 Observational Health Data Sciences and Informatics
+# Copyright 2015 Observational Health Data Sciences and Informatics
 #
-# This file is part of CohortMethod
+# This file is part of EmpiricalCalibration
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+.formatAndCheckCode <- function() {
+  OhdsiRTools::formatRFolder()
+  OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
+  OhdsiRTools::ohdsiLintrFolder()
+}
 
-.createManualAndVignettes <- function(){
+
+.createManualAndVignettes <- function() {
   shell("rm man/EmpiricalCalibration.pdf")
   shell("R CMD Rd2pdf ./ --output=man/EmpiricalCalibration.pdf")
-
-  rmarkdown::render("vignettes/EmpiricalCalibration.Rmd", rmarkdown::pdf_document(latex_engine = "pdflatex",toc = TRUE,number_sections = TRUE))
+  
+  rmarkdown::render("vignettes/EmpiricalCalibration.Rmd",
+                    output_file = "../inst/doc/EmpiricalCalibration.pdf",
+                    rmarkdown::pdf_document(latex_engine = "pdflatex",
+                                            toc = TRUE,
+                                            number_sections = TRUE))
 }

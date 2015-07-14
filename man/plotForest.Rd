@@ -10,7 +10,8 @@ plotForest(logRr, seLogRr, names, xLabel = "Relative risk")
 \item{logRr}{A numeric vector of effect estimates on the log scale}
 
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect estimate>))/qnorm(0.025)}
+error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+estimate>))/qnorm(0.025)}
 
 \item{names}{A vector containing the names of the drugs or outcomes}
 
@@ -23,12 +24,12 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 \code{plotForest} creates a forest plot of effect size estimates.
 }
 \details{
-Creates a forest plot of effect size estimates (ratios). Estimates that are significantly
-different from 1 (alpha = 0.05) are marked in orange, others are marked in blue.
+Creates a forest plot of effect size estimates (ratios). Estimates that are significantly different
+from 1 (alpha = 0.05) are marked in orange, others are marked in blue.
 }
 \examples{
 data(sccs)
-negatives <- sccs[sccs$groundTruth == 0,]
-plotForest(negatives$logRr,negatives$seLogRr, negatives$drugName)
+negatives <- sccs[sccs$groundTruth == 0, ]
+plotForest(negatives$logRr, negatives$seLogRr, negatives$drugName)
 }
 

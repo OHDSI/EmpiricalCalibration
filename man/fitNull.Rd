@@ -10,25 +10,27 @@ fitNull(logRr, seLogRr)
 \item{logRr}{A numeric vector of effect estimates on the log scale}
 
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect estimate>))/qnorm(0.025)}
+                 error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+                 estimate>))/qnorm(0.025)}
 }
 \value{
-An object of type \code{null} containing the mean and standard deviation (both on the log scale) of the
-null distribution.
+An object of type \code{null} containing the mean and standard deviation (both on the log scale) of
+the null distribution.
 }
 \description{
 \code{fitNull} fits the null distribution to a set of negative controls
 }
 \details{
-This function fits a Gaussian function to the negative control estimates as described in Schuemie et al (2014).
+This function fits a Gaussian function to the negative control estimates as described in Schuemie
+et al (2014).
 }
 \examples{
 data(sccs)
-negatives <- sccs[sccs$groundTruth == 0,]
-null <- fitNull(negatives$logRr,negatives$seLogRr)
+negatives <- sccs[sccs$groundTruth == 0, ]
+null <- fitNull(negatives$logRr, negatives$seLogRr)
 }
 \references{
-Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why empirical
-calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
+Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
+empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 }
 

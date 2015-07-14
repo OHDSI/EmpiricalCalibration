@@ -10,7 +10,8 @@ computeTraditionalP(logRr, seLogRr)
 \item{logRr}{A numeric vector of one or more effect estimates on the log scale}
 
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect estimate>))/qnorm(0.025)}
+                 error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+                 estimate>))/qnorm(0.025)}
 }
 \value{
 A two-sided (traditional) p-value.
@@ -21,7 +22,7 @@ relative risk and the standerd error of the log of the relative risk.
 }
 \examples{
 data(sccs)
-positive <- sccs[sccs$groundTruth == 1,]
+positive <- sccs[sccs$groundTruth == 1, ]
 computeTraditionalP(positive$logRr, positive$seLogRr)
 }
 

@@ -9,12 +9,15 @@ calibrateP(logRr, seLogRr, null, pValueConfidenceInterval = FALSE)
 \arguments{
 \item{logRr}{A numeric vector of one or more effect estimates on the log scale}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect estimate>))/qnorm(0.025)}
+\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often
+the standard error = (log(<lower bound 95 percent confidence
+interval>) - log(<effect estimate>))/qnorm(0.025)}
 
-\item{null}{An object of class \code{null} created using the \code{fitNull} function}
+\item{null}{An object of class \code{null} created using the \code{fitNull}
+function}
 
-\item{pValueConfidenceInterval}{If true, computes the 95 percent confidence interval of the calibrated p-value}
+\item{pValueConfidenceInterval}{If true, computes the 95 percent confidence interval of the
+                                  calibrated p-value}
 }
 \value{
 A two-sided calibrated p-value.
@@ -27,13 +30,13 @@ This function computes a calibrated two-sided p-value as described in Schuemie e
 }
 \examples{
 data(sccs)
-negatives <- sccs[sccs$groundTruth == 0,]
-null <- fitNull(negatives$logRr,negatives$seLogRr)
-positive <- sccs[sccs$groundTruth == 1,]
-calibrateP(positive$logRr,positive$seLogRr, null)
+negatives <- sccs[sccs$groundTruth == 0, ]
+null <- fitNull(negatives$logRr, negatives$seLogRr)
+positive <- sccs[sccs$groundTruth == 1, ]
+calibrateP(positive$logRr, positive$seLogRr, null)
 }
 \references{
-Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why empirical
-calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
+Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
+empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 }
 

@@ -1,8 +1,8 @@
 # @file Plots.R
 #
-# Copyright 2014 Observational Health Data Sciences and Informatics
+# Copyright 2015 Observational Health Data Sciences and Informatics
 #
-# This file is part of EmpiricalCalibration.R
+# This file is part of EmpiricalCalibration
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,80 +22,68 @@
 #' \code{plotForest} creates a forest plot of effect size estimates.
 #'
 #' @details
-#' Creates a forest plot of effect size estimates (ratios). Estimates that are significantly
-#' different from 1 (alpha = 0.05) are marked in orange, others are marked in blue.
-#' 
-#' 
+#' Creates a forest plot of effect size estimates (ratios). Estimates that are significantly different
+#' from 1 (alpha = 0.05) are marked in orange, others are marked in blue.
+#'
+#'
 #' @param logRr     A numeric vector of effect estimates on the log scale
-#' @param seLogRr  	The standard error of the log of the effect estimates. Hint: often the standard 
-#' error = (log(<lower bound 95 percent confidence interval>) - log(<effect estimate>))/qnorm(0.025) 
-#' @param names		  A vector containing the names of the drugs or outcomes
-#' @param xLabel  	The label on the x-axis: the name of the effect estimate
-#' 
-#' @return A Ggplot object. Use the \code{ggsave} function to save to file.
-#' 
-#' @examples 
+#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
+#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                  estimate>))/qnorm(0.025)
+#' @param names     A vector containing the names of the drugs or outcomes
+#' @param xLabel    The label on the x-axis: the name of the effect estimate
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
 #' data(sccs)
-#' negatives <- sccs[sccs$groundTruth == 0,]
-#' plotForest(negatives$logRr,negatives$seLogRr, negatives$drugName)
-#' 
+#' negatives <- sccs[sccs$groundTruth == 0, ]
+#' plotForest(negatives$logRr, negatives$seLogRr, negatives$drugName)
+#'
 #' @export
-plotForest <- function(logRr,seLogRr,names,xLabel="Relative risk"){
-  breaks <- c(0.25,0.5,1,2,4,6,8,10) 
-  theme <- ggplot2::element_text(colour="#000000", size=6) 
-  themeRA <- ggplot2::element_text(colour="#000000", size=5,hjust=1) 
-  col <- c(rgb(0,0,0.8,alpha=1),rgb(0.8,0.4,0,alpha=1))
-  colFill <- c(rgb(0,0,1,alpha=0.5),rgb(1,0.4,0,alpha=0.5))
-  data <- data.frame(DRUG_NAME = as.factor(names), 
-                     LOGRR = logRr, 
-                     LOGLB95RR = logRr + qnorm(0.025)*seLogRr,
-                     LOGUB95RR = logRr + qnorm(0.975)*seLogRr)
-  data$SIGNIFICANT <- data$LOGLB95RR > 0 | data$LOGUB95RR < 0 
-  data$DRUG_NAME<-factor(data$DRUG_NAME, levels=rev(levels(data$DRUG_NAME))) 
-  
-  ggplot2::ggplot(data, ggplot2::aes(x= DRUG_NAME , y=exp(LOGRR), ymin=exp(LOGLB95RR), ymax=exp(LOGUB95RR),colour=SIGNIFICANT, fill=SIGNIFICANT), environment=environment()) +
-    ggplot2::geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.2) +
-    ggplot2::geom_hline(yintercept=1, lw=0.5) + 
-    ggplot2::geom_pointrange(shape=23) +
-    ggplot2::scale_colour_manual(values=col) +
-    ggplot2::scale_fill_manual(values=colFill) +
-    ggplot2::coord_flip(ylim=c(0.25,10)) + 
-    ggplot2::scale_y_continuous(xLabel,trans="log10", breaks=breaks, labels = breaks) +
-    ggplot2:: theme(
-      panel.grid.minor = ggplot2::element_blank(),
-      panel.background= ggplot2::element_rect(fill="#FAFAFA", colour = NA),
-      panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"),
-      axis.ticks = ggplot2::element_blank(),
-      axis.title.y = ggplot2::element_blank(), 
-      axis.title.x = ggplot2::element_blank(), 
-      axis.text.y = themeRA,
-      axis.text.x = theme,
-      legend.key= ggplot2::element_blank(),
-      strip.text.x = theme,
-      strip.background = ggplot2::element_blank(),
-      legend.position = "none"
-    )
+plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk") {
+  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+  theme <- ggplot2::element_text(colour = "#000000", size = 6)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 5, hjust = 1)
+  col <- c(rgb(0, 0, 0.8, alpha = 1), rgb(0.8, 0.4, 0, alpha = 1))
+  colFill <- c(rgb(0, 0, 1, alpha = 0.5), rgb(1, 0.4, 0, alpha = 0.5))
+  data <- data.frame(DRUG_NAME = as.factor(names),
+                     logRr = logRr,
+                     logLb95Rr = logRr + qnorm(0.025) *
+    seLogRr, logUb95Rr = logRr + qnorm(0.975) * seLogRr)
+  data$significant <- data$logLb95Rr > 0 | data$logUb95Rr < 0
+  data$DRUG_NAME <- factor(data$DRUG_NAME, levels = rev(levels(data$DRUG_NAME)))
+
+  ggplot2::ggplot(data,
+                  ggplot2::aes(x = DRUG_NAME,
+                               y = exp(logRr),
+                               ymin = exp(logLb95Rr),
+                               ymax = exp(logUb95Rr),
+                               colour = significant,
+                               fill = significant),
+                  environment = environment()) + ggplot2::geom_hline(yintercept = breaks,
+                                                                     colour = "#AAAAAA",
+                                                                     lty = 1,
+                                                                     lw = 0.2) + ggplot2::geom_hline(yintercept = 1, lw = 0.5) + ggplot2::geom_pointrange(shape = 23) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_flip(ylim = c(0.25, 10)) + ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "none")
 }
 
-logRRtoSE <- function(logRR,p,null) {
-  sapply(logRR, function(logRR){
+logRrtoSE <- function(logRr, p, null) {
+  sapply(logRr, function(logRr) {
     precision <- 0.001
-    if (calibrateP(logRR,precision,null) > p)
+    if (calibrateP(logRr, precision, null) > p)
       return(0)
     L <- 0
     H <- 100
-    while (H>=L) { 
-      M=L+(H-L) / 2;
-      if	(calibrateP(logRR,M,null) - p > precision)
-        H<-M 
-      else if (p - calibrateP(logRR,M,null)  > precision)
-        L<-M 
-      else 
-        return(M)
+    while (H >= L) {
+      M <- L + (H - L)/2
+      if (calibrateP(logRr, M, null) - p > precision)
+        H <- M else if (p - calibrateP(logRr, M, null) > precision)
+        L <- M else return(M)
     }
-    return(L-1)
+    return(L - 1)
   })
-} 
+}
 
 #' Plot the effect of the calibration
 #'
@@ -103,59 +91,98 @@ logRRtoSE <- function(logRR,p,null) {
 #' \code{plotCalibrationEffect} creates a plot showing the effect of the calibration.
 #'
 #' @details
-#' Creates a plot with the effect estimate on the x-axis and the standard error on the y-axis. Negative
-#' controls are shown as blue dots, positive controls as yellow diamonds. The area below the dashed line
-#' indicated estimates with p < 0.05. The orange area indicates estimates with calibrated p < 0.05.
-#' 
-#' @param logRrNegatives     A numeric vector of effect estimates of the negative controls on the log scale
-#' @param seLogRrNegatives   The standard error of the log of the effect estimates of the negative controls
-#' @param logRrPositives     A numeric vector of effect estimates of the positive controls on the log scale
-#' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive controls
-#' @param null               An object representing the fitted null distribution as created by the \code{fitNull} function
-#' @param xLabel    The label on the x-axis: the name of the effect estimate
-#' 
-#' @return A Ggplot object. Use the \code{ggsave} function to save to file.
-#' 
-#' @examples 
+#' Creates a plot with the effect estimate on the x-axis and the standard error on the y-axis.
+#' Negative controls are shown as blue dots, positive controls as yellow diamonds. The area below the
+#' dashed line indicated estimates with p < 0.05. The orange area indicates estimates with calibrated
+#' p < 0.05.
+#'
+#' @param logRrNegatives     A numeric vector of effect estimates of the negative controls on the log
+#'                           scale.
+#' @param seLogRrNegatives   The standard error of the log of the effect estimates of the negative
+#'                           controls.
+#' @param logRrPositives     A numeric vector of effect estimates of the positive controls on the log
+#'                           scale.
+#' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive
+#'                           controls.
+#' @param null               An object representing the fitted null distribution as created by the
+#'                           \code{fitNull} function.
+#' @param xLabel             The label on the x-axis: the name of the effect estimate.
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
 #' data(sccs)
-#' negatives <- sccs[sccs$groundTruth == 0,]
-#' positive <- sccs[sccs$groundTruth == 1,]
-#' plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr)
-#' 
+#' negatives <- sccs[sccs$groundTruth == 0, ]
+#' positive <- sccs[sccs$groundTruth == 1, ]
+#' plotCalibrationEffect(negatives$logRr, negatives$seLogRr, positive$logRr, positive$seLogRr)
+#'
 #' @export
-plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositives, seLogRrPositives, null = NULL, xLabel="Relative risk"){
+plotCalibrationEffect <- function(logRrNegatives,
+                                  seLogRrNegatives,
+                                  logRrPositives,
+                                  seLogRrPositives,
+                                  null = NULL,
+                                  xLabel = "Relative risk") {
   if (is.null(null))
     null <- fitNull(logRrNegatives, seLogRrNegatives)
-  x <- exp(seq(log(0.25),log(10),by=0.01))
-  y <- logRRtoSE(log(x),0.05,null)
-  seTheoretical <- sapply(x,FUN=function(x){abs(log(x))/qnorm(0.975)})
-  breaks <- c(0.25,0.5,1,2,4,6,8,10) 
-  theme <- ggplot2::element_text(colour="#000000", size=12) 
-  themeRA <- ggplot2::element_text(colour="#000000", size=12,hjust=1) 
-  plot <- ggplot2::ggplot(data.frame(x,y,seTheoretical),ggplot2::aes(x=x,y=y), environment=environment())+
-    ggplot2::geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.5) +
-    ggplot2::geom_vline(xintercept=1, lw=1) + 			
-    ggplot2::geom_area(fill=rgb(1,0.5,0,alpha = 0.5),color=rgb(1,0.5,0),size=1,alpha=0.5) +
-    ggplot2::geom_area(ggplot2::aes(y=seTheoretical),fill=rgb(0,0,0),colour=rgb(0,0,0,alpha=0.1),alpha = 0.1)+
-    ggplot2::geom_line(ggplot2::aes(y=seTheoretical),colour=rgb(0,0,0), linetype="dashed", size=1,alpha=0.5)+
-    ggplot2::geom_point(shape=21,ggplot2::aes(x,y),data=data.frame(x=exp(logRrNegatives), y=seLogRrNegatives), size=2,fill=rgb(0,0,1,alpha=0.5),colour=rgb(0,0,0.8)) +
-    ggplot2::geom_hline(yintercept=0) +
-    ggplot2::scale_x_continuous(xLabel,trans="log10",limits = c(0.25,10), breaks=breaks,labels=breaks) + 
-    ggplot2::scale_y_continuous("Standard Error",limits = c(0,1.5)) +
-    ggplot2::theme(
-      panel.grid.minor = ggplot2::element_blank(),
-      panel.background= ggplot2::element_rect(fill="#FAFAFA", colour = NA),
-      panel.grid.major= ggplot2::element_blank(),
-      axis.ticks = ggplot2::element_blank(),
-      axis.text.y = themeRA,
-      axis.text.x = theme,
-      legend.key= ggplot2::element_blank(),
-      strip.text.x = theme,
-      strip.background = ggplot2::element_blank(),
-      legend.position = "none"
-    ) 
+  x <- exp(seq(log(0.25), log(10), by = 0.01))
+  y <- logRrtoSE(log(x), 0.05, null)
+  seTheoretical <- sapply(x, FUN = function(x) {
+    abs(log(x))/qnorm(0.975)
+  })
+  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+  theme <- ggplot2::element_text(colour = "#000000", size = 12)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
+  plot <- ggplot2::ggplot(data.frame(x, y, seTheoretical),
+                          ggplot2::aes(x = x, y = y),
+                          environment = environment()) +
+          ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, lw = 0.5) +
+          ggplot2::geom_vline(xintercept = 1, lw = 1) +
+          ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
+                             color = rgb(1, 0.5, 0),
+                             size = 1,
+                             alpha = 0.5) +
+          ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
+                             fill = rgb(0, 0, 0),
+                             colour = rgb(0, 0, 0, alpha = 0.1),
+                             alpha = 0.1) +
+          ggplot2::geom_line(ggplot2::aes(y = seTheoretical),
+                             colour = rgb(0, 0, 0),
+                             linetype = "dashed",
+                             size = 1,
+                             alpha = 0.5) +
+          ggplot2::geom_point(shape = 21,
+                              ggplot2::aes(x, y),
+                              data = data.frame(x = exp(logRrNegatives), y = seLogRrNegatives),
+                              size = 2,
+                              fill = rgb(0, 0, 1, alpha = 0.5),
+                              colour = rgb(0, 0, 0.8)) +
+          ggplot2::geom_hline(yintercept = 0) +
+          ggplot2::scale_x_continuous(xLabel,
+                                      trans = "log10",
+                                      limits = c(0.25, 10),
+                                      breaks = breaks,
+                                      labels = breaks) +
+          ggplot2::scale_y_continuous("Standard Error", limits = c(0, 1.5)) +
+          ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                         panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
+                         panel.grid.major = ggplot2::element_blank(),
+                         axis.ticks = ggplot2::element_blank(),
+                         axis.text.y = themeRA,
+                         axis.text.x = theme,
+                         legend.key = ggplot2::element_blank(),
+                         strip.text.x = theme,
+                         strip.background = ggplot2::element_blank(),
+                         legend.position = "none")
   if (!missing(logRrPositives))
-    plot = plot + ggplot2::geom_point(shape=23,ggplot2::aes(x,y),data=data.frame(x=exp(logRrPositives), y=seLogRrPositives), size=4,fill=rgb(1,1,0),alpha=0.8)
+    plot <- plot + ggplot2::geom_point(shape = 23,
+                                       ggplot2::aes(x, y),
+                                       data = data.frame(x = exp(logRrPositives),
+                                                         y = seLogRrPositives),
+                                       size = 4,
+                                       fill = rgb(1, 1, 0),
+                                       alpha = 0.8)
   return(plot)
 }
 
@@ -165,69 +192,173 @@ plotCalibrationEffect <- function(logRrNegatives, seLogRrNegatives, logRrPositiv
 #' \code{plotCalibration} creates a plot showing the calibration of our calibration procedure
 #'
 #' @details
-#' Creates a calibration plot showing the number of effects with p < alpha for every level of alpha. 
-#' The empirical calibration is performed using a leave-one-out design: The p-value of an effect is computed
-#' by fitting a null using all other negative controls. Ideally, the calibration line should approximate the 
-#' diagonal. The plot shows both theoretical (traditional) and empirically calibrated p-values.
-#' 
+#' Creates a calibration plot showing the number of effects with p < alpha for every level of alpha.
+#' The empirical calibration is performed using a leave-one-out design: The p-value of an effect is
+#' computed by fitting a null using all other negative controls. Ideally, the calibration line should
+#' approximate the diagonal. The plot shows both theoretical (traditional) and empirically calibrated
+#' p-values.
+#'
 #' @param logRr     A numeric vector of effect estimates on the log scale
-#' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard 
-#' error = (log(<lower bound 95 percent confidence interval>) - log(<effect estimate>))/qnorm(0.025) 
-#' 
-#' @return A Ggplot object. Use the \code{ggsave} function to save to file.
-#' 
-#' @examples 
+#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
+#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                  estimate>))/qnorm(0.025)
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
 #' data(sccs)
-#' negatives <- sccs[sccs$groundTruth == 0,]
-#' plotCalibration(negatives$logRr,negatives$seLogRr)
-#' 
+#' negatives <- sccs[sccs$groundTruth == 0, ]
+#' plotCalibration(negatives$logRr, negatives$seLogRr)
+#'
 #' @export
-plotCalibration <- function(logRr,seLogRr){
-  data <- data.frame(LOGRR = logRr, SE = seLogRr)
-  data$Z <- data$LOGRR / data$SE
-  data$P <- 2*pmin(pnorm(data$Z),1-pnorm(data$Z)) # 2-sided p-value   
-  data$Y <- sapply(data$P, function(x){sum(data$P < x)/nrow(data)})
-  
-  data$calibratedP <- vector(length=nrow(data))
-  for (i in 1:nrow(data)){
-    dataLeaveOneOut <- data[seq(1,nrow(data))!=i,]
-    null <- fitNull(dataLeaveOneOut$LOGRR, dataLeaveOneOut$SE)
-    data$calibratedP[i] = calibrateP(data$LOGRR[i],data$SE[i],null)
+plotCalibration <- function(logRr, seLogRr) {
+  data <- data.frame(logRr = logRr, SE = seLogRr)
+  data$Z <- data$logRr/data$SE
+  data$P <- 2 * pmin(pnorm(data$Z), 1 - pnorm(data$Z))  # 2-sided p-value
+  data$Y <- sapply(data$P, function(x) {
+    sum(data$P < x)/nrow(data)
+  })
+
+  data$calibratedP <- vector(length = nrow(data))
+  for (i in 1:nrow(data)) {
+    dataLeaveOneOut <- data[seq(1, nrow(data)) != i, ]
+    null <- fitNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)
+    data$calibratedP[i] <- calibrateP(data$logRr[i], data$SE[i], null)
   }
-  
-  data$AdjustedY <- sapply(data$calibratedP, function(x){sum(data$calibratedP < x)/nrow(data)})
-  
-  catData <- data.frame(x = c(data$P,data$calibratedP),
-                        y = c(data$Y,data$AdjustedY), 
-                        label = factor(c(rep("Theoretical",times=nrow(data)),rep("Empirical",times=nrow(data)))))
+
+  data$AdjustedY <- sapply(data$calibratedP, function(x) {
+    sum(data$calibratedP < x)/nrow(data)
+  })
+
+  catData <- data.frame(x = c(data$P, data$calibratedP),
+                        y = c(data$Y, data$AdjustedY),
+                        label = factor(c(rep("Theoretical", times = nrow(data)),
+                                         rep("Empirical", times = nrow(data)))))
   catData$label <- factor(catData$label, levels = c("Empirical", "Theoretical"))
-  
-  names(catData) <- c("x","y","P-value calculation")
-  
-  breaks <- c(0,0.25,0.5,0.75,1) 
-  theme <- ggplot2::element_text(colour="#000000", size=10) 
-  themeRA <- ggplot2::element_text(colour="#000000", size=10,hjust=1) 
-  ggplot2::ggplot(catData, ggplot2::aes(x=x,y=y,colour=`P-value calculation`,linetype=`P-value calculation`), environment=environment()) +
-    ggplot2::geom_vline(xintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
-    ggplot2::geom_vline(xintercept=0.05, colour ="#888888", linetype="dashed", lw=1) +
-    ggplot2::geom_hline(yintercept=breaks, colour ="#AAAAAA", lty=1, lw=0.3) +
-    ggplot2::geom_abline(colour ="#AAAAAA", lty=1, lw=0.3) + 
-    ggplot2::geom_step(direction="hv", size=1) +
-    ggplot2::scale_colour_manual(values=c(rgb(0,0,0),rgb(0,0,0),rgb(0.5,0.5,0.5))) +
-    ggplot2::scale_linetype_manual(values=c("solid","twodash")) +
-    ggplot2::scale_x_continuous("Alpha",limits = c(0,1), breaks=c(breaks,0.05),labels=c("",".25",".50",".75","1",".05")) + 
-    ggplot2::scale_y_continuous("Fraction with p < alpha",limits = c(0,1), breaks=breaks,labels=c("0",".25",".50",".75","1")) +
-    ggplot2::theme(
-      panel.grid.minor = ggplot2::element_blank(),
-      panel.background= ggplot2::element_rect(fill="#FAFAFA", colour = NA),
-      panel.grid.major= ggplot2::element_blank(),
-      axis.ticks = ggplot2::element_blank(),
-      axis.text.y = themeRA,
-      axis.text.x = theme,
-      strip.text.x = theme,
-      strip.background = ggplot2::element_blank(),
-      legend.position = "right"
-    )
+
+  names(catData) <- c("x", "y", "P-value calculation")
+
+  breaks <- c(0, 0.25, 0.5, 0.75, 1)
+  theme <- ggplot2::element_text(colour = "#000000", size = 10)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
+  ggplot2::ggplot(catData,
+                  ggplot2::aes(x = x,
+                               y = y,
+                               colour = `P-value calculation`,
+                               linetype = `P-value calculation`),
+                  environment = environment()) + ggplot2::geom_vline(xintercept = breaks,
+                                                                     colour = "#AAAAAA",
+                                                                     lty = 1,
+                                                                     lw = 0.3) + ggplot2::geom_vline(xintercept = 0.05, colour = "#888888", linetype = "dashed", lw = 1) + ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, lw = 0.3) + ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, lw = 0.3) + ggplot2::geom_step(direction = "hv", size = 1) + ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + ggplot2::scale_x_continuous("Alpha", limits = c(0, 1), breaks = c(breaks, 0.05), labels = c("", ".25", ".50", ".75", "1", ".05")) + ggplot2::scale_y_continuous("Fraction with p < alpha", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "right")
 }
 
+#' Plot true and observed values
+#'
+#' @description
+#' Plot true and observed values, for example from a simulation study.
+#'
+#' @details
+#' Creates a forest plot of effect size estimates (ratios). Estimates that are significantly different
+#' from the true value (alpha = 0.05) are marked in orange, others are marked in blue.
+#'
+#' @param logRr       A numeric vector of effect estimates on the log scale.
+#' @param seLogRr     The standard error of the log of the effect estimates. Hint: often the standard
+#'                    error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                    estimate>))/qnorm(0.025).
+#' @param trueLogRr   A vector of the true effect sizes.
+#' @param xLabel      The label on the x-axis: the name of the effect estimate.
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
+#' plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
+#'
+#' @export
+plotTrueAndObserved <- function(logRr, seLogRr, trueLogRr, xLabel = "Relative risk") {
+  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+  theme <- ggplot2::element_text(colour = "#000000", size = 6)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 5, hjust = 1)
+  col <- c(rgb(0, 0, 0.8, alpha = 1), rgb(0.8, 0.4, 0, alpha = 1))
+  colFill <- c(rgb(0, 0, 1, alpha = 0.5), rgb(1, 0.4, 0, alpha = 0.5))
+  data <- data.frame(logRr = logRr,
+                     logLb95Rr = logRr + qnorm(0.025) * seLogRr,
+                     logUb95Rr = logRr + qnorm(0.975) * seLogRr,
+                     trueLogRr = trueLogRr,
+                     trueRr = round(exp(trueLogRr), 2))
+  data$significant <- data$logLb95Rr > data$trueLogRr | data$logUb95Rr < data$trueLogRr
+  data <- data[order(data$trueLogRr, data$logRr), ]
+  data$order <- 1:nrow(data)
+  coverage <- aggregate(!significant ~ trueRr, data = data, mean)
+  names(coverage)[2] <- "coverage"
 
+  ggplot2::ggplot(data,
+                  ggplot2::aes(x = exp(logRr),
+                               y = order,
+                               xmin = exp(logLb95Rr),
+                               xmax = exp(logUb95Rr),
+                               colour = significant,
+                               fill = significant),
+                  environment = environment()) + ggplot2::geom_vline(yintercept = breaks,
+                                                                     colour = "#AAAAAA",
+                                                                     lty = 1,
+                                                                     lw = 0.2) + ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), lw = 1) + ggplot2::geom_errorbarh(height = 0) + ggplot2::geom_point(shape = 21, size = 1.5) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_cartesian(xlim = c(0.25, 10)) + ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank(), axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.y = ggplot2::element_blank(), strip.background = ggplot2::element_blank(), legend.position = "none")
+}
+
+#' Plot the coverage
+#'
+#' @details
+#' Plot the fractions of estimates where the true effect size is below, above or within the confidence
+#' interval, for one or more true effect sizes.
+#'
+#' @param logRr       A numeric vector of effect estimates on the log scale
+#' @param seLogRr     The standard error of the log of the effect estimates. Hint: often the standard
+#'                    error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                    estimate>))/qnorm(0.025)
+#' @param trueLogRr   A vector of the true effect sizes
+#' @param region      Size of the confidence interval. Default is .95 (95 percent).
+#'
+#' @examples
+#' data <- simulateControls(n = 50 * 3, mean = 0, sd = 0.15, trueLogRr = log(c(1, 2, 4)))
+#' plotCoverage(data$logRr, data$seLogRr, data$trueLogRr)
+#'
+#' @export
+plotCoverage <- function(logRr, seLogRr, trueLogRr, region = 0.95) {
+  data <- data.frame(logRr = logRr,
+                     logLb95Rr = logRr + qnorm((1 - region)/2) * seLogRr,
+                     logUb95Rr = logRr + qnorm(1 - (1 - region)/2) * seLogRr,
+                     trueLogRr = trueLogRr,
+                     trueRr = round(exp(trueLogRr), 2))
+  vizD <- data.frame()
+  for (trueRr in unique(data$trueRr)) {
+    subset <- data[data$trueRr == trueRr, ]
+    d <- data.frame(trueRr = trueRr, group = c("Below CI",
+                                               "Within CI",
+                                               "Above CI"), fraction = 0, pos = 0)
+    d$fraction[1] <- mean(subset$trueLogRr < subset$logLb95Rr)
+    d$fraction[2] <- mean(subset$trueLogRr >= subset$logLb95Rr & subset$trueLogRr < subset$logUb95Rr)
+    d$fraction[3] <- mean(subset$trueLogRr > subset$logUb95Rr)
+    d$pos[1] <- d$fraction[1]/2
+    d$pos[2] <- d$fraction[1] + (d$fraction[2]/2)
+    d$pos[3] <- d$fraction[1] + d$fraction[2] + (d$fraction[3]/2)
+    vizD <- rbind(vizD, d)
+  }
+  vizD$pos <- sapply(vizD$pos, function(x) {
+    max(x, 0.05)
+  })
+  vizD$label <- paste(round(100 * d$fraction), "%", sep = "")
+  vizD$group <- factor(vizD$group, levels = c("Below CI", "Within CI", "Above CI"))
+  theme <- ggplot2::element_text(colour = "#000000", size = 10)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
+  themeLA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 0)
+  ggplot2::ggplot(vizD, ggplot2::aes(x = as.factor(trueRr),
+                                     y = fraction)) + ggplot2::geom_bar(ggplot2::aes(fill = group),
+                                                                                               stat = "identity",
+                                                                                               position = "stack",
+                                                                                               alpha = 0.8) + ggplot2::scale_fill_manual(values = c("#174a9f",
+                                                                                                                                                    "#f9dd75",
+                                                                                                                                                    "#f15222")) + ggplot2::geom_text(ggplot2::aes(label = label, y = pos), size = 3) + # ggplot2::coord_flip() +
+  ggplot2::scale_x_discrete("True relative risk") + ggplot2::scale_y_continuous("Coverage") + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank(), axis.text.x = theme, legend.key = ggplot2::element_blank(), legend.position = "right")
+}

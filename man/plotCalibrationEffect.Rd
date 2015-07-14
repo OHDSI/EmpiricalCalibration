@@ -8,17 +8,22 @@ plotCalibrationEffect(logRrNegatives, seLogRrNegatives, logRrPositives,
   seLogRrPositives, null = NULL, xLabel = "Relative risk")
 }
 \arguments{
-\item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log scale}
+\item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log
+scale.}
 
-\item{seLogRrNegatives}{The standard error of the log of the effect estimates of the negative controls}
+\item{seLogRrNegatives}{The standard error of the log of the effect estimates of the negative
+controls.}
 
-\item{logRrPositives}{A numeric vector of effect estimates of the positive controls on the log scale}
+\item{logRrPositives}{A numeric vector of effect estimates of the positive controls on the log
+scale.}
 
-\item{seLogRrPositives}{The standard error of the log of the effect estimates of the positive controls}
+\item{seLogRrPositives}{The standard error of the log of the effect estimates of the positive
+controls.}
 
-\item{null}{An object representing the fitted null distribution as created by the \code{fitNull} function}
+\item{null}{An object representing the fitted null distribution as created by the
+\code{fitNull} function.}
 
-\item{xLabel}{The label on the x-axis: the name of the effect estimate}
+\item{xLabel}{The label on the x-axis: the name of the effect estimate.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -27,14 +32,15 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 \code{plotCalibrationEffect} creates a plot showing the effect of the calibration.
 }
 \details{
-Creates a plot with the effect estimate on the x-axis and the standard error on the y-axis. Negative
-controls are shown as blue dots, positive controls as yellow diamonds. The area below the dashed line
-indicated estimates with p < 0.05. The orange area indicates estimates with calibrated p < 0.05.
+Creates a plot with the effect estimate on the x-axis and the standard error on the y-axis.
+Negative controls are shown as blue dots, positive controls as yellow diamonds. The area below the
+dashed line indicated estimates with p < 0.05. The orange area indicates estimates with calibrated
+p < 0.05.
 }
 \examples{
 data(sccs)
-negatives <- sccs[sccs$groundTruth == 0,]
-positive <- sccs[sccs$groundTruth == 1,]
-plotCalibrationEffect(negatives$logRr,negatives$seLogRr,positive$logRr,positive$seLogRr)
+negatives <- sccs[sccs$groundTruth == 0, ]
+positive <- sccs[sccs$groundTruth == 1, ]
+plotCalibrationEffect(negatives$logRr, negatives$seLogRr, positive$logRr, positive$seLogRr)
 }
 
