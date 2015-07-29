@@ -46,6 +46,12 @@
 #'
 #' @export
 fitNull <- function(logRr, seLogRr) {
+  if (any(is.infinite(seLogRr))){
+    warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
+    logRr <- logRr[!is.infinite(seLogRr)]
+    seLogRr <- seLogRr[!is.infinite(seLogRr)]
+  }
+  
 
   gaussianProduct <- function(mu1, mu2, sd1, sd2) {
     (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
@@ -76,7 +82,7 @@ fitNull <- function(logRr, seLogRr) {
     prop_sigma[2]))
   attr(null, "CovarianceMatrix") <- fisher_info
   class(null) <- "null"
-  null
+  return(null)
 }
 
 #' @export
