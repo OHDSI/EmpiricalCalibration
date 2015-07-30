@@ -4,7 +4,8 @@
 \alias{plotTrueAndObserved}
 \title{Plot true and observed values}
 \usage{
-plotTrueAndObserved(logRr, seLogRr, trueLogRr, xLabel = "Relative risk")
+plotTrueAndObserved(logRr, seLogRr, trueLogRr, xLabel = "Relative risk",
+  fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -16,6 +17,10 @@ estimate>))/qnorm(0.025).}
 \item{trueLogRr}{A vector of the true effect sizes.}
 
 \item{xLabel}{The label on the x-axis: the name of the effect estimate.}
+
+\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
+                        the function \code{ggsave} in the ggplot2 package for supported file
+                        formats.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.

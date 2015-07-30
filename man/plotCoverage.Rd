@@ -4,7 +4,7 @@
 \alias{plotCoverage}
 \title{Plot the coverage}
 \usage{
-plotCoverage(logRr, seLogRr, trueLogRr, region = 0.95)
+plotCoverage(logRr, seLogRr, trueLogRr, region = 0.95, fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale}
@@ -16,6 +16,10 @@ estimate>))/qnorm(0.025)}
 \item{trueLogRr}{A vector of the true effect sizes}
 
 \item{region}{Size of the confidence interval. Default is .95 (95 percent).}
+
+\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
+                        the function \code{ggsave} in the ggplot2 package for supported file
+                        formats.}
 }
 \description{
 Plot the coverage
