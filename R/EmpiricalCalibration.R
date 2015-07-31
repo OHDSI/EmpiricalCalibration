@@ -94,7 +94,6 @@ print.null <- function(x, ...) {
   printCoefmat(output)
 }
 
-
 #' Calibrate the p-value
 #'
 #' @description
@@ -108,7 +107,8 @@ print.null <- function(x, ...) {
 #'                                   the standard error = (log(<lower bound 95 percent confidence
 #'                                   interval>) - log(<effect estimate>))/qnorm(0.025)
 #' @param null                       An object of class \code{null} created using the \code{fitNull}
-#'                                   function
+#'                                   function or an object of class \code{mcmcNull} created using the 
+#'                                   \code{fitMcmcNull} function
 #' @param pValueConfidenceInterval   If true, computes the 95 percent confidence interval of the
 #'                                   calibrated p-value
 #'
@@ -120,14 +120,20 @@ print.null <- function(x, ...) {
 #' negatives <- sccs[sccs$groundTruth == 0, ]
 #' null <- fitNull(negatives$logRr, negatives$seLogRr)
 #' positive <- sccs[sccs$groundTruth == 1, ]
-#' calibrateP(positive$logRr, positive$seLogRr, null)
+#' calibrateP(null, positive$logRr, positive$seLogRr)
 #'
 #' @references
 #' Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
 #' empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 #'
 #' @export
-calibrateP <- function(logRr, seLogRr, null, pValueConfidenceInterval = FALSE) {
+calibrateP <- function(null, logRr, seLogRr, pValueConfidenceInterval = FALSE) {
+  UseMethod("calibrateP")
+}
+
+
+#' @export
+calibrateP.null <- function(null, logRr, seLogRr, pValueConfidenceInterval = FALSE) {
 
   oneAdjustedP <- function(logRR, se, null) {
     P_upper_bound <- pnorm((null[1] - logRR)/sqrt(null[2]^2 + se^2))

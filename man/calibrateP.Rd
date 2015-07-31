@@ -4,17 +4,18 @@
 \alias{calibrateP}
 \title{Calibrate the p-value}
 \usage{
-calibrateP(logRr, seLogRr, null, pValueConfidenceInterval = FALSE)
+calibrateP(null, logRr, seLogRr, pValueConfidenceInterval = FALSE)
 }
 \arguments{
+\item{null}{An object of class \code{null} created using the \code{fitNull}
+function or an object of class \code{mcmcNull} created using the
+\code{fitMcmcNull} function}
+
 \item{logRr}{A numeric vector of one or more effect estimates on the log scale}
 
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often
 the standard error = (log(<lower bound 95 percent confidence
 interval>) - log(<effect estimate>))/qnorm(0.025)}
-
-\item{null}{An object of class \code{null} created using the \code{fitNull}
-function}
 
 \item{pValueConfidenceInterval}{If true, computes the 95 percent confidence interval of the
                                   calibrated p-value}
@@ -33,7 +34,7 @@ data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
 null <- fitNull(negatives$logRr, negatives$seLogRr)
 positive <- sccs[sccs$groundTruth == 1, ]
-calibrateP(positive$logRr, positive$seLogRr, null)
+calibrateP(null, positive$logRr, positive$seLogRr)
 }
 \references{
 Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why

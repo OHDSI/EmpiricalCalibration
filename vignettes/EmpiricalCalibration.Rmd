@@ -101,7 +101,7 @@ In this graph, the blue dots represent the negative controls. Any estimates belo
 
 We can now use the estimated null distribution to compute the calibrated p-value for our drug of interest:
 ```{r}
-p <- calibrateP(drugOfInterest$logRr, drugOfInterest$seLogRr, null, TRUE)
+p <- calibrateP(null, drugOfInterest$logRr, drugOfInterest$seLogRr, TRUE)
 p
 ```
 

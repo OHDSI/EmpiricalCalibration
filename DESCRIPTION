@@ -2,8 +2,8 @@ Package: EmpiricalCalibration
 Type: Package
 Title: Routines for performing empirical calibration of observational study
     estimates
-Version: 1.0.1
-Date: 2015-07-13
+Version: 1.1.0
+Date: 2015-08-01
 Author: Martijn Schuemie, Marc Suchard
 Maintainer: Martijn Schuemie <schuemie@ohdsi.org>
 Description: Routines for performing empirical calibration of observational

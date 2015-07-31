@@ -4,7 +4,7 @@
 \alias{plotCalibration}
 \title{Create a calibration plot}
 \usage{
-plotCalibration(logRr, seLogRr, fileName = NULL)
+plotCalibration(logRr, seLogRr, fileName = NULL, useMcmc = FALSE)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale}

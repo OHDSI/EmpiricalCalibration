@@ -77,14 +77,14 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", fileName
 logRrtoSE <- function(logRr, p, null) {
   sapply(logRr, function(logRr) {
     precision <- 0.001
-    if (calibrateP(logRr, precision, null) > p)
+    if (calibrateP(null, logRr, precision) > p)
       return(0)
     L <- 0
     H <- 100
     while (H >= L) {
       M <- L + (H - L)/2
-      if (calibrateP(logRr, M, null) - p > precision)
-        H <- M else if (p - calibrateP(logRr, M, null) > precision)
+      if (calibrateP(null, logRr, M) - p > precision)
+        H <- M else if (p - calibrateP(null, logRr, M) > precision)
         L <- M else return(M)
     }
     return(L - 1)
@@ -227,7 +227,7 @@ plotCalibrationEffect <- function(logRrNegatives,
 #' plotCalibration(negatives$logRr, negatives$seLogRr)
 #'
 #' @export
-plotCalibration <- function(logRr, seLogRr, fileName = NULL) {
+plotCalibration <- function(logRr, seLogRr, fileName = NULL, useMcmc = FALSE) {
   data <- data.frame(logRr = logRr, SE = seLogRr)
   data$Z <- data$logRr/data$SE
   data$P <- 2 * pmin(pnorm(data$Z), 1 - pnorm(data$Z))  # 2-sided p-value
@@ -238,10 +238,13 @@ plotCalibration <- function(logRr, seLogRr, fileName = NULL) {
   data$calibratedP <- vector(length = nrow(data))
   for (i in 1:nrow(data)) {
     dataLeaveOneOut <- data[seq(1, nrow(data)) != i, ]
-    null <- fitNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)
-    data$calibratedP[i] <- calibrateP(data$logRr[i], data$SE[i], null)
+    if (useMcmc){
+      null <- fitMcmcNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)
+    } else {
+      null <- fitNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)  
+    }
+    data$calibratedP[i] <- calibrateP(null, data$logRr[i], data$SE[i])
   }
-
   data$AdjustedY <- sapply(data$calibratedP, function(x) {
     sum(data$calibratedP < x)/nrow(data)
   })
@@ -400,6 +403,39 @@ plotCoverage <- function(logRr, seLogRr, trueLogRr, region = 0.95, fileName = NU
                    axis.text.x = theme, 
                    legend.key = ggplot2::element_blank(), 
                    legend.position = "right")
+  if (!is.null(fileName))
+    ggplot2::ggsave(fileName, plot, width = 5, height = 3.5, dpi = 400)
+  return(plot)
+}
+
+
+#' Plot the MCMC trace
+#'
+#' @details
+#' Plot the trace of the MCMC for diagnostics purposes.
+#'
+#' @param mcmcNull         An object of type \code{mcmcNull} as generated using the \code{fitMcmcNull} function.
+#' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
+#'                         the function \code{ggsave} in the ggplot2 package for supported file
+#'                         formats.
+#'                         
+#' @examples
+#' data(sccs)
+#' negatives <- sccs[sccs$groundTruth == 0, ]
+#' null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
+#' plotMcmcTrace(null)
+#'
+#' @export
+plotMcmcTrace <- function(mcmcNull, fileName = NULL){
+  mcmc <- attr(mcmcNull, "mcmc")
+  dataMean <- data.frame(x = 1:nrow(mcmc$chain), trace = as.numeric(ts(mcmc$chain[, 1])), var = "Mean")
+  dataPrecision <- data.frame(x = 1:nrow(mcmc$chain), trace = as.numeric(ts(mcmc$chain[, 2])), var = "Precision")
+  data <- rbind(dataMean, dataPrecision)
+  plot <- ggplot2::ggplot(data, ggplot2::aes(x = x, y = trace)) + 
+    ggplot2::geom_line(alpha = 0.7) + 
+    ggplot2::scale_x_continuous("Iterations") + 
+    ggplot2::facet_grid(var~., scales = "free") +
+    ggplot2::theme(axis.title.y = ggplot2::element_blank())
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 3.5, dpi = 400)
   return(plot)
