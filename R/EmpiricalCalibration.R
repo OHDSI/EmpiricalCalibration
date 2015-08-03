@@ -67,7 +67,7 @@ fitNull <- function(logRr, seLogRr) {
     result
   }
   theta <- c(0, 0)
-  fit <- optim(theta, LL, estimate = logRr, se = seLogRr, hessian = TRUE)
+  fit <- optim(theta, LL, estimate = logRr, se = seLogRr)
   #   fisher_info <- solve(fit$hessian)
   #   prop_sigma <- sqrt(diag(fisher_info))
   null <- fit$par

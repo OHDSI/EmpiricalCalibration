@@ -71,7 +71,7 @@ logLikelihood <- function(theta, estimate, se) {
     result <- -99999
   }
   # Add weak prior for when precision becomes very large:
-  result <- result + dgamma(theta[2], shape = 0.001, rate = 0.001, log = TRUE)
+  result <- result + dgamma(theta[2], shape = 0.0001, rate = 0.0001, log = TRUE)
   return(-result)
 }
 
@@ -101,7 +101,7 @@ binarySearchSigma <- function(modeMu, modeSigma, alpha = 0.1, logRrNegatives = l
   q <- qchisq(1-alpha, 1)/2
   llMode <- -logLikelihood(c(modeMu, modeSigma), estimate = logRrNegatives, se = seLogRrNegatives)
   L <- modeSigma
-  for (i in 1:10) {
+  for (i in 1:100) {
     H <- modeSigma + exp(i)
     llM <- -logLikelihood(c(modeMu, H), estimate = logRrNegatives, se = seLogRrNegatives)
     metric <- llMode - llM - q
@@ -109,7 +109,6 @@ binarySearchSigma <- function(modeMu, modeSigma, alpha = 0.1, logRrNegatives = l
       break 
     }
   }
-  #H <- 1500
   while (H >= L) {
     M <- L + (H - L)/2
     llM <- -logLikelihood(c(modeMu, M), estimate = logRrNegatives, se = seLogRrNegatives)
@@ -159,6 +158,11 @@ binarySearchSigma <- function(modeMu, modeSigma, alpha = 0.1, logRrNegatives = l
 fitMcmcNull <- function(logRr,
                         seLogRr,
                         iter = 10000) {
+  if (any(is.infinite(seLogRr))){
+    warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
+    logRr <- logRr[!is.infinite(seLogRr)]
+    seLogRr <- seLogRr[!is.infinite(seLogRr)]
+  }
   fit <- optim(c(0, 0.1), logLikelihood, estimate = logRr, se = seLogRr)
   
   # Profile likelihood for roughly correct scale:
