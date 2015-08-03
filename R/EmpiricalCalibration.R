@@ -32,13 +32,13 @@
 #'                  estimate>))/qnorm(0.025)
 #'
 #' @return
-#' An object of type \code{null} containing the mean and standard deviation (both on the log scale) of
-#' the null distribution.
+#' An object containing the parameters of the null distribution.
 #'
 #' @examples
 #' data(sccs)
 #' negatives <- sccs[sccs$groundTruth == 0, ]
 #' null <- fitNull(negatives$logRr, negatives$seLogRr)
+#' null
 #'
 #' @references
 #' Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
@@ -52,35 +52,34 @@ fitNull <- function(logRr, seLogRr) {
     seLogRr <- seLogRr[!is.infinite(seLogRr)]
   }
   
-
+  
   gaussianProduct <- function(mu1, mu2, sd1, sd2) {
     (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
   }
-
+  
   LL <- function(theta, estimate, se) {
     result <- 0
-    for (i in 1:length(estimate)) result <- result - log(gaussianProduct(estimate[i],
-                                                                         theta[1],
-                                                                         se[i],
-                                                                         exp(theta[2])))
+    for (i in 1:length(estimate)) {
+      result <- result - log(gaussianProduct(estimate[i], theta[1], se[i], exp(theta[2])))
+    }
     if (is.infinite(result))
       result <- 99999
     result
   }
   theta <- c(0, 0)
   fit <- optim(theta, LL, estimate = logRr, se = seLogRr, hessian = TRUE)
-  fisher_info <- solve(fit$hessian)
-  prop_sigma <- sqrt(diag(fisher_info))
+  #   fisher_info <- solve(fit$hessian)
+  #   prop_sigma <- sqrt(diag(fisher_info))
   null <- fit$par
   null[2] <- exp(null[2])
   names(null) <- c("mean", "sd")
-  attr(null,
-       "LB95CI") <- c(fit$par[1] + qnorm(0.025) * prop_sigma[1], exp(fit$par[2] + qnorm(0.025) *
-    prop_sigma[2]))
-  attr(null,
-       "UB95CI") <- c(fit$par[1] + qnorm(0.975) * prop_sigma[1], exp(fit$par[2] + qnorm(0.975) *
-    prop_sigma[2]))
-  attr(null, "CovarianceMatrix") <- fisher_info
+  #   attr(null,
+  #        "LB95CI") <- c(fit$par[1] + qnorm(0.025) * prop_sigma[1], exp(fit$par[2] + qnorm(0.025) *
+  #                                                                        prop_sigma[2]))
+  #   attr(null,
+  #        "UB95CI") <- c(fit$par[1] + qnorm(0.975) * prop_sigma[1], exp(fit$par[2] + qnorm(0.975) *
+  #                                                                        prop_sigma[2]))
+  #   attr(null, "CovarianceMatrix") <- fisher_info
   class(null) <- "null"
   return(null)
 }
@@ -88,10 +87,15 @@ fitNull <- function(logRr, seLogRr) {
 #' @export
 print.null <- function(x, ...) {
   writeLines("Estimated null distribution\n")
-  output <- data.frame(Estimate = c(x[1], x[2]), lb95 = attr(x, "LB95CI"), ub95 = attr(x, "UB95CI"))
-  colnames(output) <- c("Estimate", "lower .95", "upper .95")
+  #   output <- data.frame(Estimate = c(x[1], x[2]), lb95 = attr(x, "LB95CI"), ub95 = attr(x, "UB95CI"))
+  #   colnames(output) <- c("Estimate", "lower .95", "upper .95")
+  #   rownames(output) <- c("Mean", "SD")
+  #   printCoefmat(output)
+  output <- data.frame(Estimate = c(x[1], x[2]))
+  colnames(output) <- c("Estimate")
   rownames(output) <- c("Mean", "SD")
   printCoefmat(output)
+  
 }
 
 #' Calibrate the p-value
@@ -108,12 +112,11 @@ print.null <- function(x, ...) {
 #'                                   interval>) - log(<effect estimate>))/qnorm(0.025)
 #' @param null                       An object of class \code{null} created using the \code{fitNull}
 #'                                   function or an object of class \code{mcmcNull} created using the 
-#'                                   \code{fitMcmcNull} function
-#' @param pValueConfidenceInterval   If true, computes the 95 percent confidence interval of the
-#'                                   calibrated p-value
+#'                                   \code{fitMcmcNull} function.
+#' @param ...                        Any additional parameters (currently none).
 #'
 #' @return
-#' A two-sided calibrated p-value.
+#' The two-sided calibrated p-value.
 #'
 #' @examples
 #' data(sccs)
@@ -127,39 +130,42 @@ print.null <- function(x, ...) {
 #' empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 #'
 #' @export
-calibrateP <- function(null, logRr, seLogRr, pValueConfidenceInterval = FALSE) {
+calibrateP <- function(null, logRr, seLogRr, ...) {
   UseMethod("calibrateP")
 }
 
 
+#' @describeIn calibrateP Computes the calibrated P-value using asymptotic assumptions.
 #' @export
-calibrateP.null <- function(null, logRr, seLogRr, pValueConfidenceInterval = FALSE) {
-
+calibrateP.null <- function(null, logRr, seLogRr, ...) {
+  
   oneAdjustedP <- function(logRR, se, null) {
     P_upper_bound <- pnorm((null[1] - logRR)/sqrt(null[2]^2 + se^2))
     P_lower_bound <- pnorm((logRR - null[1])/sqrt(null[2]^2 + se^2))
     2 * min(P_upper_bound, P_lower_bound)
   }
-
+  
   adjustedP <- vector(length = length(logRr))
-  for (i in 1:length(logRr)) adjustedP[i] <- oneAdjustedP(logRr[i], seLogRr[i], null)
-
-  if (pValueConfidenceInterval) {
-    adjustedP <- data.frame(p = adjustedP, lb95ci = 0, ub95ci = 0)
-    rand <- MASS::mvrnorm(10000, c(null[1], log(null[2])), attr(null, "CovarianceMatrix"))
-    for (i in 1:length(logRr)) {
-      P_upper_bound <- pnorm((rand[, 1] - logRr[i])/sqrt(exp(rand[, 2])^2 + seLogRr[i]^2))
-      P_lower_bound <- pnorm((logRr[i] - rand[, 1])/sqrt(exp(rand[, 2])^2 + seLogRr[i]^2))
-      # Take min:
-      p <- P_upper_bound
-      p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
-      p <- p * 2
-
-      adjustedP$lb95ci[i] <- quantile(p, 0.025)
-      adjustedP$ub95ci[i] <- quantile(p, 0.975)
-    }
+  for (i in 1:length(logRr)) {
+    adjustedP[i] <- oneAdjustedP(logRr[i], seLogRr[i], null)
   }
-  adjustedP
+  
+  #   if (pValueConfidenceInterval) {
+  #     adjustedP <- data.frame(p = adjustedP, lb95ci = 0, ub95ci = 0)
+  #     rand <- MASS::mvrnorm(10000, c(null[1], log(null[2])), attr(null, "CovarianceMatrix"))
+  #     for (i in 1:length(logRr)) {
+  #       P_upper_bound <- pnorm((rand[, 1] - logRr[i])/sqrt(exp(rand[, 2])^2 + seLogRr[i]^2))
+  #       P_lower_bound <- pnorm((logRr[i] - rand[, 1])/sqrt(exp(rand[, 2])^2 + seLogRr[i]^2))
+  #       # Take min:
+  #       p <- P_upper_bound
+  #       p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
+  #       p <- p * 2
+  #       
+  #       adjustedP$lb95ci[i] <- quantile(p, 0.025)
+  #       adjustedP$ub95ci[i] <- quantile(p, 0.975)
+  #     }
+  #   }
+  return(adjustedP)
 }
 
 #' Compute the (traditional) p-value
@@ -174,7 +180,7 @@ calibrateP.null <- function(null, logRr, seLogRr, pValueConfidenceInterval = FAL
 #'                  estimate>))/qnorm(0.025)
 #'
 #' @return
-#' A two-sided (traditional) p-value.
+#' The two-sided (traditional) p-value.
 #'
 #' @examples
 #' data(sccs)
@@ -184,5 +190,5 @@ calibrateP.null <- function(null, logRr, seLogRr, pValueConfidenceInterval = FAL
 #' @export
 computeTraditionalP <- function(logRr, seLogRr) {
   z <- logRr/seLogRr
-  return(2 * pmin(pnorm(z), 1 - pnorm(z)))  # 2-sided p-value
+  return(2 * pmin(pnorm(z), 1 - pnorm(z))) # 2-sided p-value
 }

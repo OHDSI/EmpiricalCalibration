@@ -4,7 +4,7 @@
 \alias{plotCalibration}
 \title{Create a calibration plot}
 \usage{
-plotCalibration(logRr, seLogRr, fileName = NULL, useMcmc = FALSE)
+plotCalibration(logRr, seLogRr, useMcmc = FALSE, fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale}
@@ -12,6 +12,8 @@ plotCalibration(logRr, seLogRr, fileName = NULL, useMcmc = FALSE)
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
 error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 estimate>))/qnorm(0.025)}
+
+\item{useMcmc}{Use MCMC to estimate the calibrated P-value?}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
                         the function \code{ggsave} in the ggplot2 package for supported file

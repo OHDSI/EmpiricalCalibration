@@ -14,8 +14,7 @@ fitNull(logRr, seLogRr)
                  estimate>))/qnorm(0.025)}
 }
 \value{
-An object of type \code{null} containing the mean and standard deviation (both on the log scale) of
-the null distribution.
+An object containing the parameters of the null distribution.
 }
 \description{
 \code{fitNull} fits the null distribution to a set of negative controls
@@ -28,6 +27,7 @@ et al (2014).
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
 null <- fitNull(negatives$logRr, negatives$seLogRr)
+null
 }
 \references{
 Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why

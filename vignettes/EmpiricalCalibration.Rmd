@@ -1,6 +1,6 @@
 ---
 title: "Empirical calibration"
-author: "Martijn Schuemie"
+author: "Martijn J. Schuemie, Marc A. Suchard"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
@@ -69,9 +69,7 @@ null <- fitNull(negatives$logRr, negatives$seLogRr)
 null
 ```
 
-We see that the point estimate of the mean of our distribution is greater than 0, indicating the analysis is positively biased. We also see the point estimate of the standard deviation is greater than 0.25, indicating there is considerable variability in the systematic error from one estimate to the next.
-
-We also see that there is uncertainty around the estimates of the mean and standard deviation, as expressed in the 95% confidence intervals. This uncertainty can be reduced by either increasing the number of negative controls, or by increasing the power for the existing controls (e.g. by waiting for more data to accumulate).
+We see that the mean of our distribution is greater than 0, indicating the analysis is positively biased. We also see the standard deviation is greater than 0.25, indicating there is considerable variability in the systematic error from one estimate to the next.
 
 ## Evaluating the calibration
 
@@ -105,7 +103,7 @@ p <- calibrateP(null, drugOfInterest$logRr, drugOfInterest$seLogRr, TRUE)
 p
 ```
 
-In this case, the calibrated p-value is 0.84, meaning we have very little confidence we can reject the null hypothesis. Also note that there is uncertainty around the calibrated p-value as expressed in the 95% confidence interval of the p-value. This is caused by the uncertainty in the estimation of the null distribution.
+In this case, the calibrated p-value is 0.84, meaning we have very little confidence we can reject the null hypothesis. 
 
 ## Plotting the null distribution
 
@@ -120,6 +118,34 @@ plotCalibrationEffect(negatives$logRr,
 ```
 
 In this plot we see that, even though the drug of interest (the yellow diamond) has a high relative risk, it is indistinguishable from our negative controls.
+
+# Computing the credible interval 
+
+Depending on how much information we have in terms of number of negative controls, or precision of those negative controls, we will be more or less certain about the parameters of the null distribution and therefore about the calibrated p-value. To estimate our uncertainty we can compute the 95% credible interval using Markov Chain Monte Carlo (MCMC). We can apply the `fitMcmcNull` function for this purpose:
+
+```{r}
+null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
+null
+```
+
+We see that there is uncertainty around the estimates of the mean and precision (= 1/SD^2), as expressed in the 95% credible intervals. This uncertainty can be reduced by either increasing the number of negative controls, or by increasing the power for the existing controls (e.g. by waiting for more data to accumulate).
+
+The acceptance rate of the MCMC seems reasonable (ideal values are typically between 0.2 and 0.6), but we can investigate the trace just to be sure:
+
+```{r}
+plotMcmcTrace(null)
+```
+
+For both variables the trace should look like 'random noise', as is the case above. When we see auto-correlation, meaning that one value of the trace depends on the previous value of the trace, the MCMC might not be reliable and we should not trust the 95% credible interval.
+
+We can use the new null object to compute the calibrated p-value as well as the 95% credible interval:
+
+```{r}
+p <- calibrateP(null, drugOfInterest$logRr, drugOfInterest$seLogRr)
+p
+```
+
+Note that there is uncertainty around the calibrated p-value as expressed in the 95% credible interval.
 
 # References
 

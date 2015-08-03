@@ -16,17 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-proposalFunction <- function(param, scale = c(0.1, 0.1), fixed = NULL) {
+proposalFunction <- function(param, scale) {
   dim <- length(param)
   draw <- rnorm(dim, mean = param, sd = scale)
-  if (!is.null(fixed)) {
-    draw[fixed] <- param[fixed]
-  }
+  
+  # Precision cannot be negative:
   draw[2] <- abs(draw[2])
   return(draw)
 }
 
-runMetropolisMcmc <- function(startValue, ll, iterations, scale, logRr, seLogRr, fixed = NULL) {
+runMetropolisMcmc <- function(startValue, ll, iterations, scale, logRr, seLogRr) {
   dim <- length(startValue)
   chain <- array(dim = c(iterations + 1, dim))
   logLik <- array(dim = c(iterations + 1, 1))
@@ -38,8 +37,7 @@ runMetropolisMcmc <- function(startValue, ll, iterations, scale, logRr, seLogRr,
   
   for (i in 1:iterations) {
     # print(paste('itr =', i))
-    proposal <- proposalFunction(chain[i, ], scale = scale, fixed = fixed)
-    
+    proposal <- proposalFunction(chain[i, ], scale = scale)
     newLogLik <- tryCatch(-ll(proposal, logRr, seLogRr), error = function(e) {
       -1e+10
     })
@@ -101,9 +99,17 @@ binarySearchMu <- function(modeMu, modeSigma, alpha = 0.1, logRrNegatives = logR
 
 binarySearchSigma <- function(modeMu, modeSigma, alpha = 0.1, logRrNegatives = logRrNegatives, seLogRrNegatives = seLogRrNegatives, precision = 0.0000001){
   q <- qchisq(1-alpha, 1)/2
-  L <- modeSigma
-  H <- 1500
   llMode <- -logLikelihood(c(modeMu, modeSigma), estimate = logRrNegatives, se = seLogRrNegatives)
+  L <- modeSigma
+  for (i in 1:10) {
+    H <- modeSigma + exp(i)
+    llM <- -logLikelihood(c(modeMu, H), estimate = logRrNegatives, se = seLogRrNegatives)
+    metric <- llMode - llM - q
+    if (metric > 0) {
+      break 
+    }
+  }
+  #H <- 1500
   while (H >= L) {
     M <- L + (H - L)/2
     llM <- -logLikelihood(c(modeMu, M), estimate = logRrNegatives, se = seLogRrNegatives)
@@ -127,15 +133,14 @@ binarySearchSigma <- function(modeMu, modeSigma, alpha = 0.1, logRrNegatives = l
 #' \code{fitNull} fits the null distribution to a set of negative controls using Markov Chain Monte Carlo (MCMC).
 #'
 #' @details
-#' This is an experimental function for computing the 95 percent confidence interval of a calibrated
-#' p-value using Markov-Chain Monte Carlo (MCMC). This should give better estimates than the default
-#' function when the standard deviation of the error distribution is close to zero.
+#' This is an experimental function for computing the 95 percent credible interval of a calibrated
+#' p-value using Markov-Chain Monte Carlo (MCMC). 
 #'
 #' @param logRr     A numeric vector of effect estimates on the log scale
 #' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
 #'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 #'                  estimate>))/qnorm(0.025)
-#' @param iter               Number of iterations of the MCMC.
+#' @param iter      Number of iterations of the MCMC.
 #'
 #' @return
 #' An object of type \code{mcmcNull} containing the mean and standard deviation (both on the log scale) of
@@ -148,22 +153,20 @@ binarySearchSigma <- function(modeMu, modeSigma, alpha = 0.1, logRrNegatives = l
 #' null
 #' plotMcmcTrace(null)
 #' positive <- sccs[sccs$groundTruth == 1, ]
-#' calibrateP(null, positive$logRr, positive$seLogRr, pValueConfidenceInterval = TRUE)
+#' calibrateP(null, positive$logRr, positive$seLogRr)
 #'
 #' @export
-fitMcmcNull <- function(logRrNegatives,
-                        seLogRrNegatives,
-                        logRrPositives,
-                        seLogRrPositives,
+fitMcmcNull <- function(logRr,
+                        seLogRr,
                         iter = 10000) {
-  fit <- optim(c(0, 0.1), logLikelihood, estimate = logRrNegatives, se = seLogRrNegatives)
+  fit <- optim(c(0, 0.1), logLikelihood, estimate = logRr, se = seLogRr)
   
   # Profile likelihood for roughly correct scale:
-  scale <- binarySearchMu(fit$par[1], fit$par[2], logRrNegatives = logRrNegatives, seLogRrNegatives = seLogRrNegatives)
-  scale <- c(scale,binarySearchSigma(fit$par[1], fit$par[2], logRrNegatives = logRrNegatives, seLogRrNegatives = seLogRrNegatives))
- 
+  scale <- binarySearchMu(fit$par[1], fit$par[2], logRrNegatives = logRr, seLogRrNegatives = seLogRr)
+  scale <- c(scale,binarySearchSigma(fit$par[1], fit$par[2], logRrNegatives = logRr, seLogRrNegatives = seLogRr))
+  
   #writeLines(paste("Scale:", paste(scale,collapse=",")))
-  mcmc <- runMetropolisMcmc(fit$par, logLikelihood, iterations = iter, scale, logRrNegatives, seLogRrNegatives)
+  mcmc <- runMetropolisMcmc(fit$par, logLikelihood, iterations = iter, scale, logRr, seLogRr)
   result <- c(mean(mcmc$chain[, 1]), mean(mcmc$chain[, 2]))
   attr(result,"mcmc") <- mcmc
   class(result) <- "mcmcNull"
@@ -185,16 +188,20 @@ print.mcmcNull <- function(x, ...) {
   writeLines(paste("\nAcceptance rate:",mean(mcmc$acc)))
 }
 
+#' @describeIn calibrateP Computes the calibrated P-value and 95 percent credibel interval using Markov Chain Monte Carlo (MCMC).
+#' 
+#' @param pValueOnly If true, will return only the calibrated P-value itself, not the credible interval.
+#' 
 #' @export
-calibrateP.mcmcNull <- function(null, logRr, seLogRr, pValueConfidenceInterval = FALSE) {
+calibrateP.mcmcNull <- function(null, logRr, seLogRr, pValueOnly, ...) {
   mcmc <-attr(null,"mcmc")  
   adjustedP <- data.frame(p = rep(1, length(logRr)), lb95ci = 0, ub95ci = 0)
   for (i in 1:length(logRr)) {
     P_upper_bound <- pnorm((mcmc$chain[,
                                        1] - logRr[i])/sqrt((1/sqrt(mcmc$chain[,
-                                                                                       2]))^2 + seLogRr[i]^2))
+                                                                              2]))^2 + seLogRr[i]^2))
     P_lower_bound <- pnorm((logRr[i] - mcmc$chain[,
-                                                           1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+                                                  1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
     p <- P_upper_bound
     p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
     p <- p * 2
@@ -202,8 +209,8 @@ calibrateP.mcmcNull <- function(null, logRr, seLogRr, pValueConfidenceInterval =
     adjustedP$lb95ci[i] <- quantile(p, 0.025)
     adjustedP$ub95ci[i] <- quantile(p, 0.975)
   }
-  attr(adjustedP, "mcmc") <- mcmc
-  if (pValueConfidenceInterval) {
+  if (missing(pValueOnly) || pValueOnly == FALSE){
+    attr(adjustedP, "mcmc") <- mcmc
     return(adjustedP)
   } else {
     return(adjustedP$p)

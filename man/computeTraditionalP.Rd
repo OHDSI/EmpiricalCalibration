@@ -14,7 +14,7 @@ computeTraditionalP(logRr, seLogRr)
                  estimate>))/qnorm(0.025)}
 }
 \value{
-A two-sided (traditional) p-value.
+The two-sided (traditional) p-value.
 }
 \description{
 \code{computeTraditionalP} computes the traditional two-sided p-value based on the log of the

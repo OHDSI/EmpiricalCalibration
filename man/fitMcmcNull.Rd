@@ -4,17 +4,16 @@
 \alias{fitMcmcNull}
 \title{Fit the null distribution using MCMC}
 \usage{
-fitMcmcNull(logRrNegatives, seLogRrNegatives, logRrPositives, seLogRrPositives,
-  iter = 10000)
+fitMcmcNull(logRr, seLogRr, iter = 10000)
 }
 \arguments{
-\item{iter}{Number of iterations of the MCMC.}
-
 \item{logRr}{A numeric vector of effect estimates on the log scale}
 
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
 error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 estimate>))/qnorm(0.025)}
+
+\item{iter}{Number of iterations of the MCMC.}
 }
 \value{
 An object of type \code{mcmcNull} containing the mean and standard deviation (both on the log scale) of
@@ -24,9 +23,8 @@ the null distribution, as well as the MCMC trace.
 \code{fitNull} fits the null distribution to a set of negative controls using Markov Chain Monte Carlo (MCMC).
 }
 \details{
-This is an experimental function for computing the 95 percent confidence interval of a calibrated
-p-value using Markov-Chain Monte Carlo (MCMC). This should give better estimates than the default
-function when the standard deviation of the error distribution is close to zero.
+This is an experimental function for computing the 95 percent credible interval of a calibrated
+p-value using Markov-Chain Monte Carlo (MCMC).
 }
 \examples{
 data(sccs)
@@ -35,6 +33,6 @@ null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
 null
 plotMcmcTrace(null)
 positive <- sccs[sccs$groundTruth == 1, ]
-calibrateP(null, positive$logRr, positive$seLogRr, pValueConfidenceInterval = TRUE)
+calibrateP(null, positive$logRr, positive$seLogRr)
 }
 

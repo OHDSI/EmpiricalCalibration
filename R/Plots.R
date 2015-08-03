@@ -77,14 +77,14 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", fileName
 logRrtoSE <- function(logRr, p, null) {
   sapply(logRr, function(logRr) {
     precision <- 0.001
-    if (calibrateP(null, logRr, precision) > p)
+    if (calibrateP(null, logRr, precision, pValueOnly = TRUE) > p)
       return(0)
     L <- 0
     H <- 100
     while (H >= L) {
       M <- L + (H - L)/2
-      if (calibrateP(null, logRr, M) - p > precision)
-        H <- M else if (p - calibrateP(null, logRr, M) > precision)
+      if (calibrateP(null, logRr, M, pValueOnly = TRUE) - p > precision)
+        H <- M else if (p - calibrateP(null, logRr, M, pValueOnly = TRUE) > precision)
         L <- M else return(M)
     }
     return(L - 1)
@@ -214,6 +214,7 @@ plotCalibrationEffect <- function(logRrNegatives,
 #' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
 #'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 #'                  estimate>))/qnorm(0.025)
+#' @param useMcmc          Use MCMC to estimate the calibrated P-value?        
 #' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
 #'                         the function \code{ggsave} in the ggplot2 package for supported file
 #'                         formats.
@@ -227,7 +228,7 @@ plotCalibrationEffect <- function(logRrNegatives,
 #' plotCalibration(negatives$logRr, negatives$seLogRr)
 #'
 #' @export
-plotCalibration <- function(logRr, seLogRr, fileName = NULL, useMcmc = FALSE) {
+plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, fileName = NULL) {
   data <- data.frame(logRr = logRr, SE = seLogRr)
   data$Z <- data$logRr/data$SE
   data$P <- 2 * pmin(pnorm(data$Z), 1 - pnorm(data$Z))  # 2-sided p-value
@@ -243,7 +244,7 @@ plotCalibration <- function(logRr, seLogRr, fileName = NULL, useMcmc = FALSE) {
     } else {
       null <- fitNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)  
     }
-    data$calibratedP[i] <- calibrateP(null, data$logRr[i], data$SE[i])
+    data$calibratedP[i] <- calibrateP(null, data$logRr[i], data$SE[i], pValueOnly = TRUE)
   }
   data$AdjustedY <- sapply(data$calibratedP, function(x) {
     sum(data$calibratedP < x)/nrow(data)
@@ -387,8 +388,6 @@ plotCoverage <- function(logRr, seLogRr, trueLogRr, region = 0.95, fileName = NU
   vizD$label <- paste(round(100 * vizD$fraction), "%", sep = "")
   vizD$group <- factor(vizD$group, levels = c("Below CI", "Within CI", "Above CI"))
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
-  themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
-  themeLA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 0)
   plot <- ggplot2::ggplot(vizD, ggplot2::aes(x = as.factor(trueRr), y = fraction)) + 
     ggplot2::geom_bar(ggplot2::aes(fill = group), stat = "identity", position = "stack", alpha = 0.8) + 
     ggplot2::scale_fill_manual(values = c("#174a9f", "#f9dd75", "#f15222")) + 
