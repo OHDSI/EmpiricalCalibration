@@ -163,6 +163,21 @@ fitMcmcNull <- function(logRr,
     logRr <- logRr[!is.infinite(seLogRr)]
     seLogRr <- seLogRr[!is.infinite(seLogRr)]
   }
+  if (any(is.infinite(logRr))){
+    warning("Estimate(s) with infinite logRr detected. Removing before fitting null distribution")
+    seLogRr <- seLogRr[!is.infinite(logRr)]
+    logRr <- logRr[!is.infinite(logRr)]
+  }
+  if (any(is.na(seLogRr))){
+    warning("Estimate(s) with NA standard error detected. Removing before fitting null distribution")
+    logRr <- logRr[!is.na(seLogRr)]
+    seLogRr <- seLogRr[!is.na(seLogRr)]
+  }
+  if (any(is.na(logRr))){
+    warning("Estimate(s) with NA logRr detected. Removing before fitting null distribution")
+    seLogRr <- seLogRr[!is.na(logRr)]
+    logRr <- logRr[!is.na(logRr)]
+  }  
   fit <- optim(c(0, 0.1), logLikelihood, estimate = logRr, se = seLogRr)
   
   # Profile likelihood for roughly correct scale:
