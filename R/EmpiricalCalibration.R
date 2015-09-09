@@ -51,7 +51,21 @@ fitNull <- function(logRr, seLogRr) {
     logRr <- logRr[!is.infinite(seLogRr)]
     seLogRr <- seLogRr[!is.infinite(seLogRr)]
   }
-  
+  if (any(is.infinite(logRr))){
+    warning("Estimate(s) with infinite logRr detected. Removing before fitting null distribution")
+    seLogRr <- seLogRr[!is.infinite(logRr)]
+    logRr <- logRr[!is.infinite(logRr)]
+  }
+  if (any(is.na(seLogRr))){
+    warning("Estimate(s) with NA standard error detected. Removing before fitting null distribution")
+    logRr <- logRr[!is.na(seLogRr)]
+    seLogRr <- seLogRr[!is.na(seLogRr)]
+  }
+  if (any(is.na(logRr))){
+    warning("Estimate(s) with NA logRr detected. Removing before fitting null distribution")
+    seLogRr <- seLogRr[!is.na(logRr)]
+    logRr <- logRr[!is.na(logRr)]
+  }  
   
   gaussianProduct <- function(mu1, mu2, sd1, sd2) {
     (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
@@ -147,7 +161,11 @@ calibrateP.null <- function(null, logRr, seLogRr, ...) {
   
   adjustedP <- vector(length = length(logRr))
   for (i in 1:length(logRr)) {
-    adjustedP[i] <- oneAdjustedP(logRr[i], seLogRr[i], null)
+    if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
+      adjustedP$p[i] <- NA
+    } else {
+      adjustedP[i] <- oneAdjustedP(logRr[i], seLogRr[i], null)
+    }
   }
   
   #   if (pValueConfidenceInterval) {

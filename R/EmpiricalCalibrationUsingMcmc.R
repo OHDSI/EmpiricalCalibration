@@ -216,17 +216,23 @@ calibrateP.mcmcNull <- function(null, logRr, seLogRr, pValueOnly, ...) {
   mcmc <-attr(null,"mcmc")  
   adjustedP <- data.frame(p = rep(1, length(logRr)), lb95ci = 0, ub95ci = 0)
   for (i in 1:length(logRr)) {
-    P_upper_bound <- pnorm((mcmc$chain[,
-                                       1] - logRr[i])/sqrt((1/sqrt(mcmc$chain[,
-                                                                              2]))^2 + seLogRr[i]^2))
-    P_lower_bound <- pnorm((logRr[i] - mcmc$chain[,
-                                                  1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-    p <- P_upper_bound
-    p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
-    p <- p * 2
-    adjustedP$p[i] <- quantile(p, 0.5)
-    adjustedP$lb95ci[i] <- quantile(p, 0.025)
-    adjustedP$ub95ci[i] <- quantile(p, 0.975)
+    if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
+      adjustedP$p[i] <- NA
+      adjustedP$lb95ci[i] <- NA
+      adjustedP$ub95ci[i] <- NA
+    } else {
+      P_upper_bound <- pnorm((mcmc$chain[,
+                                         1] - logRr[i])/sqrt((1/sqrt(mcmc$chain[,
+                                                                                2]))^2 + seLogRr[i]^2))
+      P_lower_bound <- pnorm((logRr[i] - mcmc$chain[,
+                                                    1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+      p <- P_upper_bound
+      p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
+      p <- p * 2
+      adjustedP$p[i] <- quantile(p, 0.5)
+      adjustedP$lb95ci[i] <- quantile(p, 0.025)
+      adjustedP$ub95ci[i] <- quantile(p, 0.975)
+    }
   }
   if (missing(pValueOnly) || pValueOnly == FALSE){
     attr(adjustedP, "mcmc") <- mcmc
