@@ -62,6 +62,10 @@ notifications:
 after_success:
   - Rscript -e 'library(covr);codecov()'
   # Rebuild docker container
-#  - curl --data "build=true" -X POST https://registry.hub.docker.com/u/ohdsi/development/trigger/e51f720d-c4e7-45df-b042-5d8a362bd7e0/
+  - curl --data "build=true" -X POST https://registry.hub.docker.com/u/ohdsi/development/trigger/e51f720d-c4e7-45df-b042-5d8a362bd7e0/
   # Rebuild drat repo
-   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && bash deploy_container.sh
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && bash deploy_container.sh
+  
+env:
+  global:
+    secure: clBIB1ryoj28wttYw5YQClr4wTNw/s2rqs0OzjnvdnD3NAONxMz+8CXR7cmHow5nQ211J/zKP/+wnd8x0oCId2cJT2a8Kp99bjAMs6q0hvjAUBxmYQgQAJ3VQ8PNTXB4WglDimXPSJfYdExo3mqbQozWnqx9pu7Z+029/M7+h+M=
