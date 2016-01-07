@@ -15,9 +15,11 @@ Description: Routines for performing empirical calibration of observational
     and systematic error into account.
 VignetteBuilder: knitr
 Imports:
-    ggplot2
+    ggplot2 (>= 2.0.0),
+    MASS
 Suggests:
     knitr,
     rmarkdown,
     OhdsiRTools
 License: Apache License 2.0
+RoxygenNote: 5.0.1

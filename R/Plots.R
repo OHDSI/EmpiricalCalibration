@@ -68,7 +68,7 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", fileName
                   environment = environment()) + ggplot2::geom_hline(yintercept = breaks,
                                                                      colour = "#AAAAAA",
                                                                      lty = 1,
-                                                                     lw = 0.2) + ggplot2::geom_hline(yintercept = 1, lw = 0.5) + ggplot2::geom_pointrange(shape = 23) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_flip(ylim = c(0.25, 10)) + ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "none")
+                                                                     size = 0.2) + ggplot2::geom_hline(yintercept = 1, size = 0.5) + ggplot2::geom_pointrange(shape = 23) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_flip(ylim = c(0.25, 10)) + ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "none")
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 2.5 + length(logRr)*0.8, dpi = 400)
   return(plot)
@@ -147,8 +147,8 @@ plotCalibrationEffect <- function(logRrNegatives,
   plot <- ggplot2::ggplot(data.frame(x, y, seTheoretical),
                           ggplot2::aes(x = x, y = y),
                           environment = environment()) +
-          ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, lw = 0.5) +
-          ggplot2::geom_vline(xintercept = 1, lw = 1) +
+          ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
+          ggplot2::geom_vline(xintercept = 1, size = 1) +
           ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
                              color = rgb(1, 0.5, 0),
                              size = 1,
@@ -269,7 +269,7 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, fileName = NULL) {
                   environment = environment()) + ggplot2::geom_vline(xintercept = breaks,
                                                                      colour = "#AAAAAA",
                                                                      lty = 1,
-                                                                     lw = 0.3) + ggplot2::geom_vline(xintercept = 0.05, colour = "#888888", linetype = "dashed", lw = 1) + ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, lw = 0.3) + ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, lw = 0.3) + ggplot2::geom_step(direction = "hv", size = 1) + ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + ggplot2::scale_x_continuous("Alpha", limits = c(0, 1), breaks = c(breaks, 0.05), labels = c("", ".25", ".50", ".75", "1", ".05")) + ggplot2::scale_y_continuous("Fraction with p < alpha", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "right")
+                                                                     size = 0.3) + ggplot2::geom_vline(xintercept = 0.05, colour = "#888888", linetype = "dashed", size = 1) + ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) + ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, size = 0.3) + ggplot2::geom_step(direction = "hv", size = 1) + ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + ggplot2::scale_x_continuous("Alpha", limits = c(0, 1), breaks = c(breaks, 0.05), labels = c("", ".25", ".50", ".75", "1", ".05")) + ggplot2::scale_y_continuous("Fraction with p < alpha", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "right")
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
   return(plot)
@@ -326,8 +326,8 @@ plotTrueAndObserved <- function(logRr, seLogRr, trueLogRr, xLabel = "Relative ri
                                colour = significant,
                                fill = significant),
                   environment = environment()) + 
-    ggplot2::geom_vline(yintercept = breaks, colour = "#AAAAAA", lty = 1, lw = 0.2) + 
-    ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), lw = 1) + 
+    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
+    ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) + 
     ggplot2::geom_errorbarh(height = 0) + ggplot2::geom_point(shape = 21, size = 1.5) + 
     ggplot2::scale_colour_manual(values = col) + 
     ggplot2::scale_fill_manual(values = colFill) + 

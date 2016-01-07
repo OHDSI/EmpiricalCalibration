@@ -6,12 +6,8 @@ output:
   pdf_document:
     number_sections: yes
     toc: yes
-  html_document:
-    number_sections: yes
-    toc: yes
 ---
 <!--
-%\VignetteEngine{knitr}
 %\VignetteIndexEntry{Single studies using CohortMethod}
 -->
 
