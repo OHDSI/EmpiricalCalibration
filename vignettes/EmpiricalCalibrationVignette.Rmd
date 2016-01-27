@@ -8,7 +8,9 @@ output:
     toc: yes
 ---
 <!--
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Single studies using CohortMethod}
+%\usepackage[utf8]{inputenc}
 -->
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
