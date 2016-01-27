@@ -82,18 +82,9 @@ fitNull <- function(logRr, seLogRr) {
   }
   theta <- c(0, 0)
   fit <- optim(theta, LL, estimate = logRr, se = seLogRr)
-  #   fisher_info <- solve(fit$hessian)
-  #   prop_sigma <- sqrt(diag(fisher_info))
   null <- fit$par
   null[2] <- exp(null[2])
   names(null) <- c("mean", "sd")
-  #   attr(null,
-  #        "LB95CI") <- c(fit$par[1] + qnorm(0.025) * prop_sigma[1], exp(fit$par[2] + qnorm(0.025) *
-  #                                                                        prop_sigma[2]))
-  #   attr(null,
-  #        "UB95CI") <- c(fit$par[1] + qnorm(0.975) * prop_sigma[1], exp(fit$par[2] + qnorm(0.975) *
-  #                                                                        prop_sigma[2]))
-  #   attr(null, "CovarianceMatrix") <- fisher_info
   class(null) <- "null"
   return(null)
 }
@@ -101,10 +92,6 @@ fitNull <- function(logRr, seLogRr) {
 #' @export
 print.null <- function(x, ...) {
   writeLines("Estimated null distribution\n")
-  #   output <- data.frame(Estimate = c(x[1], x[2]), lb95 = attr(x, "LB95CI"), ub95 = attr(x, "UB95CI"))
-  #   colnames(output) <- c("Estimate", "lower .95", "upper .95")
-  #   rownames(output) <- c("Mean", "SD")
-  #   printCoefmat(output)
   output <- data.frame(Estimate = c(x[1], x[2]))
   colnames(output) <- c("Estimate")
   rownames(output) <- c("Mean", "SD")
@@ -162,27 +149,11 @@ calibrateP.null <- function(null, logRr, seLogRr, ...) {
   adjustedP <- vector(length = length(logRr))
   for (i in 1:length(logRr)) {
     if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
-      adjustedP$p[i] <- NA
+      adjustedP[i] <- NA
     } else {
       adjustedP[i] <- oneAdjustedP(logRr[i], seLogRr[i], null)
     }
   }
-  
-  #   if (pValueConfidenceInterval) {
-  #     adjustedP <- data.frame(p = adjustedP, lb95ci = 0, ub95ci = 0)
-  #     rand <- MASS::mvrnorm(10000, c(null[1], log(null[2])), attr(null, "CovarianceMatrix"))
-  #     for (i in 1:length(logRr)) {
-  #       P_upper_bound <- pnorm((rand[, 1] - logRr[i])/sqrt(exp(rand[, 2])^2 + seLogRr[i]^2))
-  #       P_lower_bound <- pnorm((logRr[i] - rand[, 1])/sqrt(exp(rand[, 2])^2 + seLogRr[i]^2))
-  #       # Take min:
-  #       p <- P_upper_bound
-  #       p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
-  #       p <- p * 2
-  #       
-  #       adjustedP$lb95ci[i] <- quantile(p, 0.025)
-  #       adjustedP$ub95ci[i] <- quantile(p, 0.975)
-  #     }
-  #   }
   return(adjustedP)
 }
 

@@ -229,6 +229,27 @@ plotCalibrationEffect <- function(logRrNegatives,
 #'
 #' @export
 plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, fileName = NULL) {
+  if (any(is.infinite(seLogRr))){
+    warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
+    logRr <- logRr[!is.infinite(seLogRr)]
+    seLogRr <- seLogRr[!is.infinite(seLogRr)]
+  }
+  if (any(is.infinite(logRr))){
+    warning("Estimate(s) with infinite logRr detected. Removing before fitting null distribution")
+    seLogRr <- seLogRr[!is.infinite(logRr)]
+    logRr <- logRr[!is.infinite(logRr)]
+  }
+  if (any(is.na(seLogRr))){
+    warning("Estimate(s) with NA standard error detected. Removing before fitting null distribution")
+    logRr <- logRr[!is.na(seLogRr)]
+    seLogRr <- seLogRr[!is.na(seLogRr)]
+  }
+  if (any(is.na(logRr))){
+    warning("Estimate(s) with NA logRr detected. Removing before fitting null distribution")
+    seLogRr <- seLogRr[!is.na(logRr)]
+    logRr <- logRr[!is.na(logRr)]
+  }  
+  
   data <- data.frame(logRr = logRr, SE = seLogRr)
   data$Z <- data$logRr/data$SE
   data$P <- 2 * pmin(pnorm(data$Z), 1 - pnorm(data$Z))  # 2-sided p-value
@@ -246,6 +267,7 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, fileName = NULL) {
     }
     data$calibratedP[i] <- calibrateP(null, data$logRr[i], data$SE[i], pValueOnly = TRUE)
   }
+  data <- data[!is.na(data$calibratedP),]
   data$AdjustedY <- sapply(data$calibratedP, function(x) {
     sum(data$calibratedP < x)/nrow(data)
   })
