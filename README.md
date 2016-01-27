@@ -15,7 +15,7 @@ Features
 
 Screenshots and examples
 ========================
-<img src="https://github.com/OHDSI/EmpiricalCalibration/blob/master/man/plot.png" alt="Calibration effect plot" title="Calibration effect plot" />
+<img src="https://github.com/OHDSI/EmpiricalCalibration/blob/master/extras/plot.png" alt="Calibration effect plot" title="Calibration effect plot" />
 
 ```r
 data(sccs) #Load one of the included data sets
@@ -52,7 +52,7 @@ install_github("ohdsi/EmpiricalCalibration")
 Getting Involved
 ================
 * Vignette: [Empirical calibration](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalCalibration.pdf)
-* Package manual: [EmpiricalCalibration.pdf](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/man/EmpiricalCalibration.pdf) 
+* Package manual: [EmpiricalCalibration.pdf](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/extras/EmpiricalCalibration.pdf) 
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
 * We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements
   

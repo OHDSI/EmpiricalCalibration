@@ -23,8 +23,8 @@
 
 
 .createManualAndVignettes <- function() {
-  shell("rm man/EmpiricalCalibration.pdf")
-  shell("R CMD Rd2pdf ./ --output=man/EmpiricalCalibration.pdf")
+  shell("rm extras/EmpiricalCalibration.pdf")
+  shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
   
   rmarkdown::render("vignettes/EmpiricalCalibration.Rmd",
                     output_file = "../inst/doc/EmpiricalCalibration.pdf",
