@@ -1,6 +1,7 @@
+extras
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\R\Temp*
-R/PackageMaintenance\.R
+^R/PackageMaintenance\.R$
 ^\.travis\.yml$
-deploy_container.sh
+^deploy_container.sh$
