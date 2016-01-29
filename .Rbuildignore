@@ -5,3 +5,4 @@ extras
 ^R/PackageMaintenance\.R$
 ^\.travis\.yml$
 ^deploy_container.sh$
+^cran-comments.md$
