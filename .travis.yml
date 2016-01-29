@@ -17,6 +17,11 @@ addons:
     - r-recommended
     - qpdf
     - pandoc
+    - texlive-fonts-recommended
+    - texlive-latex-extra
+    - texlive-fonts-extra
+    - texlive-latex-recommended 
+    - dvipng
 
 # cache local R libraries directory:
 cache:
