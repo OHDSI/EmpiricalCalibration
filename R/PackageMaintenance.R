@@ -32,3 +32,9 @@
                                             toc = TRUE,
                                             number_sections = TRUE))
 }
+
+releasePackage <- function() {
+  devtools::build_win(version = "R-release") 
+  
+  devtools::release()
+}

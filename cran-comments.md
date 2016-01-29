@@ -4,7 +4,7 @@ This is the first submission of this package
 
 ## Test environments
 * Ubuntu 14.04.3 LTS (Travis), R 3.2.3
-* Windows 7, R 3.2.2
+* Windows 7, R 3.2.3
 
 ## R CMD check results
 
