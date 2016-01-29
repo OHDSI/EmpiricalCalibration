@@ -6,12 +6,11 @@ output:
   pdf_document:
     number_sections: yes
     toc: yes
+vignette: >
+  %\VignetteIndexEntry{Single studies using CohortMethod}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Single studies using CohortMethod}
-%\usepackage[utf8]{inputenc}
--->
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 library(EmpiricalCalibration)
