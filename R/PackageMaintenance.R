@@ -34,7 +34,7 @@
 }
 
 releasePackage <- function() {
-  devtools::build_win(version = "R-release") 
+  devtools::build_win() 
   
   devtools::release()
 }
