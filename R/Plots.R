@@ -26,19 +26,18 @@
 #' from 1 (alpha = 0.05) are marked in orange, others are marked in blue.
 #'
 #'
-#' @param logRr     A numeric vector of effect estimates on the log scale
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025)
-#' @param names     A vector containing the names of the drugs or outcomes
-#' @param xLabel    The label on the x-axis: the name of the effect estimate
+#' @param logRr      A numeric vector of effect estimates on the log scale
+#' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard
+#'                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                   estimate>))/qnorm(0.025)
+#' @param names      A vector containing the names of the drugs or outcomes
+#' @param xLabel     The label on the x-axis: the name of the effect estimate
 #'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
-#' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
-#'                         the function \code{ggsave} in the ggplot2 package for supported file
-#'                         formats.
-#'                         
+#' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
+#'                   function \code{ggsave} in the ggplot2 package for supported file formats.
+#'
 #' @examples
 #' data(sccs)
 #' negatives <- sccs[sccs$groundTruth == 0, ]
@@ -54,24 +53,24 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", fileName
   data <- data.frame(DRUG_NAME = as.factor(names),
                      logRr = logRr,
                      logLb95Rr = logRr + qnorm(0.025) *
-                       seLogRr, logUb95Rr = logRr + qnorm(0.975) * seLogRr)
+    seLogRr, logUb95Rr = logRr + qnorm(0.975) * seLogRr)
   data$significant <- data$logLb95Rr > 0 | data$logUb95Rr < 0
   data$DRUG_NAME <- factor(data$DRUG_NAME, levels = rev(levels(data$DRUG_NAME)))
   plot <- with(data, {
     ggplot2::ggplot(data,
-                            ggplot2::aes(x = DRUG_NAME,
-                                         y = exp(logRr),
-                                         ymin = exp(logLb95Rr),
-                                         ymax = exp(logUb95Rr),
-                                         colour = significant,
-                                         fill = significant),
-                            environment = environment()) + ggplot2::geom_hline(yintercept = breaks,
-                                                                               colour = "#AAAAAA",
-                                                                               lty = 1,
-                                                                               size = 0.2) + ggplot2::geom_hline(yintercept = 1, size = 0.5) + ggplot2::geom_pointrange(shape = 23) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_flip(ylim = c(0.25, 10)) + ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "none")
+                    ggplot2::aes(x = DRUG_NAME,
+                                 y = exp(logRr),
+                                 ymin = exp(logLb95Rr),
+                                 ymax = exp(logUb95Rr),
+                                 colour = significant,
+                                 fill = significant),
+                    environment = environment()) + ggplot2::geom_hline(yintercept = breaks,
+                                                                       colour = "#AAAAAA",
+                                                                       lty = 1,
+                                                                       size = 0.2) + ggplot2::geom_hline(yintercept = 1, size = 0.5) + ggplot2::geom_pointrange(shape = 23) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_flip(ylim = c(0.25, 10)) + ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "none")
   })
   if (!is.null(fileName))
-    ggplot2::ggsave(fileName, plot, width = 5, height = 2.5 + length(logRr)*0.8, dpi = 400)
+    ggplot2::ggsave(fileName, plot, width = 5, height = 2.5 + length(logRr) * 0.8, dpi = 400)
   return(plot)
 }
 
@@ -86,7 +85,7 @@ logRrtoSE <- function(logRr, p, null) {
       M <- L + (H - L)/2
       if (calibrateP(null, logRr, M, pValueOnly = TRUE) - p > precision)
         H <- M else if (p - calibrateP(null, logRr, M, pValueOnly = TRUE) > precision)
-          L <- M else return(M)
+        L <- M else return(M)
     }
     return(L - 1)
   })
@@ -114,10 +113,10 @@ logRrtoSE <- function(logRr, p, null) {
 #' @param null               An object representing the fitted null distribution as created by the
 #'                           \code{fitNull} function.
 #' @param xLabel             The label on the x-axis: the name of the effect estimate.
-#' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
-#'                         the function \code{ggsave} in the ggplot2 package for supported file
-#'                         formats.
-#'                         
+#' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
+#'                           See the function \code{ggsave} in the ggplot2 package for supported file
+#'                           formats.
+#'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
 #'
@@ -148,44 +147,44 @@ plotCalibrationEffect <- function(logRrNegatives,
   plot <- ggplot2::ggplot(data.frame(x, y, seTheoretical),
                           ggplot2::aes(x = x, y = y),
                           environment = environment()) +
-    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
-    ggplot2::geom_vline(xintercept = 1, size = 1) +
-    ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
-                       color = rgb(1, 0.5, 0),
-                       size = 1,
-                       alpha = 0.5) +
-    ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
-                       fill = rgb(0, 0, 0),
-                       colour = rgb(0, 0, 0, alpha = 0.1),
-                       alpha = 0.1) +
-    ggplot2::geom_line(ggplot2::aes(y = seTheoretical),
-                       colour = rgb(0, 0, 0),
-                       linetype = "dashed",
-                       size = 1,
-                       alpha = 0.5) +
-    ggplot2::geom_point(shape = 21,
-                        ggplot2::aes(x, y),
-                        data = data.frame(x = exp(logRrNegatives), y = seLogRrNegatives),
-                        size = 2,
-                        fill = rgb(0, 0, 1, alpha = 0.5),
-                        colour = rgb(0, 0, 0.8)) +
-    ggplot2::geom_hline(yintercept = 0) +
-    ggplot2::scale_x_continuous(xLabel,
-                                trans = "log10",
-                                limits = c(0.25, 10),
-                                breaks = breaks,
-                                labels = breaks) +
-    ggplot2::scale_y_continuous("Standard Error", limits = c(0, 1.5)) +
-    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                   panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
-                   panel.grid.major = ggplot2::element_blank(),
-                   axis.ticks = ggplot2::element_blank(),
-                   axis.text.y = themeRA,
-                   axis.text.x = theme,
-                   legend.key = ggplot2::element_blank(),
-                   strip.text.x = theme,
-                   strip.background = ggplot2::element_blank(),
-                   legend.position = "none")
+          ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
+          ggplot2::geom_vline(xintercept = 1, size = 1) +
+          ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
+                             color = rgb(1, 0.5, 0),
+                             size = 1,
+                             alpha = 0.5) +
+          ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
+                             fill = rgb(0, 0, 0),
+                             colour = rgb(0, 0, 0, alpha = 0.1),
+                             alpha = 0.1) +
+          ggplot2::geom_line(ggplot2::aes(y = seTheoretical),
+                             colour = rgb(0, 0, 0),
+                             linetype = "dashed",
+                             size = 1,
+                             alpha = 0.5) +
+          ggplot2::geom_point(shape = 21,
+                              ggplot2::aes(x, y),
+                              data = data.frame(x = exp(logRrNegatives), y = seLogRrNegatives),
+                              size = 2,
+                              fill = rgb(0, 0, 1, alpha = 0.5),
+                              colour = rgb(0, 0, 0.8)) +
+          ggplot2::geom_hline(yintercept = 0) +
+          ggplot2::scale_x_continuous(xLabel,
+                                      trans = "log10",
+                                      limits = c(0.25, 10),
+                                      breaks = breaks,
+                                      labels = breaks) +
+          ggplot2::scale_y_continuous("Standard Error", limits = c(0, 1.5)) +
+          ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                         panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
+                         panel.grid.major = ggplot2::element_blank(),
+                         axis.ticks = ggplot2::element_blank(),
+                         axis.text.y = themeRA,
+                         axis.text.x = theme,
+                         legend.key = ggplot2::element_blank(),
+                         strip.text.x = theme,
+                         strip.background = ggplot2::element_blank(),
+                         legend.position = "none")
   if (!missing(logRrPositives)) {
     plot <- plot + ggplot2::geom_point(shape = 23,
                                        ggplot2::aes(x, y),
@@ -212,15 +211,14 @@ plotCalibrationEffect <- function(logRrNegatives,
 #' approximate the diagonal. The plot shows both theoretical (traditional) and empirically calibrated
 #' p-values.
 #'
-#' @param logRr     A numeric vector of effect estimates on the log scale
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025)
-#' @param useMcmc          Use MCMC to estimate the calibrated P-value?        
-#' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
-#'                         the function \code{ggsave} in the ggplot2 package for supported file
-#'                         formats.
-#'                         
+#' @param logRr      A numeric vector of effect estimates on the log scale
+#' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard
+#'                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                   estimate>))/qnorm(0.025)
+#' @param useMcmc    Use MCMC to estimate the calibrated P-value?
+#' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
+#'                   function \code{ggsave} in the ggplot2 package for supported file formats.
+#'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
 #'
@@ -231,70 +229,70 @@ plotCalibrationEffect <- function(logRrNegatives,
 #'
 #' @export
 plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, fileName = NULL) {
-  if (any(is.infinite(seLogRr))){
+  if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     logRr <- logRr[!is.infinite(seLogRr)]
     seLogRr <- seLogRr[!is.infinite(seLogRr)]
   }
-  if (any(is.infinite(logRr))){
+  if (any(is.infinite(logRr))) {
     warning("Estimate(s) with infinite logRr detected. Removing before fitting null distribution")
     seLogRr <- seLogRr[!is.infinite(logRr)]
     logRr <- logRr[!is.infinite(logRr)]
   }
-  if (any(is.na(seLogRr))){
+  if (any(is.na(seLogRr))) {
     warning("Estimate(s) with NA standard error detected. Removing before fitting null distribution")
     logRr <- logRr[!is.na(seLogRr)]
     seLogRr <- seLogRr[!is.na(seLogRr)]
   }
-  if (any(is.na(logRr))){
+  if (any(is.na(logRr))) {
     warning("Estimate(s) with NA logRr detected. Removing before fitting null distribution")
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
-  }  
-  
+  }
+
   data <- data.frame(logRr = logRr, SE = seLogRr)
   data$Z <- data$logRr/data$SE
   data$P <- 2 * pmin(pnorm(data$Z), 1 - pnorm(data$Z))  # 2-sided p-value
   data$Y <- sapply(data$P, function(x) {
     sum(data$P < x)/nrow(data)
   })
-  
+
   data$calibratedP <- vector(length = nrow(data))
   for (i in 1:nrow(data)) {
     dataLeaveOneOut <- data[seq(1, nrow(data)) != i, ]
-    if (useMcmc){
+    if (useMcmc) {
       null <- fitMcmcNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)
     } else {
-      null <- fitNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)  
+      null <- fitNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)
     }
     data$calibratedP[i] <- calibrateP(null, data$logRr[i], data$SE[i], pValueOnly = TRUE)
   }
-  data <- data[!is.na(data$calibratedP),]
+  data <- data[!is.na(data$calibratedP), ]
   data$AdjustedY <- sapply(data$calibratedP, function(x) {
     sum(data$calibratedP < x)/nrow(data)
   })
-  
+
   catData <- data.frame(x = c(data$P, data$calibratedP),
                         y = c(data$Y, data$AdjustedY),
                         label = factor(c(rep("Theoretical", times = nrow(data)),
                                          rep("Empirical", times = nrow(data)))))
   catData$label <- factor(catData$label, levels = c("Empirical", "Theoretical"))
-  
+
   names(catData) <- c("x", "y", "P-value calculation")
-  
+
   breaks <- c(0, 0.25, 0.5, 0.75, 1)
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
   plot <- with(catData, {
-   ggplot2::ggplot(catData,
-                            ggplot2::aes(x = x,
-                                         y = y,
-                                         colour = `P-value calculation`,
-                                         linetype = `P-value calculation`),
-                            environment = environment()) + ggplot2::geom_vline(xintercept = breaks,
-                                                                               colour = "#AAAAAA",
-                                                                               lty = 1,
-                                                                               size = 0.3) + ggplot2::geom_vline(xintercept = 0.05, colour = "#888888", linetype = "dashed", size = 1) + ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) + ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, size = 0.3) + ggplot2::geom_step(direction = "hv", size = 1) + ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + ggplot2::scale_x_continuous("Alpha", limits = c(0, 1), breaks = c(breaks, 0.05), labels = c("", ".25", ".50", ".75", "1", ".05")) + ggplot2::scale_y_continuous("Fraction with p < alpha", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "right")
+    ggplot2::ggplot(catData,
+                    ggplot2::aes(x = x,
+                                 y = y,
+                                 colour = `P-value calculation`,
+                                 linetype = `P-value calculation`),
+                    environment = environment()) + ggplot2::geom_vline(xintercept = breaks,
+                                                                       colour = "#AAAAAA",
+                                                                       lty = 1,
+                                                                       size = 0.3) + ggplot2::geom_vline(xintercept = 0.05, colour = "#888888", linetype = "dashed", size = 1) + ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) + ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, size = 0.3) + ggplot2::geom_step(direction = "hv", size = 1) + ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + ggplot2::scale_x_continuous("Alpha", limits = c(0, 1), breaks = c(breaks, 0.05), labels = c("", ".25", ".50", ".75", "1", ".05")) + ggplot2::scale_y_continuous("Fraction with p < alpha", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "right")
   })
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
@@ -316,10 +314,9 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, fileName = NULL) {
 #'                    estimate>))/qnorm(0.025).
 #' @param trueLogRr   A vector of the true effect sizes.
 #' @param xLabel      The label on the x-axis: the name of the effect estimate.
-#' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
-#'                         the function \code{ggsave} in the ggplot2 package for supported file
-#'                         formats.
-#'                         
+#' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
+#'                    function \code{ggsave} in the ggplot2 package for supported file formats.
+#'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
 #'
@@ -328,7 +325,11 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, fileName = NULL) {
 #' plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
 #'
 #' @export
-plotTrueAndObserved <- function(logRr, seLogRr, trueLogRr, xLabel = "Relative risk", fileName = NULL) {
+plotTrueAndObserved <- function(logRr,
+                                seLogRr,
+                                trueLogRr,
+                                xLabel = "Relative risk",
+                                fileName = NULL) {
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 6)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 5, hjust = 1)
@@ -345,22 +346,17 @@ plotTrueAndObserved <- function(logRr, seLogRr, trueLogRr, xLabel = "Relative ri
   coverage <- aggregate(!significant ~ trueRr, data = data, mean)
   names(coverage)[2] <- "coverage"
   plot <- with(data, {
-    ggplot2::ggplot(data, ggplot2::aes(x = exp(logRr),
-                                               y = order,
-                                               xmin = exp(logLb95Rr),
-                                               xmax = exp(logUb95Rr),
-                                               colour = significant,
-                                               fill = significant),
-                            environment = environment()) + 
-      ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
-      ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) + 
-      ggplot2::geom_errorbarh(height = 0) + ggplot2::geom_point(shape = 21, size = 1.5) + 
-      ggplot2::scale_colour_manual(values = col) + 
-      ggplot2::scale_fill_manual(values = colFill) + 
-      ggplot2::coord_cartesian(xlim = c(0.25, 10)) + 
-      ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
-      ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + 
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank(), axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.y = ggplot2::element_blank(), strip.background = ggplot2::element_blank(), legend.position = "none")
+    ggplot2::ggplot(data,
+                    ggplot2::aes(x = exp(logRr),
+                                 y = order,
+                                 xmin = exp(logLb95Rr),
+                                 xmax = exp(logUb95Rr),
+                                 colour = significant,
+                                 fill = significant),
+                    environment = environment()) + ggplot2::geom_vline(xintercept = breaks,
+                                                                       colour = "#AAAAAA",
+                                                                       lty = 1,
+                                                                       size = 0.2) + ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) + ggplot2::geom_errorbarh(height = 0) + ggplot2::geom_point(shape = 21, size = 1.5) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_cartesian(xlim = c(0.25, 10)) + ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank(), axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.y = ggplot2::element_blank(), strip.background = ggplot2::element_blank(), legend.position = "none")
   })
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 7, dpi = 400)
@@ -379,10 +375,9 @@ plotTrueAndObserved <- function(logRr, seLogRr, trueLogRr, xLabel = "Relative ri
 #'                    estimate>))/qnorm(0.025)
 #' @param trueLogRr   A vector of the true effect sizes
 #' @param region      Size of the confidence interval. Default is .95 (95 percent).
-#' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
-#'                         the function \code{ggsave} in the ggplot2 package for supported file
-#'                         formats.
-#'                         
+#' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
+#'                    function \code{ggsave} in the ggplot2 package for supported file formats.
+#'
 #' @examples
 #' data <- simulateControls(n = 50 * 3, mean = 0, sd = 0.15, trueLogRr = log(c(1, 2, 4)))
 #' plotCoverage(data$logRr, data$seLogRr, data$trueLogRr)
@@ -411,25 +406,18 @@ plotCoverage <- function(logRr, seLogRr, trueLogRr, region = 0.95, fileName = NU
   vizD$pos <- sapply(vizD$pos, function(x) {
     min(max(x, 0.05), 0.95)
   })
-  
+
   vizD$label <- paste(round(100 * vizD$fraction), "%", sep = "")
   vizD$group <- factor(vizD$group, levels = c("Below CI", "Within CI", "Above CI"))
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   plot <- with(vizD, {
-    ggplot2::ggplot(vizD, ggplot2::aes(x = as.factor(trueRr), y = fraction)) + 
-      ggplot2::geom_bar(ggplot2::aes(fill = group), stat = "identity", position = "stack", alpha = 0.8) + 
-      ggplot2::scale_fill_manual(values = c("#174a9f", "#f9dd75", "#f15222")) + 
-      ggplot2::geom_text(ggplot2::aes(label = label, y = pos), size = 3) + 
-      ggplot2::scale_x_discrete("True relative risk") + 
-      ggplot2::scale_y_continuous("Coverage") + 
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
-                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
-                     panel.grid.major = ggplot2::element_blank(), 
-                     axis.ticks = ggplot2::element_blank(), 
-                     axis.text.y = ggplot2::element_blank(), 
-                     axis.text.x = theme, 
-                     legend.key = ggplot2::element_blank(), 
-                     legend.position = "right")
+    ggplot2::ggplot(vizD, ggplot2::aes(x = as.factor(trueRr),
+                                       y = fraction)) + ggplot2::geom_bar(ggplot2::aes(fill = group),
+                                                                                                 stat = "identity",
+                                                                                                 position = "stack",
+                                                                                                 alpha = 0.8) + ggplot2::scale_fill_manual(values = c("#174a9f",
+                                                                                                                                                      "#f9dd75",
+                                                                                                                                                      "#f15222")) + ggplot2::geom_text(ggplot2::aes(label = label, y = pos), size = 3) + ggplot2::scale_x_discrete("True relative risk") + ggplot2::scale_y_continuous("Coverage") + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank(), axis.text.x = theme, legend.key = ggplot2::element_blank(), legend.position = "right")
   })
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 3.5, dpi = 400)
@@ -442,11 +430,11 @@ plotCoverage <- function(logRr, seLogRr, trueLogRr, region = 0.95, fileName = NU
 #' @details
 #' Plot the trace of the MCMC for diagnostics purposes.
 #'
-#' @param mcmcNull         An object of type \code{mcmcNull} as generated using the \code{fitMcmcNull} function.
-#' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
-#'                         the function \code{ggsave} in the ggplot2 package for supported file
-#'                         formats.
-#'                         
+#' @param mcmcNull   An object of type \code{mcmcNull} as generated using the \code{fitMcmcNull}
+#'                   function.
+#' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
+#'                   function \code{ggsave} in the ggplot2 package for supported file formats.
+#'
 #' @examples
 #' data(sccs)
 #' negatives <- sccs[sccs$groundTruth == 0, ]
@@ -454,17 +442,16 @@ plotCoverage <- function(logRr, seLogRr, trueLogRr, region = 0.95, fileName = NU
 #' plotMcmcTrace(null)
 #'
 #' @export
-plotMcmcTrace <- function(mcmcNull, fileName = NULL){
+plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
   mcmc <- attr(mcmcNull, "mcmc")
-  dataMean <- data.frame(x = 1:nrow(mcmc$chain), trace = as.numeric(ts(mcmc$chain[, 1])), var = "Mean")
-  dataPrecision <- data.frame(x = 1:nrow(mcmc$chain), trace = as.numeric(ts(mcmc$chain[, 2])), var = "Precision")
+  dataMean <- data.frame(x = 1:nrow(mcmc$chain), trace = as.numeric(ts(mcmc$chain[,
+                                                                       1])), var = "Mean")
+  dataPrecision <- data.frame(x = 1:nrow(mcmc$chain), trace = as.numeric(ts(mcmc$chain[,
+                                                                            2])), var = "Precision")
   data <- rbind(dataMean, dataPrecision)
   plot <- with(data, {
-    ggplot2::ggplot(data, ggplot2::aes(x = x, y = trace)) + 
-      ggplot2::geom_line(alpha = 0.7) + 
-      ggplot2::scale_x_continuous("Iterations") + 
-      ggplot2::facet_grid(var~., scales = "free") +
-      ggplot2::theme(axis.title.y = ggplot2::element_blank())
+    ggplot2::ggplot(data, ggplot2::aes(x = x,
+                                       y = trace)) + ggplot2::geom_line(alpha = 0.7) + ggplot2::scale_x_continuous("Iterations") + ggplot2::facet_grid(var ~ ., scales = "free") + ggplot2::theme(axis.title.y = ggplot2::element_blank())
   })
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 3.5, dpi = 400)

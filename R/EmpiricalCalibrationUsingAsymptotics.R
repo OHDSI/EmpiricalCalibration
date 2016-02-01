@@ -46,31 +46,31 @@
 #'
 #' @export
 fitNull <- function(logRr, seLogRr) {
-  if (any(is.infinite(seLogRr))){
+  if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     logRr <- logRr[!is.infinite(seLogRr)]
     seLogRr <- seLogRr[!is.infinite(seLogRr)]
   }
-  if (any(is.infinite(logRr))){
+  if (any(is.infinite(logRr))) {
     warning("Estimate(s) with infinite logRr detected. Removing before fitting null distribution")
     seLogRr <- seLogRr[!is.infinite(logRr)]
     logRr <- logRr[!is.infinite(logRr)]
   }
-  if (any(is.na(seLogRr))){
+  if (any(is.na(seLogRr))) {
     warning("Estimate(s) with NA standard error detected. Removing before fitting null distribution")
     logRr <- logRr[!is.na(seLogRr)]
     seLogRr <- seLogRr[!is.na(seLogRr)]
   }
-  if (any(is.na(logRr))){
+  if (any(is.na(logRr))) {
     warning("Estimate(s) with NA logRr detected. Removing before fitting null distribution")
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
-  }  
-  
+  }
+
   gaussianProduct <- function(mu1, mu2, sd1, sd2) {
     (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
   }
-  
+
   LL <- function(theta, estimate, se) {
     result <- 0
     for (i in 1:length(estimate)) {
@@ -96,7 +96,7 @@ print.null <- function(x, ...) {
   colnames(output) <- c("Estimate")
   rownames(output) <- c("Mean", "SD")
   printCoefmat(output)
-  
+
 }
 
 #' Calibrate the p-value
@@ -107,14 +107,13 @@ print.null <- function(x, ...) {
 #' @details
 #' This function computes a calibrated two-sided p-value as described in Schuemie et al (2014).
 #'
-#' @param logRr                      A numeric vector of one or more effect estimates on the log scale
-#' @param seLogRr                    The standard error of the log of the effect estimates. Hint: often
-#'                                   the standard error = (log(<lower bound 95 percent confidence
-#'                                   interval>) - log(<effect estimate>))/qnorm(0.025)
-#' @param null                       An object of class \code{null} created using the \code{fitNull}
-#'                                   function or an object of class \code{mcmcNull} created using the 
-#'                                   \code{fitMcmcNull} function.
-#' @param ...                        Any additional parameters (currently none).
+#' @param logRr     A numeric vector of one or more effect estimates on the log scale
+#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
+#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                  estimate>))/qnorm(0.025)
+#' @param null      An object of class \code{null} created using the \code{fitNull} function or an
+#'                  object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.
+#' @param ...       Any additional parameters (currently none).
 #'
 #' @return
 #' The two-sided calibrated p-value.
@@ -136,16 +135,17 @@ calibrateP <- function(null, logRr, seLogRr, ...) {
 }
 
 
-#' @describeIn calibrateP Computes the calibrated P-value using asymptotic assumptions.
+#' @describeIn
+#' calibrateP Computes the calibrated P-value using asymptotic assumptions.
 #' @export
 calibrateP.null <- function(null, logRr, seLogRr, ...) {
-  
+
   oneAdjustedP <- function(logRR, se, null) {
     P_upper_bound <- pnorm((null[1] - logRR)/sqrt(null[2]^2 + se^2))
     P_lower_bound <- pnorm((logRR - null[1])/sqrt(null[2]^2 + se^2))
     2 * min(P_upper_bound, P_lower_bound)
   }
-  
+
   adjustedP <- vector(length = length(logRr))
   for (i in 1:length(logRr)) {
     if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
@@ -179,5 +179,5 @@ calibrateP.null <- function(null, logRr, seLogRr, ...) {
 #' @export
 computeTraditionalP <- function(logRr, seLogRr) {
   z <- logRr/seLogRr
-  return(2 * pmin(pnorm(z), 1 - pnorm(z))) # 2-sided p-value
+  return(2 * pmin(pnorm(z), 1 - pnorm(z)))  # 2-sided p-value
 }

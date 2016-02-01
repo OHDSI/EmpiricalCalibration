@@ -17,20 +17,20 @@
 # limitations under the License.
 
 # Format and check code:
-  OhdsiRTools::formatRFolder()
-  OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
+OhdsiRTools::formatRFolder()
+OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
 
 # Create manual and vignettes:
-  shell("rm extras/EmpiricalCalibration.pdf")
-  shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
-  
-  rmarkdown::render("vignettes/EmpiricalCalibrationVignette.Rmd",
-                    output_file = "../extras/EmpiricalCalibrationVignette.pdf",
-                    rmarkdown::pdf_document(latex_engine = "pdflatex",
-                                            toc = TRUE,
-                                            number_sections = TRUE))
+shell("rm extras/EmpiricalCalibration.pdf")
+shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
+
+rmarkdown::render("vignettes/EmpiricalCalibrationVignette.Rmd",
+                  output_file = "../extras/EmpiricalCalibrationVignette.pdf",
+                  rmarkdown::pdf_document(latex_engine = "pdflatex",
+                                          toc = TRUE,
+                                          number_sections = TRUE))
 
 # Release package:
-  devtools::build_win() 
-  
-  devtools::release()
+devtools::build_win()
+
+devtools::release()

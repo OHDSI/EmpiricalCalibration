@@ -13,19 +13,19 @@ calibrateP(null, logRr, seLogRr, ...)
 \method{calibrateP}{mcmcNull}(null, logRr, seLogRr, pValueOnly, ...)
 }
 \arguments{
-\item{null}{An object of class \code{null} created using the \code{fitNull}
-function or an object of class \code{mcmcNull} created using the 
-\code{fitMcmcNull} function.}
+\item{null}{An object of class \code{null} created using the \code{fitNull} function or an
+object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.}
 
 \item{logRr}{A numeric vector of one or more effect estimates on the log scale}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often
-the standard error = (log(<lower bound 95 percent confidence
-interval>) - log(<effect estimate>))/qnorm(0.025)}
+\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
+error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+estimate>))/qnorm(0.025)}
 
 \item{...}{Any additional parameters (currently none).}
 
-\item{pValueOnly}{If true, will return only the calibrated P-value itself, not the credible interval.}
+\item{pValueOnly}{If true, will return only the calibrated P-value itself, not the credible
+interval.}
 }
 \value{
 The two-sided calibrated p-value.
@@ -40,7 +40,8 @@ This function computes a calibrated two-sided p-value as described in Schuemie e
 \itemize{
 \item \code{null}: Computes the calibrated P-value using asymptotic assumptions.
 
-\item \code{mcmcNull}: Computes the calibrated P-value and 95 percent credibel interval using Markov Chain Monte Carlo (MCMC).
+\item \code{mcmcNull}: Computes the calibrated P-value and 95 percent credibel interval using Markov Chain
+Monte Carlo (MCMC).
 }}
 \examples{
 data(sccs)

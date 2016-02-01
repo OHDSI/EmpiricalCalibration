@@ -17,9 +17,8 @@ estimate>))/qnorm(0.025)}
 
 \item{region}{Size of the confidence interval. Default is .95 (95 percent).}
 
-\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
-the function \code{ggsave} in the ggplot2 package for supported file
-formats.}
+\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
+function \code{ggsave} in the ggplot2 package for supported file formats.}
 }
 \description{
 Plot the coverage

@@ -15,9 +15,8 @@ estimate>))/qnorm(0.025)}
 
 \item{useMcmc}{Use MCMC to estimate the calibrated P-value?}
 
-\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
-the function \code{ggsave} in the ggplot2 package for supported file
-formats.}
+\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
+function \code{ggsave} in the ggplot2 package for supported file formats.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.

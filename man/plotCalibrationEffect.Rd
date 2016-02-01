@@ -26,8 +26,8 @@ controls.}
 
 \item{xLabel}{The label on the x-axis: the name of the effect estimate.}
 
-\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
-the function \code{ggsave} in the ggplot2 package for supported file
+\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'.
+See the function \code{ggsave} in the ggplot2 package for supported file
 formats.}
 }
 \value{

@@ -7,11 +7,11 @@
 plotMcmcTrace(mcmcNull, fileName = NULL)
 }
 \arguments{
-\item{mcmcNull}{An object of type \code{mcmcNull} as generated using the \code{fitMcmcNull} function.}
+\item{mcmcNull}{An object of type \code{mcmcNull} as generated using the \code{fitMcmcNull}
+function.}
 
-\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
-the function \code{ggsave} in the ggplot2 package for supported file
-formats.}
+\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
+function \code{ggsave} in the ggplot2 package for supported file formats.}
 }
 \description{
 Plot the MCMC trace

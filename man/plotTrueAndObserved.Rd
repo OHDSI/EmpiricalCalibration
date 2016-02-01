@@ -18,9 +18,8 @@ estimate>))/qnorm(0.025).}
 
 \item{xLabel}{The label on the x-axis: the name of the effect estimate.}
 
-\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
-the function \code{ggsave} in the ggplot2 package for supported file
-formats.}
+\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
+function \code{ggsave} in the ggplot2 package for supported file formats.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.

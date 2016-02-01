@@ -18,17 +18,16 @@ Incidence rate ratios from Self-Controlled Case Series
 A dataset containing the incidence rate ratios (and standard errors) produced using a
 Self-Controlled Case Series (SCCS) design. The outcome is upper GI bleeding, the drug of interest
 (groundTruth = 1) is sertraline. Also included are 45 negative control drugs, for which we believe
-there to be no causal relation with upper GI bleeding.
-We used a database of medical records from general practices in the USA, the General Electric (GE)
-Centricity database, which contains data on 11.2 million subjects. We restricted on study period
-(start of 1990 through November 2003), age requirements (18 years or older), available time prior
-to event (180 days), and risk definition window (30 days following the prescription). Time 30 days
-prior to the first prescription was removed to account for possible contra-indications. Cases of
-upper GI bleeding were identified on the basis of the occurrence of ICD-9 diagnosis codes in the
-problem list. These codes pertain to esophageal, gastric, duodenal, peptic, and gastrojejunal
-ulceration, perforation, and hemorrhage, as well as gastritis and non-specific gastrointestinal
-hemorrhage.
-For more information on this set see Schuemie et al (2014).
+there to be no causal relation with upper GI bleeding. We used a database of medical records from
+general practices in the USA, the General Electric (GE) Centricity database, which contains data on
+11.2 million subjects. We restricted on study period (start of 1990 through November 2003), age
+requirements (18 years or older), available time prior to event (180 days), and risk definition
+window (30 days following the prescription). Time 30 days prior to the first prescription was
+removed to account for possible contra-indications. Cases of upper GI bleeding were identified on
+the basis of the occurrence of ICD-9 diagnosis codes in the problem list. These codes pertain to
+esophageal, gastric, duodenal, peptic, and gastrojejunal ulceration, perforation, and hemorrhage,
+as well as gastritis and non-specific gastrointestinal hemorrhage. For more information on this set
+see Schuemie et al (2014).
 }
 \references{
 Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
