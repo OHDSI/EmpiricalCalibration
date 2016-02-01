@@ -16,13 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.formatAndCheckCode <- function() {
+# Format and check code:
   OhdsiRTools::formatRFolder()
   OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
-}
 
-
-.createManualAndVignettes <- function() {
+# Create manual and vignettes:
   shell("rm extras/EmpiricalCalibration.pdf")
   shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
   
@@ -31,10 +29,8 @@
                     rmarkdown::pdf_document(latex_engine = "pdflatex",
                                             toc = TRUE,
                                             number_sections = TRUE))
-}
 
-releasePackage <- function() {
+# Release package:
   devtools::build_win() 
   
   devtools::release()
-}
