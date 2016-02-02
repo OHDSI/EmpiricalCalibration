@@ -17,6 +17,7 @@ addToDrat(){
   git checkout gh-pages
 
   ## Install drat
+  echo 'R_LIBS=~/Rlib' > .Renviron
   Rscript -e "if(!require('drat')) install.packages('drat')"
   
   ## Get file names
