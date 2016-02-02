@@ -17,10 +17,12 @@ addToDrat(){
   git checkout gh-pages
 
   ## Install drat
-  mkdir -p ~/Rlib
-  echo 'R_LIBS=~/Rlib' > .Renviron
-  Rscript -e 'if(!"drat" %in% rownames(installed.packages())) { install.packages("drat", dependencies = TRUE) }'
-
+  Rscript -e "if(!require('drat')) install.packages('drat')"
+  
+  ## Get file names
+  PKG_NAME=$(Rscript -e 'cat(paste0(devtools::as.package(".")$package))')
+  PKG_TARBALL=$(Rscript -e 'pkg <- devtools::as.package("."); cat(paste0(pkg$package,"_",pkg$version,".tar.gz"))')  
+  
   ## Deploy
   Rscript -e "drat::insertPackage('$PKG_REPO/$PKG_TARBALL', \
     repodir = '.', \

@@ -47,12 +47,13 @@ install:
   - wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-pandoc | bash
   - PATH=$HOME/texlive/bin/x86_64-linux:$PATH  
   # Install R packages
+  - Rscript -e "if (!require('devtools')) install.packages('devtools')"    
+  - Rscript -e "if (!require('covr')) devtools::install_github('jimhester/covr')"  
   - Rscript -e "if (!require('rmarkdown')) install.packages('rmarkdown')"  
   - Rscript -e "if (!require('knitr')) install.packages('knitr')"    
   - Rscript -e "if (!require('ggplot2')) install.packages('ggplot2')"    
   - Rscript -e "if (!require('MASS')) install.packages('MASS')" 
-  - Rscript -e "if (!require('stringi')) install.packages('stringi')"       
-#  - Rscript -e "library(stringi); stri_install_icudt()"    
+  - Rscript -e "if (!require('stringi')) install.packages('stringi')"
   
 #before_script:
 #  - sudo Rscript -e "library(stringi); stri_install_icudt()"
