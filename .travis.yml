@@ -25,6 +25,7 @@ addons:
     - r-base-dev
     - r-recommended
     - texinfo
+    - qpdf
     
 cache:
   directories:
