@@ -216,6 +216,7 @@ plotCalibrationEffect <- function(logRrNegatives,
 #'                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 #'                   estimate>))/qnorm(0.025)
 #' @param useMcmc    Use MCMC to estimate the calibrated P-value?
+#' @param legendPosition  Where should the legend be positioned? ("none", "left", "right", "bottom", "top")
 #' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
 #'                   function \code{ggsave} in the ggplot2 package for supported file formats.
 #'
@@ -407,6 +408,10 @@ plotCoverage <- function(logRr, seLogRr, trueLogRr, region = 0.95, fileName = NU
                      logUb95Rr = logRr + qnorm(1 - (1 - region)/2) * seLogRr,
                      trueLogRr = trueLogRr,
                      trueRr = round(exp(trueLogRr), 2))
+  if (any(is.na(data$logRr))) {
+    warning("Some estimates are NA, removing prior to computing coverage")
+    data <- data[!is.na(data$logRr), ]
+  }
   vizD <- data.frame()
   for (trueRr in unique(data$trueRr)) {
     subset <- data[data$trueRr == trueRr, ]

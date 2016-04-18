@@ -40,6 +40,30 @@
 #'
 #' @export
 fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr) {
+  if (any(is.infinite(seLogRr))) {
+    warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
+    trueLogRr <- trueLogRr[!is.infinite(seLogRr)]
+    logRr <- logRr[!is.infinite(seLogRr)]
+    seLogRr <- seLogRr[!is.infinite(seLogRr)]
+  }
+  if (any(is.infinite(logRr))) {
+    warning("Estimate(s) with infinite logRr detected. Removing before fitting error model")
+    trueLogRr <- trueLogRr[!is.infinite(logRr)]
+    seLogRr <- seLogRr[!is.infinite(logRr)]
+    logRr <- logRr[!is.infinite(logRr)]
+  }
+  if (any(is.na(seLogRr))) {
+    warning("Estimate(s) with NA standard error detected. Removing before fitting error model")
+    trueLogRr <- trueLogRr[!is.na(seLogRr)]
+    logRr <- logRr[!is.na(seLogRr)]
+    seLogRr <- seLogRr[!is.na(seLogRr)]
+  }
+  if (any(is.na(logRr))) {
+    warning("Estimate(s) with NA logRr detected. Removing before fitting error model")
+    trueLogRr <- trueLogRr[!is.na(logRr)]
+    seLogRr <- seLogRr[!is.na(logRr)]
+    logRr <- logRr[!is.na(logRr)]
+  }
 
   gaussianProduct <- function(mu1, mu2, sd1, sd2) {
     (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))

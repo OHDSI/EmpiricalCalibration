@@ -16,6 +16,8 @@ estimate>))/qnorm(0.025)}
 
 \item{useMcmc}{Use MCMC to estimate the calibrated P-value?}
 
+\item{legendPosition}{Where should the legend be positioned? ("none", "left", "right", "bottom", "top")}
+
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
 function \code{ggsave} in the ggplot2 package for supported file formats.}
 }
