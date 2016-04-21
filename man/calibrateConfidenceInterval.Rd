@@ -4,7 +4,7 @@
 \alias{calibrateConfidenceInterval}
 \title{Calibrate confidence intervals}
 \usage{
-calibrateConfidenceInterval(logRr, seLogRr, model)
+calibrateConfidenceInterval(logRr, seLogRr, model, ciWidth = 0.95)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -15,6 +15,8 @@ estimate>))/qnorm(0.025).}
 
 \item{model}{An object of type \code{systematicErrorModel} as created by the
 \code{\link{fitSystematicErrorModel}} function.}
+
+\item{ciWidth}{The width of the confidence interval. Typically this would be .95, for the 95 percent confidence interval.}
 }
 \value{
 A data frame with calibrated confidence intervals and point estimates.

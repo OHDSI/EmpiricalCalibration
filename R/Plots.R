@@ -318,6 +318,147 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
   return(plot)
 }
 
+#' Create a confidence interval calibration plot
+#'
+#' @description
+#' \code{plotCalibration} creates a plot showing the calibration of our confidence interval calibration procedure
+#'
+#' @details
+#' Creates a calibration plot showing the fraction of effects within the confidence interval.
+#' The empirical calibration is performed using a leave-one-out design: The confidence interval of an effect is
+#' computed by fitting a null using all other controls. Ideally, the calibration line should
+#' approximate the diagonal. The plot shows the coverage for both theoretical (traditional) and empirically calibrated
+#' confidence intervals.
+#'
+#' @param logRr      A numeric vector of effect estimates on the log scale.
+#' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard
+#'                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                   estimate>))/qnorm(0.025).
+#' @param trueLogRr  The true log relative risk.
+#' @param strata     Variable used to stratify the plot. Set \code{strata = NULL} for no stratification.
+#' @param legendPosition  Where should the legend be positioned? ("none", "left", "right", "bottom", "top").
+#' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
+#'                   function \code{ggsave} in the ggplot2 package for supported file formats.
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
+#' plotCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
+#'
+#' @export
+plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr), legendPosition = "right", fileName = NULL) {
+  if (!is.null(strata) && !is.factor(strata)) 
+    stop("Strata argument should be a factor (or null)")
+  if (is.null(strata))
+    strata = as.factor(-1)
+  data <- data.frame(logRr = logRr, seLogRr = seLogRr, trueLogRr = trueLogRr, strata = strata)
+  if (any(is.infinite(data$seLogRr))) {
+    warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
+    data <- data[!is.infinite(seLogRr), ]
+  }
+  if (any(is.infinite(data$logRr))) {
+    warning("Estimate(s) with infinite logRr detected. Removing before fitting error model")
+    data <- data[!is.infinite(logRr), ]  
+  }
+  if (any(is.na(data$seLogRr))) {
+    warning("Estimate(s) with NA standard error detected. Removing before fitting error model")
+    data <- data[!is.na(seLogRr), ]
+  }
+  if (any(is.na(data$logRr))) {
+    warning("Estimate(s) with NA logRr detected. Removing before fitting error model")
+    data <- data[!is.na(logRr), ]
+  }
+  fitLooErrorModel <- function(leaveOutIndex, data) {
+    dataLeaveOneOut <- data[-leaveOutIndex, ]
+    return(fitSystematicErrorModel(logRr = dataLeaveOneOut$logRr,
+                                   seLogRr = dataLeaveOneOut$seLogRr,
+                                   trueLogRr = dataLeaveOneOut$trueLogRr))
+  }
+  writeLines("Fitting error models within leave-one-out cross-validation")
+  models <- sapply(1:nrow(data), fitLooErrorModel, data = data)
+  models <- t(models)
+  data <- cbind(data, models)
+  ciWidth <- seq(0.01, 0.99, by = 0.01)
+  
+  withinCi <- function(i, ciWidth, strataData) {
+    ci <- calibrateConfidenceInterval(logRr = strataData$logRr[i],
+                                      seLogRr = strataData$seLogRr[i],
+                                      ciWidth = ciWidth,
+                                      model = as.numeric(strataData[i, c("meanIntercept", "meanSlope", "sdIntercept", "sdSlope")]))
+    return(strataData$trueLogRr[i] >= ci$logLb95Rr && strataData$trueLogRr[i] <= ci$logUb95Rr)
+  }
+  
+  coverage <- function(ciWidth, strataData) {
+    covered <- sapply(1:nrow(strataData), withinCi, ciWidth = ciWidth, strataData = strataData)
+    return(mean(covered))
+  }
+  
+  theoreticalCoverage <- function(ciWidth, strataData) {
+    covered <- (strataData$trueLogRr >= strataData$logRr + qnorm((1-ciWidth)/2)*strataData$seLogRr) & (strataData$trueLogRr <= strataData$logRr - qnorm((1-ciWidth)/2)*strataData$seLogRr)
+    return(mean(covered))
+  }
+  
+  vizData <- data.frame()
+  for (stratum in levels(data$strata)) {
+    strataData <- data[data$strata == stratum, ]
+    coveragePerCiWidth <- sapply(ciWidth, coverage, strataData = strataData)
+    theorCoveragePerCiWidth <- sapply(ciWidth, theoreticalCoverage, strataData = strataData)
+    vizData <- rbind(vizData, data.frame(ciWidth = ciWidth,
+                                         coverage = coveragePerCiWidth,
+                                         label = "Empirical",
+                                         stratum = stratum))
+    vizData <- rbind(vizData, data.frame(ciWidth = ciWidth,
+                                         coverage = theorCoveragePerCiWidth,
+                                         label = "Theoretical",
+                                         stratum = stratum))
+  }
+  names(vizData)[names(vizData) == "label"] <- "CI calculation"
+  vizData$trueRr <- as.factor(exp(as.numeric(as.character(vizData$stratum))))
+  breaks <- c(0, 0.25, 0.5, 0.75, 1)
+  theme <- ggplot2::element_text(colour = "#000000", size = 10)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
+  plot <- with(vizData, {
+    ggplot2::ggplot(vizData,
+                    ggplot2::aes(x = ciWidth,
+                                 y = coverage,
+                                 colour = `CI calculation`,
+                                 linetype = `CI calculation`),
+                    environment = environment()) + 
+      ggplot2::geom_vline(xintercept = breaks,
+                          colour = "#AAAAAA",
+                          lty = 1,
+                          size = 0.3) + 
+      ggplot2::geom_vline(xintercept = 0.95, colour = "#888888", linetype = "dashed", size = 1) + 
+      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) + 
+      ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, size = 0.3) + 
+      ggplot2::geom_line(size = 1) + 
+      ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + 
+      ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + 
+      ggplot2::scale_x_continuous("Width of CI", limits = c(0, 1), breaks = c(breaks, 0.95), labels = c("0", ".25", ".50", ".75", "", ".95")) + 
+      ggplot2::scale_y_continuous("Coverage", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + 
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
+                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
+                     panel.grid.major = ggplot2::element_blank(), 
+                     axis.ticks = ggplot2::element_blank(), 
+                     axis.text.y = themeRA, 
+                     axis.text.x = theme, 
+                     strip.text.x = theme, 
+                     strip.background = ggplot2::element_blank(), 
+                     legend.position = legendPosition)
+  })
+  if (length(strata) != 1 && strata != -1) {
+    plot <- with(vizData, {
+      plot + ggplot2::facet_wrap(~trueRr)
+    })
+  }
+  
+  if (!is.null(fileName))
+    ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
+  return(plot)
+}
+
 #' Plot true and observed values
 #'
 #' @description
@@ -381,72 +522,6 @@ plotTrueAndObserved <- function(logRr,
     ggplot2::ggsave(fileName, plot, width = 5, height = 7, dpi = 400)
   return(plot)
 }
-
-#' Plot the coverage
-#'
-#' @details
-#' Plot the fractions of estimates where the true effect size is below, above or within the confidence
-#' interval, for one or more true effect sizes.
-#'
-#' @param logRr       A numeric vector of effect estimates on the log scale
-#' @param seLogRr     The standard error of the log of the effect estimates. Hint: often the standard
-#'                    error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                    estimate>))/qnorm(0.025)
-#' @param trueLogRr   A vector of the true effect sizes
-#' @param region      Size of the confidence interval. Default is .95 (95 percent).
-#' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
-#'                    function \code{ggsave} in the ggplot2 package for supported file formats.
-#'
-#' @examples
-#' data <- simulateControls(n = 50 * 3, mean = 0, sd = 0.15, trueLogRr = log(c(1, 2, 4)))
-#' plotCoverage(data$logRr, data$seLogRr, data$trueLogRr)
-#'
-#' @export
-plotCoverage <- function(logRr, seLogRr, trueLogRr, region = 0.95, fileName = NULL) {
-  data <- data.frame(logRr = logRr,
-                     logLb95Rr = logRr + qnorm((1 - region)/2) * seLogRr,
-                     logUb95Rr = logRr + qnorm(1 - (1 - region)/2) * seLogRr,
-                     trueLogRr = trueLogRr,
-                     trueRr = round(exp(trueLogRr), 2))
-  if (any(is.na(data$logRr))) {
-    warning("Some estimates are NA, removing prior to computing coverage")
-    data <- data[!is.na(data$logRr), ]
-  }
-  vizD <- data.frame()
-  for (trueRr in unique(data$trueRr)) {
-    subset <- data[data$trueRr == trueRr, ]
-    d <- data.frame(trueRr = trueRr, group = c("Below CI",
-                                               "Within CI",
-                                               "Above CI"), fraction = 0, pos = 0)
-    d$fraction[1] <- mean(subset$trueLogRr < subset$logLb95Rr)
-    d$fraction[2] <- mean(subset$trueLogRr >= subset$logLb95Rr & subset$trueLogRr <= subset$logUb95Rr)
-    d$fraction[3] <- mean(subset$trueLogRr > subset$logUb95Rr)
-    d$pos[1] <- d$fraction[1]/2
-    d$pos[2] <- d$fraction[1] + (d$fraction[2]/2)
-    d$pos[3] <- d$fraction[1] + d$fraction[2] + (d$fraction[3]/2)
-    vizD <- rbind(vizD, d)
-  }
-  vizD$pos <- sapply(vizD$pos, function(x) {
-    min(max(x, 0.05), 0.95)
-  })
-  
-  vizD$label <- paste(round(100 * vizD$fraction), "%", sep = "")
-  vizD$group <- factor(vizD$group, levels = c("Below CI", "Within CI", "Above CI"))
-  theme <- ggplot2::element_text(colour = "#000000", size = 10)
-  plot <- with(vizD, {
-    ggplot2::ggplot(vizD, ggplot2::aes(x = as.factor(trueRr),
-                                       y = fraction)) + ggplot2::geom_bar(ggplot2::aes(fill = group),
-                                                                          stat = "identity",
-                                                                          position = "stack",
-                                                                          alpha = 0.8) + ggplot2::scale_fill_manual(values = c("#174a9f",
-                                                                                                                               "#f9dd75",
-                                                                                                                               "#f15222")) + ggplot2::geom_text(ggplot2::aes(label = label, y = pos), size = 3) + ggplot2::scale_x_discrete("True relative risk") + ggplot2::scale_y_continuous("Coverage") + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank(), axis.text.x = theme, legend.key = ggplot2::element_blank(), legend.position = "right")
-  })
-  if (!is.null(fileName))
-    ggplot2::ggsave(fileName, plot, width = 5, height = 3.5, dpi = 400)
-  return(plot)
-}
-
 
 #' Plot the MCMC trace
 #'
