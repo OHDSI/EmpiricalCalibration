@@ -136,6 +136,6 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
     result$logLb95Rr[i] <- logLowerBound(ciWidth, logRr[i], seLogRr[i], model[1], model[2], model[3], model[4])
     result$logUb95Rr[i] <- logUpperBound(ciWidth, logRr[i], seLogRr[i], model[1], model[2], model[3], model[4])
   }
-  result$seLogRr <- (result$logLb95Rr - result$logUb95Rr)/2*qnorm((1-ciWidth)/2)
+  result$seLogRr <- (result$logLb95Rr - result$logUb95Rr)/(2*qnorm((1-ciWidth)/2))
   return(result)
 }
