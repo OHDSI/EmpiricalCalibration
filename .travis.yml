@@ -1,17 +1,3 @@
-#language: R
-#sudo: required
-#dist: precise
-#warnings_are_errors: false
-#
-#r_packages:
-#  - rmarkdown
-#  - knitr
-#  - ggplot2
-#  - MASS
-#
-#r_github_packages:
-#  - jimhester/covr
-
 # Use container-based Travis with caching
 
 languague: c
@@ -53,7 +39,6 @@ install:
   - Rscript -e "if (!require('knitr')) install.packages('knitr')"  
   - Rscript -e "if (!require('drat')) install.packages('drat')"      
   - Rscript -e "if (!require('ggplot2')) install.packages('ggplot2')"    
-  - Rscript -e "if (!require('MASS')) install.packages('MASS')" 
   - Rscript -e "if (!require('stringi')) install.packages('stringi')"
   
 #before_script:

@@ -91,6 +91,44 @@ logRrtoSE <- function(logRr, p, null) {
   })
 }
 
+logRrtoSeLb <- function(logRr, p, null) {
+  sapply(logRr, function(logRr) {
+    precision <- 0.001
+    if (calibrateP(null, logRr, precision, pValueOnly = FALSE)$lb95ci > p)
+      return(0)
+    L <- 0
+    H <- 100
+    while (H >= L) {
+      M <- L + (H - L)/2
+      if (calibrateP(null, logRr, M, pValueOnly = FALSE)$lb95ci - p > precision)
+        H <- M else if (p - calibrateP(null, logRr, M, pValueOnly = FALSE)$lb95ci > precision)
+          L <- M else return(M)
+    }
+    return(L - 1)
+  })
+}
+
+logRrtoSeUb <- function(logRr, p, null) {
+  sapply(logRr, function(logRr) {
+    precision <- 0.001
+    if (calibrateP(null, logRr, precision, pValueOnly = FALSE)$ub95ci > p)
+      return(0)
+    L <- 0
+    H <- 100
+    while (H >= L) {
+      M <- L + (H - L)/2
+      if (calibrateP(null, logRr, M, pValueOnly = FALSE)$ub95ci - p > precision) {
+        H <- M 
+      } else if (p - calibrateP(null, logRr, M, pValueOnly = FALSE)$ub95ci > precision) {
+        L <- M 
+      } else {
+        return(M)
+      }
+    }
+    return(L - 1)
+  })
+}
+
 #' Plot the effect of the calibration
 #'
 #' @description
@@ -111,8 +149,9 @@ logRrtoSE <- function(logRr, p, null) {
 #' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive
 #'                           controls.
 #' @param null               An object representing the fitted null distribution as created by the
-#'                           \code{fitNull} function.
+#'                           \code{fitNull} function. If not provided, a null will be fitted before plotting.
 #' @param xLabel             The label on the x-axis: the name of the effect estimate.
+#' @param showCis            Show 95 percent credible intervals for the calibrated p = 0.05 boundary.
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function \code{ggsave} in the ggplot2 package for supported file
 #'                           formats.
@@ -133,11 +172,25 @@ plotCalibrationEffect <- function(logRrNegatives,
                                   seLogRrPositives,
                                   null = NULL,
                                   xLabel = "Relative risk",
+                                  showCis = FALSE,
                                   fileName = NULL) {
-  if (is.null(null))
-    null <- fitNull(logRrNegatives, seLogRrNegatives)
+  if (is.null(null)) {
+    if (showCis) {
+      null <- fitMcmcNull(logRrNegatives, seLogRrNegatives)
+    } else {
+      null <- fitNull(logRrNegatives, seLogRrNegatives)
+    }
+  } 
+  if (showCis && is(null, "null"))
+    stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
+  
   x <- exp(seq(log(0.25), log(10), by = 0.01))
   y <- logRrtoSE(log(x), 0.05, null)
+  if (showCis){
+    writeLines("Computing 95% credible interval bounds")
+    yLb <- logRrtoSeLb(log(x), 0.05, null)
+    yUb <- logRrtoSeUb(log(x), 0.05, null)
+  }
   seTheoretical <- sapply(x, FUN = function(x) {
     abs(log(x))/qnorm(0.975)
   })
@@ -152,8 +205,20 @@ plotCalibrationEffect <- function(logRrNegatives,
     ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
                        color = rgb(1, 0.5, 0),
                        size = 1,
-                       alpha = 0.5) +
-    ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
+                       alpha = 0.5)
+  
+  if (showCis) {
+    plot <- plot + ggplot2::geom_ribbon(ggplot2::aes(ymin = yLb, ymax = yUb),
+                                      fill = rgb(0.8, 0.2, 0.2),
+                                      alpha = 0.3) +
+      ggplot2::geom_line(ggplot2::aes(y = yLb),
+                                      colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                                      size = 1) +
+      ggplot2::geom_line(ggplot2::aes(y = yUb),
+                         colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                         size = 1)
+  }
+  plot <- plot + ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
                        fill = rgb(0, 0, 0),
                        colour = rgb(0, 0, 0, alpha = 0.1),
                        alpha = 0.1) +
