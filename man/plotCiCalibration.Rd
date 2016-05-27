@@ -5,7 +5,7 @@
 \title{Create a confidence interval calibration plot}
 \usage{
 plotCiCalibration(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr),
-  legendPosition = "right", fileName = NULL)
+  legendPosition = "top", fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}

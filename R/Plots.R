@@ -348,7 +348,7 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
 #' plotCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
 #'
 #' @export
-plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr), legendPosition = "right", fileName = NULL) {
+plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr), legendPosition = "top", fileName = NULL) {
   if (!is.null(strata) && !is.factor(strata)) 
     stop("Strata argument should be a factor (or null)")
   if (is.null(strata))
@@ -450,12 +450,14 @@ plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(true
   })
   if (length(strata) != 1 && strata != -1) {
     plot <- with(vizData, {
-      plot + ggplot2::facet_wrap(~trueRr)
+      plot + ggplot2::facet_grid(. ~ trueRr)
     })
   }
   
-  if (!is.null(fileName))
-    ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
+  if (!is.null(fileName)) {
+    width <- 1 + 2 * length(levels(strata))
+    ggplot2::ggsave(fileName, plot, width = width, height = 3.5, dpi = 400)
+  }
   return(plot)
 }
 
