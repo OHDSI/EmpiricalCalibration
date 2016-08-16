@@ -409,9 +409,10 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
 #'
 #' @examples
+#' \dontrun{
 #' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
 #' plotCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
-#'
+#' }
 #' @export
 plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr), legendPosition = "top", fileName = NULL) {
   if (!is.null(strata) && !is.factor(strata)) 
