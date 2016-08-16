@@ -23,4 +23,5 @@
 #' @import stats
 #' @importFrom grDevices rgb
 #' @importFrom utils read.csv
+#' @importFrom methods is
 NULL

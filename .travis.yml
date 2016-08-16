@@ -40,6 +40,7 @@ install:
   - Rscript -e "if (!require('drat')) install.packages('drat')"      
   - Rscript -e "if (!require('ggplot2')) install.packages('ggplot2')"    
   - Rscript -e "if (!require('stringi')) install.packages('stringi')"
+  - Rscript -e "if (!require('methods')) install.packages('methods')"
   
 #before_script:
 #  - sudo Rscript -e "library(stringi); stri_install_icudt()"

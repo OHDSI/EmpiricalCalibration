@@ -2,7 +2,7 @@ Package: EmpiricalCalibration
 Type: Package
 Title: Routines for Performing Empirical Calibration of Observational Study Estimates
 Version: 1.1.1
-Date: 2016-04-18
+Date: 2016-08-16
 Author: Martijn Schuemie, Marc Suchard
 Maintainer: Martijn Schuemie <schuemie@ohdsi.org>
 Description: Routines for performing empirical calibration of observational
@@ -14,7 +14,8 @@ Description: Routines for performing empirical calibration of observational
     and systematic error into account.
 VignetteBuilder: knitr
 Imports:
-    ggplot2 (>= 2.0.0)
+    ggplot2 (>= 2.0.0),
+    methods
 Suggests:
     knitr,
     rmarkdown

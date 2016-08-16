@@ -25,7 +25,7 @@ shell("rm extras/EmpiricalCalibration.pdf")
 shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
 
 rmarkdown::render("vignettes/EmpiricalCalibrationVignette.Rmd",
-                  output_file = "../extras/EmpiricalCalibrationVignette.pdf",
+                  output_file = "../inst/doc/EmpiricalCalibrationVignette.pdf",
                   rmarkdown::pdf_document(latex_engine = "pdflatex",
                                           toc = TRUE,
                                           number_sections = TRUE))

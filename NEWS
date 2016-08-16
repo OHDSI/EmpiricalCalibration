@@ -1,0 +1,20 @@
+EmpiricalCalibration v1.1.1 (Release date: 2016-08-15)
+==============
+
+NEW FEATURES
+
+* Ability to add credible intervals to calibration effect plot
+
+* Plot CI calibration (using leave-one-out cross-validation)
+
+BUG FIXES
+
+* Fixed vignette name in index
+
+* Removed coverage plot (moved to MethodEvaluation package)
+
+
+EmpiricalCalibration v1.1.0 (Release date: 2016-02-15)
+==============
+
+Changes: initial submission to CRAN
