@@ -1,20 +1,28 @@
-This is the first submission of this package
+This is an update of the package
+
+NEW FEATURES
+
+* Ability to add credible intervals to calibration effect plot
+
+* Plot CI calibration (using leave-one-out cross-validation)
+
+BUG FIXES
+
+* Fixed vignette name in index
+
+* Removed coverage plot (moved to MethodEvaluation package)
 
 ---
 
 ## Test environments
-* Ubuntu 14.04.3 LTS (Travis), R 3.2.3
-* Windows 7, R 3.2.3
+* Ubuntu 12.04.5 LTS (Travis), R 3.2.5
+* Windows 7, R 3.3.1
+* win-builder
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs. I see 2 NOTES (on Travis):
-
-* CRAN New submission
-
-* No repository set, so cyclic dependency check skipped 
-  (Not sure how to fix this on Travis. Does not appear on Windows where I've set the repository)
+There were no ERRORs or WARNINGs. 
 
 ## Downstream dependencies
 
-This is a new submission, there are no downstream dependencies.
+There are currently no downstream dependencies.
