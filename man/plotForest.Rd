@@ -4,7 +4,8 @@
 \alias{plotForest}
 \title{Create a forest plot}
 \usage{
-plotForest(logRr, seLogRr, names, xLabel = "Relative risk", fileName = NULL)
+plotForest(logRr, seLogRr, names, xLabel = "Relative risk", title,
+  fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale}
@@ -16,6 +17,8 @@ estimate>))/qnorm(0.025)}
 \item{names}{A vector containing the names of the drugs or outcomes}
 
 \item{xLabel}{The label on the x-axis: the name of the effect estimate}
+
+\item{title}{Optional: the main title for the plot}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
 function \code{ggsave} in the ggplot2 package for supported file formats.}

@@ -5,7 +5,7 @@
 \title{Create a confidence interval calibration plot}
 \usage{
 plotCiCalibration(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr),
-  legendPosition = "top", fileName = NULL)
+  legendPosition = "top", title, fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -19,6 +19,8 @@ estimate>))/qnorm(0.025).}
 \item{strata}{Variable used to stratify the plot. Set \code{strata = NULL} for no stratification.}
 
 \item{legendPosition}{Where should the legend be positioned? ("none", "left", "right", "bottom", "top").}
+
+\item{title}{Optional: the main title for the plot}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
 function \code{ggsave} in the ggplot2 package for supported file formats.}

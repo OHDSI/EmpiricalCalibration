@@ -32,6 +32,7 @@
 #'                   estimate>))/qnorm(0.025)
 #' @param names      A vector containing the names of the drugs or outcomes
 #' @param xLabel     The label on the x-axis: the name of the effect estimate
+#' @param title      Optional: the main title for the plot
 #'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -44,7 +45,7 @@
 #' plotForest(negatives$logRr, negatives$seLogRr, negatives$drugName)
 #'
 #' @export
-plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", fileName = NULL) {
+plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", title, fileName = NULL) {
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 6)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 5, hjust = 1)
@@ -69,6 +70,9 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", fileName
                                                                        lty = 1,
                                                                        size = 0.2) + ggplot2::geom_hline(yintercept = 1, size = 0.5) + ggplot2::geom_pointrange(shape = 23) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_flip(ylim = c(0.25, 10)) + ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "none")
   })
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 2.5 + length(logRr) * 0.8, dpi = 400)
   return(plot)
@@ -151,6 +155,7 @@ logRrtoSeUb <- function(logRr, p, null) {
 #' @param null               An object representing the fitted null distribution as created by the
 #'                           \code{fitNull} function. If not provided, a null will be fitted before plotting.
 #' @param xLabel             The label on the x-axis: the name of the effect estimate.
+#' @param title      Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the calibrated p = 0.05 boundary.
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function \code{ggsave} in the ggplot2 package for supported file
@@ -172,6 +177,7 @@ plotCalibrationEffect <- function(logRrNegatives,
                                   seLogRrPositives,
                                   null = NULL,
                                   xLabel = "Relative risk",
+                                  title,
                                   showCis = FALSE,
                                   fileName = NULL) {
   if (is.null(null)) {
@@ -259,6 +265,9 @@ plotCalibrationEffect <- function(logRrNegatives,
                                        fill = rgb(1, 1, 0),
                                        alpha = 0.8)
   }
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
   return(plot)
@@ -282,6 +291,7 @@ plotCalibrationEffect <- function(logRrNegatives,
 #'                   estimate>))/qnorm(0.025)
 #' @param useMcmc    Use MCMC to estimate the calibrated P-value?
 #' @param legendPosition  Where should the legend be positioned? ("none", "left", "right", "bottom", "top")
+#' @param title      Optional: the main title for the plot
 #' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
 #'                   function \code{ggsave} in the ggplot2 package for supported file formats.
 #'
@@ -294,7 +304,7 @@ plotCalibrationEffect <- function(logRrNegatives,
 #' plotCalibration(negatives$logRr, negatives$seLogRr)
 #'
 #' @export
-plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "right", fileName = NULL) {
+plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "right", title, fileName = NULL) {
   if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     logRr <- logRr[!is.infinite(seLogRr)]
@@ -378,6 +388,9 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
                      strip.background = ggplot2::element_blank(), 
                      legend.position = legendPosition)
   })
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
   return(plot)
@@ -402,6 +415,7 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
 #' @param trueLogRr  The true log relative risk.
 #' @param strata     Variable used to stratify the plot. Set \code{strata = NULL} for no stratification.
 #' @param legendPosition  Where should the legend be positioned? ("none", "left", "right", "bottom", "top").
+#' @param title      Optional: the main title for the plot
 #' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
 #'                   function \code{ggsave} in the ggplot2 package for supported file formats.
 #'
@@ -414,7 +428,7 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
 #' plotCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
 #' }
 #' @export
-plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr), legendPosition = "top", fileName = NULL) {
+plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr), legendPosition = "top", title, fileName = NULL) {
   if (!is.null(strata) && !is.factor(strata)) 
     stop("Strata argument should be a factor (or null)")
   if (is.null(strata))
@@ -519,7 +533,9 @@ plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(true
       plot + ggplot2::facet_grid(. ~ trueRr)
     })
   }
-  
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
   if (!is.null(fileName)) {
     width <- 1 + 2 * length(levels(strata))
     ggplot2::ggsave(fileName, plot, width = width, height = 3.5, dpi = 400)
@@ -542,6 +558,7 @@ plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(true
 #'                    estimate>))/qnorm(0.025).
 #' @param trueLogRr   A vector of the true effect sizes.
 #' @param xLabel      The label on the x-axis: the name of the effect estimate.
+#' @param title      Optional: the main title for the plot
 #' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
 #'                    function \code{ggsave} in the ggplot2 package for supported file formats.
 #'
@@ -557,6 +574,7 @@ plotTrueAndObserved <- function(logRr,
                                 seLogRr,
                                 trueLogRr,
                                 xLabel = "Relative risk",
+                                title,
                                 fileName = NULL) {
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 6)
@@ -586,6 +604,9 @@ plotTrueAndObserved <- function(logRr,
                                                                        lty = 1,
                                                                        size = 0.2) + ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) + ggplot2::geom_errorbarh(height = 0) + ggplot2::geom_point(shape = 21, size = 1.5) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_cartesian(xlim = c(0.25, 10)) + ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank(), axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.y = ggplot2::element_blank(), strip.background = ggplot2::element_blank(), legend.position = "none")
   })
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 7, dpi = 400)
   return(plot)
