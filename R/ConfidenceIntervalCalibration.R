@@ -74,7 +74,7 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr) {
     for (i in 1:length(logRr)) {
       mean <- theta[1] + theta[2] * trueLogRr[i]
       # sd <- theta[3] + theta[4] * trueLogRr[i] # OLD MODEL
-      sd <- exp(theta[3] + theta[4] * trueLogRr[i]
+      sd <- exp(theta[3] + theta[4] * trueLogRr[i])
       result <- result - log(gaussianProduct(logRr[i], mean, seLogRr[i], sd))
     }
     if (is.infinite(result))
