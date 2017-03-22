@@ -73,7 +73,8 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr) {
     result <- 0
     for (i in 1:length(logRr)) {
       mean <- theta[1] + theta[2] * trueLogRr[i]
-      sd <- theta[3] + theta[4] * trueLogRr[i]
+      # sd <- theta[3] + theta[4] * trueLogRr[i] # OLD MODEL
+      sd <- exp(theta[3] + theta[4] * trueLogRr[i]
       result <- result - log(gaussianProduct(logRr[i], mean, seLogRr[i], sd))
     }
     if (is.infinite(result))
@@ -118,17 +119,43 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr) {
 #'
 #' @export
 calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
+  
+  opt <- function(x,
+                  ciWidth,
+                  lb = TRUE,
+                  logRR,
+                  tau,
+                  interceptLogRR,
+                  slopeLogRR,
+                  interceptSD,
+                  slopeSD) {
+    z <- qnorm((1 - ciWidth) / 2)
+    if (lb) {
+      z <- -z
+    }
+    mean <- interceptLogRR + slopeLogRR * x
+    # sd <- interceptSD + slopeSD * x # OLD MODEL
+    sd <- exp(interceptSD + slopeSD * x)
+    z + (mean - logRR) / sqrt((sd) ^ 2 + (tau) ^ 2)
+  }
+  
   logLowerBound <- function(ciWidth, logRR, se, interceptLogRR, slopeLogRR, interceptSD, slopeSD) {
-    z <- qnorm((1-ciWidth)/2)
-    (-sqrt((interceptLogRR - logRR)^2 * slopeSD^2 * z^2 - 2 * (interceptLogRR - logRR) * slopeLogRR *
-             interceptSD * slopeSD * z^2 + slopeLogRR^2 * interceptSD^2 * z^2 + slopeLogRR^2 * se^2 *
-             z^2 - slopeSD^2 * se^2 * z^4) - (interceptLogRR - logRR) * slopeLogRR + interceptSD * slopeSD *
-      z^2)/(slopeLogRR^2 - slopeSD^2 * z^2)
+    # z <- qnorm((1-ciWidth)/2)
+    # (-sqrt((interceptLogRR - logRR)^2 * slopeSD^2 * z^2 - 2 * (interceptLogRR - logRR) * slopeLogRR *
+    #          interceptSD * slopeSD * z^2 + slopeLogRR^2 * interceptSD^2 * z^2 + slopeLogRR^2 * se^2 *
+    #          z^2 - slopeSD^2 * se^2 * z^4) - (interceptLogRR - logRR) * slopeLogRR + interceptSD * slopeSD *
+    #   z^2)/(slopeLogRR^2 - slopeSD^2 * z^2)
+    uniroot(f = opt, interval = c(-50,50), ciWidth = ciWidth, lb = TRUE, logRR = logRR, tau = se, 
+            interceptLogRR = interceptLogRR, slopeLogRR = slopeLogRR, 
+            interceptSD = interceptSD, slopeSD = slopeSD)$root    
   }
   logUpperBound <- function(ciWidth, logRR, se, interceptLogRR, slopeLogRR, interceptSD, slopeSD) {
-    z <- qnorm((1-ciWidth)/2)
-    (sqrt((interceptLogRR-logRR)^2*slopeSD^2*z^2 - 2*(interceptLogRR-logRR)*slopeLogRR*interceptSD*slopeSD*z^2 + slopeLogRR^2*interceptSD^2*z^2 +
-            slopeLogRR^2*se^2*z^2 - slopeSD^2*se^2*z^4) - (interceptLogRR-logRR)*slopeLogRR + interceptSD*slopeSD*z^2) / (slopeLogRR^2-slopeSD^2*z^2)
+    # z <- qnorm((1-ciWidth)/2)
+    # (sqrt((interceptLogRR-logRR)^2*slopeSD^2*z^2 - 2*(interceptLogRR-logRR)*slopeLogRR*interceptSD*slopeSD*z^2 + slopeLogRR^2*interceptSD^2*z^2 +
+    #         slopeLogRR^2*se^2*z^2 - slopeSD^2*se^2*z^4) - (interceptLogRR-logRR)*slopeLogRR + interceptSD*slopeSD*z^2) / (slopeLogRR^2-slopeSD^2*z^2)
+    uniroot(f = opt, interval = c(-50,50), ciWidth = ciWidth, lb = FALSE, logRR = logRR, tau = se, 
+            interceptLogRR = interceptLogRR, slopeLogRR = slopeLogRR, 
+            interceptSD = interceptSD, slopeSD = slopeSD)$root 
   }
   result <- data.frame(logRr = rep(0, length(logRr)), logLb95Rr = 0, logUb95Rr = 0)
   for (i in 1:nrow(result)) {
