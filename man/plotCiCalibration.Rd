@@ -5,7 +5,8 @@
 \title{Create a confidence interval calibration plot}
 \usage{
 plotCiCalibration(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr),
-  legendPosition = "top", title, fileName = NULL)
+  crossValidationGroup = 1:length(logRr), legendPosition = "top", title,
+  fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -17,6 +18,10 @@ estimate>))/qnorm(0.025).}
 \item{trueLogRr}{The true log relative risk.}
 
 \item{strata}{Variable used to stratify the plot. Set \code{strata = NULL} for no stratification.}
+
+\item{crossValidationGroup}{What should be the unit for the cross-validation? By default the unit is a single control,
+but a different grouping can be provided, for example linking a negative control to synthetic
+positive controls derived from that negative control.}
 
 \item{legendPosition}{Where should the legend be positioned? ("none", "left", "right", "bottom", "top").}
 

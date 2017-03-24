@@ -215,19 +215,19 @@ plotCalibrationEffect <- function(logRrNegatives,
   
   if (showCis) {
     plot <- plot + ggplot2::geom_ribbon(ggplot2::aes(ymin = yLb, ymax = yUb),
-                                      fill = rgb(0.8, 0.2, 0.2),
-                                      alpha = 0.3) +
+                                        fill = rgb(0.8, 0.2, 0.2),
+                                        alpha = 0.3) +
       ggplot2::geom_line(ggplot2::aes(y = yLb),
-                                      colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
-                                      size = 1) +
+                         colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                         size = 1) +
       ggplot2::geom_line(ggplot2::aes(y = yUb),
                          colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
                          size = 1)
   }
   plot <- plot + ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
-                       fill = rgb(0, 0, 0),
-                       colour = rgb(0, 0, 0, alpha = 0.1),
-                       alpha = 0.1) +
+                                    fill = rgb(0, 0, 0),
+                                    colour = rgb(0, 0, 0, alpha = 0.1),
+                                    alpha = 0.1) +
     ggplot2::geom_line(ggplot2::aes(y = seTheoretical),
                        colour = rgb(0, 0, 0),
                        linetype = "dashed",
@@ -414,6 +414,9 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
 #'                   estimate>))/qnorm(0.025).
 #' @param trueLogRr  The true log relative risk.
 #' @param strata     Variable used to stratify the plot. Set \code{strata = NULL} for no stratification.
+#' @param crossValidationGroup  What should be the unit for the cross-validation? By default the unit is a single control,
+#'                              but a different grouping can be provided, for example linking a negative control to synthetic
+#'                              positive controls derived from that negative control.
 #' @param legendPosition  Where should the legend be positioned? ("none", "left", "right", "bottom", "top").
 #' @param title      Optional: the main title for the plot
 #' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
@@ -428,12 +431,23 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
 #' plotCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
 #' }
 #' @export
-plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr), legendPosition = "top", title, fileName = NULL) {
+plotCiCalibration <- function(logRr, 
+                              seLogRr, 
+                              trueLogRr, 
+                              strata = as.factor(trueLogRr), 
+                              crossValidationGroup = 1:length(logRr), 
+                              legendPosition = "top", 
+                              title, 
+                              fileName = NULL) {
   if (!is.null(strata) && !is.factor(strata)) 
     stop("Strata argument should be a factor (or null)")
   if (is.null(strata))
     strata = as.factor(-1)
-  data <- data.frame(logRr = logRr, seLogRr = seLogRr, trueLogRr = trueLogRr, strata = strata)
+  data <- data.frame(logRr = logRr, 
+                     seLogRr = seLogRr, 
+                     trueLogRr = trueLogRr, 
+                     strata = strata, 
+                     crossValidationGroup = crossValidationGroup)
   if (any(is.infinite(data$seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
     data <- data[!is.infinite(seLogRr), ]
@@ -450,52 +464,60 @@ plotCiCalibration <- function(logRr, seLogRr, trueLogRr, strata = as.factor(true
     warning("Estimate(s) with NA logRr detected. Removing before fitting error model")
     data <- data[!is.na(logRr), ]
   }
-  fitLooErrorModel <- function(leaveOutIndex, data) {
-    dataLeaveOneOut <- data[-leaveOutIndex, ]
-    return(fitSystematicErrorModel(logRr = dataLeaveOneOut$logRr,
-                                   seLogRr = dataLeaveOneOut$seLogRr,
-                                   trueLogRr = dataLeaveOneOut$trueLogRr))
+  computeCoverage <- function(j, subResult, dataLeftOut, model) {
+    subset <- dataLeftOut[dataLeftOut$strata == subResult$strata[j],]
+    if (nrow(subset) == 0)
+      return(0)
+    ci <- EmpiricalCalibration::calibrateConfidenceInterval(logRr = subset$logRr,
+                                                            seLogRr = subset$seLogRr,
+                                                            ciWidth = subResult$ciWidth[j],
+                                                            model = model)
+    return(sum(ci$logLb95Rr <= subset$trueLogRr & ci$logUb95Rr >= subset$trueLogRr))
+  }
+  
+  computeTheoreticalCoverage <- function(j, subResult, dataLeftOut) {
+    subset <- dataLeftOut[dataLeftOut$strata == subResult$strata[j],]
+    ciWidth <- subResult$ciWidth[j]
+    return(sum((subset$trueLogRr >= subset$logRr + qnorm((1-ciWidth)/2)*subset$seLogRr) & (subset$trueLogRr <= subset$logRr - qnorm((1-ciWidth)/2)*subset$seLogRr)))
+  }
+  
+  computeLooCoverage <- function(leaveOutGroup, data) {
+    dataLeaveOneOut <- data[data$crossValidationGroup != leaveOutGroup, ]
+    dataLeftOut <- data[data$crossValidationGroup == leaveOutGroup, ]
+    if (nrow(dataLeaveOneOut) == 0 || nrow(dataLeftOut) == 0)
+      return(data.frame())
+    
+    model <- fitSystematicErrorModel(logRr = dataLeaveOneOut$logRr,
+                                     seLogRr = dataLeaveOneOut$seLogRr,
+                                     trueLogRr = dataLeaveOneOut$trueLogRr,
+                                     estimateCovarianceMatrix = FALSE)
+    
+    strata <- unique(dataLeftOut$strata)
+    ciWidth <- seq(0.01, 0.99, by = 0.01)
+    subResult <- expand.grid(strata, ciWidth)
+    names(subResult) <- c("strata", "ciWidth")
+    subResult$coverage <- sapply(1:nrow(subResult), computeCoverage, subResult = subResult, dataLeftOut = dataLeftOut, model = model)
+    subResult$theoreticalCoverage <- sapply(1:nrow(subResult), computeTheoreticalCoverage, subResult = subResult, dataLeftOut = dataLeftOut)
+    return(subResult)
   }
   writeLines("Fitting error models within leave-one-out cross-validation")
-  models <- sapply(1:nrow(data), fitLooErrorModel, data = data)
-  models <- t(models)
-  data <- cbind(data, models)
-  ciWidth <- seq(0.01, 0.99, by = 0.01)
+  coverages <- lapply(unique(data$crossValidationGroup), computeLooCoverage, data = data)
+  coverage <- do.call("rbind", coverages)
+  data$count <- 1
+  counts <- aggregate(count ~ strata, data = data, sum)
+  coverageCali <- aggregate(coverage ~ strata + ciWidth, data = coverage, sum)
+  coverageCali <- merge(coverageCali, counts, by = "strata")
+  coverageCali$coverage <- coverageCali$coverage / coverageCali$count
+  coverageCali$label <- "Calibrated"
+  coverageTheoretical <- aggregate(theoreticalCoverage ~ strata + ciWidth, data = coverage, sum)
+  coverageTheoretical <- merge(coverageTheoretical, counts, by = "strata")
+  coverageTheoretical$coverage <- coverageTheoretical$theoreticalCoverage / coverageCali$count
+  coverageTheoretical$label <- "Uncalibrated"
+  vizData <- rbind(coverageCali[, c("strata", "label", "ciWidth", "coverage")],
+                   coverageTheoretical[, c("strata", "label", "ciWidth", "coverage")])
   
-  withinCi <- function(i, ciWidth, strataData) {
-    ci <- calibrateConfidenceInterval(logRr = strataData$logRr[i],
-                                      seLogRr = strataData$seLogRr[i],
-                                      ciWidth = ciWidth,
-                                      model = as.numeric(strataData[i, c("meanIntercept", "meanSlope", "sdIntercept", "sdSlope")]))
-    return(strataData$trueLogRr[i] >= ci$logLb95Rr && strataData$trueLogRr[i] <= ci$logUb95Rr)
-  }
-  
-  coverage <- function(ciWidth, strataData) {
-    covered <- sapply(1:nrow(strataData), withinCi, ciWidth = ciWidth, strataData = strataData)
-    return(mean(covered))
-  }
-  
-  theoreticalCoverage <- function(ciWidth, strataData) {
-    covered <- (strataData$trueLogRr >= strataData$logRr + qnorm((1-ciWidth)/2)*strataData$seLogRr) & (strataData$trueLogRr <= strataData$logRr - qnorm((1-ciWidth)/2)*strataData$seLogRr)
-    return(mean(covered))
-  }
-  
-  vizData <- data.frame()
-  for (stratum in levels(data$strata)) {
-    strataData <- data[data$strata == stratum, ]
-    coveragePerCiWidth <- sapply(ciWidth, coverage, strataData = strataData)
-    theorCoveragePerCiWidth <- sapply(ciWidth, theoreticalCoverage, strataData = strataData)
-    vizData <- rbind(vizData, data.frame(ciWidth = ciWidth,
-                                         coverage = coveragePerCiWidth,
-                                         label = "Empirical",
-                                         stratum = stratum))
-    vizData <- rbind(vizData, data.frame(ciWidth = ciWidth,
-                                         coverage = theorCoveragePerCiWidth,
-                                         label = "Theoretical",
-                                         stratum = stratum))
-  }
   names(vizData)[names(vizData) == "label"] <- "CI calculation"
-  vizData$trueRr <- as.factor(exp(as.numeric(as.character(vizData$stratum))))
+  vizData$trueRr <- as.factor(exp(as.numeric(as.character(vizData$strata))))
   breaks <- c(0, 0.25, 0.5, 0.75, 1)
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)

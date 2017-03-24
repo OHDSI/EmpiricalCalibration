@@ -4,7 +4,8 @@
 \alias{fitSystematicErrorModel}
 \title{Fit a systematic error model}
 \usage{
-fitSystematicErrorModel(logRr, seLogRr, trueLogRr)
+fitSystematicErrorModel(logRr, seLogRr, trueLogRr,
+  estimateCovarianceMatrix = TRUE)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -14,6 +15,9 @@ error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 estimate>))/qnorm(0.025).}
 
 \item{trueLogRr}{A vector of the true effect sizes.}
+
+\item{estimateCovarianceMatrix}{should a covariance matrix be computed? If so, confidence intervals for the model
+parameters will be available.}
 }
 \value{
 An object of type \code{systematicErrorModel}.
