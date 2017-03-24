@@ -31,4 +31,3 @@ data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1
 plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
 
 }
-

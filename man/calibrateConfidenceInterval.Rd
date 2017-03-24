@@ -35,4 +35,3 @@ result <- calibrateConfidenceInterval(newData$logRr, newData$seLogRr, model)
 result
 
 }
-

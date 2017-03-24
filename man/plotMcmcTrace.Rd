@@ -26,4 +26,3 @@ null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
 plotMcmcTrace(null)
 
 }
-

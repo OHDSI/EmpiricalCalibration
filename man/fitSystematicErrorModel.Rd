@@ -37,4 +37,3 @@ model <- fitSystematicErrorModel(controls$logRr, controls$seLogRr, controls$true
 model
 
 }
-

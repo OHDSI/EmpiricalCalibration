@@ -42,4 +42,3 @@ negatives <- sccs[sccs$groundTruth == 0, ]
 plotCalibration(negatives$logRr, negatives$seLogRr)
 
 }
-
