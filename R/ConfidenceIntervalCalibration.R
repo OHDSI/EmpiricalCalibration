@@ -81,8 +81,10 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr) {
       result <- 99999
     result
   }
-  theta <- c(0, 1, 0.5, 0)
-  fit <- optim(theta, LL, logRr = logRr, seLogRr = seLogRr, trueLogRr = trueLogRr, hessian = TRUE)
+  theta <- c(0, 1, -2, 0)
+  fit <- optim(theta, LL, logRr = logRr, seLogRr = seLogRr, trueLogRr = trueLogRr,
+               method = "BFGS", hessian = TRUE,
+               control = list(parscale = c(1, 1, 10, 10)))
   fisher_info <- solve(fit$hessian)
   prop_sigma <- sqrt(diag(fisher_info))
   model <- fit$par
