@@ -24,10 +24,12 @@
 #' distributions are assumed to be linear with respect to the true effect size, and each component is
 #' therefore represented by an intercept and a slope.
 #'
-#' @param logRr       A numeric vector of effect estimates on the log scale.
-#' @param seLogRr     The standard error of the log of the effect estimates. Hint: often the standard
-#'                    error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                    estimate>))/qnorm(0.025).
+#' @param logRr                      A numeric vector of effect estimates on the log scale.
+#' @param seLogRr                    The standard error of the log of the effect estimates. Hint: often the standard
+#'                                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                                   estimate>))/qnorm(0.025).
+#' @param estimateCovarianceMatrix   should a covariance matrix be computed? If so, confidence intervals for the model
+#'                                   parameters will be available.
 #' @param trueLogRr   A vector of the true effect sizes.
 #'
 #' @return
@@ -39,7 +41,7 @@
 #' model
 #'
 #' @export
-fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr) {
+fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianceMatrix = TRUE) {
   if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
     trueLogRr <- trueLogRr[!is.infinite(seLogRr)]
@@ -89,9 +91,13 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr) {
   prop_sigma <- sqrt(diag(fisher_info))
   model <- fit$par
   names(model) <- c("meanIntercept", "meanSlope", "sdIntercept", "sdSlope")
-  attr(model, "LB95CI") <- fit$par + qnorm(0.025) * prop_sigma
-  attr(model, "UB95CI") <- fit$par + qnorm(0.975) * prop_sigma
-  attr(model, "CovarianceMatrix") <- fisher_info
+  if (estimateCovarianceMatrix) {
+    fisher_info <- solve(fit$hessian)
+    prop_sigma <- sqrt(diag(fisher_info))
+    attr(model, "CovarianceMatrix") <- fisher_info
+    attr(model, "LB95CI") <- fit$par + qnorm(0.025) * prop_sigma
+    attr(model, "UB95CI") <- fit$par + qnorm(0.975) * prop_sigma
+  }
   class(model) <- "systematicErrorModel"
   model
 }

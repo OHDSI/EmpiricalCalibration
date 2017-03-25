@@ -37,4 +37,3 @@ positive <- sccs[sccs$groundTruth == 1, ]
 calibrateP(null, positive$logRr, positive$seLogRr)
 
 }
-

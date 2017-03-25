@@ -53,4 +53,3 @@ positive <- sccs[sccs$groundTruth == 1, ]
 plotCalibrationEffect(negatives$logRr, negatives$seLogRr, positive$logRr, positive$seLogRr)
 
 }
-

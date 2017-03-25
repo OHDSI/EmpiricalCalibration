@@ -41,4 +41,3 @@ Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observati
 empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 }
 \keyword{datasets}
-

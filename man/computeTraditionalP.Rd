@@ -26,4 +26,3 @@ positive <- sccs[sccs$groundTruth == 1, ]
 computeTraditionalP(positive$logRr, positive$seLogRr)
 
 }
-
