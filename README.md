@@ -71,7 +71,8 @@ EmpiricalCalibration is licensed under Apache License 2.0
 Development
 ===========
 This package has been developed in RStudio.
-###Development status
+
+### Development status
 [![Build Status](https://travis-ci.org/OHDSI/EmpiricalCalibration.svg?branch=master)](https://travis-ci.org/OHDSI/EmpiricalCalibration)
 
 This package is ready for use.
