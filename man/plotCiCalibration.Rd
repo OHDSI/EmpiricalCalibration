@@ -11,37 +11,42 @@ plotCiCalibration(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr),
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-estimate>))/qnorm(0.025).}
+\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the
+standard error = (log(<lower bound 95 percent confidence interval>) -
+log(<effect estimate>))/qnorm(0.025).}
 
 \item{trueLogRr}{The true log relative risk.}
 
-\item{strata}{Variable used to stratify the plot. Set \code{strata = NULL} for no stratification.}
+\item{strata}{Variable used to stratify the plot. Set \code{strata = NULL} for no
+stratification.}
 
-\item{crossValidationGroup}{What should be the unit for the cross-validation? By default the unit is a single control,
-but a different grouping can be provided, for example linking a negative control to synthetic
-positive controls derived from that negative control.}
+\item{crossValidationGroup}{What should be the unit for the cross-validation? By default the unit
+is a single control, but a different grouping can be provided, for
+example linking a negative control to synthetic positive controls
+derived from that negative control.}
 
-\item{legendPosition}{Where should the legend be positioned? ("none", "left", "right", "bottom", "top").}
+\item{legendPosition}{Where should the legend be positioned? ("none", "left", "right",
+"bottom", "top").}
 
 \item{title}{Optional: the main title for the plot}
 
-\item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
-function \code{ggsave} in the ggplot2 package for supported file formats.}
+\item{fileName}{Name of the file where the plot should be saved, for example
+'plot.png'. See the function \code{ggsave} in the ggplot2 package for
+supported file formats.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.
 }
 \description{
-\code{plotCalibration} creates a plot showing the calibration of our confidence interval calibration procedure
+\code{plotCalibration} creates a plot showing the calibration of our confidence interval
+calibration procedure
 }
 \details{
-Creates a calibration plot showing the fraction of effects within the confidence interval.
-The empirical calibration is performed using a leave-one-out design: The confidence interval of an effect is
-computed by fitting a null using all other controls. Ideally, the calibration line should
-approximate the diagonal. The plot shows the coverage for both theoretical (traditional) and empirically calibrated
-confidence intervals.
+Creates a calibration plot showing the fraction of effects within the confidence interval. The
+empirical calibration is performed using a leave-one-out design: The confidence interval of an
+effect is computed by fitting a null using all other controls. Ideally, the calibration line should
+approximate the diagonal. The plot shows the coverage for both theoretical (traditional) and
+empirically calibrated confidence intervals.
 }
 \examples{
 \dontrun{

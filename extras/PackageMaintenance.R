@@ -1,6 +1,6 @@
 # @file PackageMaintenance
 #
-# Copyright 2015 Observational Health Data Sciences and Informatics
+# Copyright 2017 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
 # 
@@ -19,6 +19,7 @@
 # Format and check code:
 OhdsiRTools::formatRFolder()
 OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
+OhdsiRTools::updateCopyrightYearFolder()
 
 # Create manual and vignettes:
 shell("rm extras/EmpiricalCalibration.pdf")

@@ -22,7 +22,8 @@ scale.}
 controls.}
 
 \item{null}{An object representing the fitted null distribution as created by the
-\code{fitNull} function. If not provided, a null will be fitted before plotting.}
+\code{fitNull} function. If not provided, a null will be fitted before
+plotting.}
 
 \item{xLabel}{The label on the x-axis: the name of the effect estimate.}
 
