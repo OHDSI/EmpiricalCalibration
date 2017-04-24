@@ -9,12 +9,11 @@ plotCoverage(data$logRr, data$seLogRr, data$trueLogRr)
 
 model <- fitSystematicErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
 
-
 cal <- calibrateConfidenceInterval(data$logRr, data$seLogRr, model)
 
 
 plotTrueAndObserved(cal$logRr, cal$seLogRr, data$trueLogRr)
-plotCoverage(cal$logRr, cal$seLogRr, data$trueLogRr)
+
 
 
 logRr <- data$logRr
