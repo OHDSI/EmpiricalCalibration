@@ -44,5 +44,3 @@ simulateControls <- function(n = 50,
   data <- data.frame(logRr = logRr, seLogRr = seLogRr, trueLogRr = trueLogRr)
   return(data)
 }
-
-

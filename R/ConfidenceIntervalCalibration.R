@@ -25,12 +25,12 @@
 #' therefore represented by an intercept and a slope.
 #'
 #' @param logRr                      A numeric vector of effect estimates on the log scale.
-#' @param seLogRr                    The standard error of the log of the effect estimates. Hint: often the standard
-#'                                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                                   estimate>))/qnorm(0.025).
-#' @param estimateCovarianceMatrix   should a covariance matrix be computed? If so, confidence intervals for the model
-#'                                   parameters will be available.
-#' @param trueLogRr   A vector of the true effect sizes.
+#' @param seLogRr                    The standard error of the log of the effect estimates. Hint: often
+#'                                   the standard error = (log(<lower bound 95 percent confidence
+#'                                   interval>) - log(<effect estimate>))/qnorm(0.025).
+#' @param estimateCovarianceMatrix   should a covariance matrix be computed? If so, confidence
+#'                                   intervals for the model parameters will be available.
+#' @param trueLogRr                  A vector of the true effect sizes.
 #'
 #' @return
 #' An object of type \code{systematicErrorModel}.
@@ -66,11 +66,11 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
   }
-  
+
   gaussianProduct <- function(mu1, mu2, sd1, sd2) {
     (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
   }
-  
+
   LL <- function(theta, logRr, seLogRr, trueLogRr) {
     result <- 0
     for (i in 1:length(logRr)) {
@@ -83,8 +83,13 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
     result
   }
   theta <- c(0, 1, -2, 0)
-  fit <- optim(theta, LL, logRr = logRr, seLogRr = seLogRr, trueLogRr = trueLogRr,
-               method = "BFGS", hessian = TRUE,
+  fit <- optim(theta,
+               LL,
+               logRr = logRr,
+               seLogRr = seLogRr,
+               trueLogRr = trueLogRr,
+               method = "BFGS",
+               hessian = TRUE,
                control = list(parscale = c(1, 1, 10, 10)))
   fisher_info <- solve(fit$hessian)
   prop_sigma <- sqrt(diag(fisher_info))
@@ -110,7 +115,8 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
 #' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
 #'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 #'                  estimate>))/qnorm(0.025).
-#' @param ciWidth   The width of the confidence interval. Typically this would be .95, for the 95 percent confidence interval.
+#' @param ciWidth   The width of the confidence interval. Typically this would be .95, for the 95
+#'                  percent confidence interval.
 #' @param model     An object of type \code{systematicErrorModel} as created by the
 #'                  \code{\link{fitSystematicErrorModel}} function.
 #'
@@ -126,7 +132,7 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
 #'
 #' @export
 calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
-  
+
   opt <- function(x,
                   ciWidth,
                   lb = TRUE,
@@ -136,21 +142,35 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                   slopeMean,
                   interceptLogSd,
                   slopeLogSd) {
-    z <- qnorm((1 - ciWidth) / 2)
+    z <- qnorm((1 - ciWidth)/2)
     if (lb) {
       z <- -z
     }
     mean <- interceptMean + slopeMean * x
     sd <- exp(interceptLogSd + slopeLogSd * x)
-    return(z + (mean - logRr) / sqrt((sd) ^ 2 + (se) ^ 2))
+    return(z + (mean - logRr)/sqrt((sd)^2 + (se)^2))
   }
-  
-  logBound <- function(ciWidth, lb = TRUE, logRr, se, interceptMean, slopeMean, interceptLogSd, slopeLogSd) {
-    uniroot(f = opt, interval = c(-7, 7), ciWidth = ciWidth, lb = lb, logRr = logRr, se = se, 
-            interceptMean = interceptMean, slopeMean = slopeMean, 
-            interceptLogSd = interceptLogSd, slopeLogSd = slopeLogSd)$root    
+
+  logBound <- function(ciWidth,
+                       lb = TRUE,
+                       logRr,
+                       se,
+                       interceptMean,
+                       slopeMean,
+                       interceptLogSd,
+                       slopeLogSd) {
+    uniroot(f = opt,
+            interval = c(-7, 7),
+            ciWidth = ciWidth,
+            lb = lb,
+            logRr = logRr,
+            se = se,
+            interceptMean = interceptMean,
+            slopeMean = slopeMean,
+            interceptLogSd = interceptLogSd,
+            slopeLogSd = slopeLogSd)$root
   }
-  
+
   result <- data.frame(logRr = rep(0, length(logRr)), logLb95Rr = 0, logUb95Rr = 0)
   for (i in 1:nrow(result)) {
     if (is.infinite(logRr[i]) || is.na(logRr[i]) || is.infinite(seLogRr[i]) || is.na(seLogRr[i])) {
@@ -158,11 +178,32 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
       result$logLb95Rr[i] <- NA
       result$logUb95Rr[i] <- NA
     } else {
-      result$logRr[i] <- logBound(0, TRUE, logRr[i], seLogRr[i], model[1], model[2], model[3], model[4])
-      result$logLb95Rr[i] <- logBound(ciWidth, TRUE, logRr[i], seLogRr[i], model[1], model[2], model[3], model[4])
-      result$logUb95Rr[i] <- logBound(ciWidth, FALSE, logRr[i], seLogRr[i], model[1], model[2], model[3], model[4])
+      result$logRr[i] <- logBound(0,
+                                  TRUE,
+                                  logRr[i],
+                                  seLogRr[i],
+                                  model[1],
+                                  model[2],
+                                  model[3],
+                                  model[4])
+      result$logLb95Rr[i] <- logBound(ciWidth,
+                                      TRUE,
+                                      logRr[i],
+                                      seLogRr[i],
+                                      model[1],
+                                      model[2],
+                                      model[3],
+                                      model[4])
+      result$logUb95Rr[i] <- logBound(ciWidth,
+                                      FALSE,
+                                      logRr[i],
+                                      seLogRr[i],
+                                      model[1],
+                                      model[2],
+                                      model[3],
+                                      model[4])
     }
   }
-  result$seLogRr <- (result$logLb95Rr - result$logUb95Rr)/(2*qnorm((1-ciWidth)/2))
+  result$seLogRr <- (result$logLb95Rr - result$logUb95Rr)/(2 * qnorm((1 - ciWidth)/2))
   return(result)
 }
