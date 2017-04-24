@@ -134,18 +134,13 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
 calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
 
   opt <- function(x,
-                  ciWidth,
-                  lb = TRUE,
+                  z,
                   logRr,
                   se,
                   interceptMean,
                   slopeMean,
                   interceptLogSd,
                   slopeLogSd) {
-    z <- qnorm((1 - ciWidth)/2)
-    if (lb) {
-      z <- -z
-    }
     mean <- interceptMean + slopeMean * x
     sd <- exp(interceptLogSd + slopeLogSd * x)
     return(z + (mean - logRr)/sqrt((sd)^2 + (se)^2))
@@ -159,10 +154,26 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                        slopeMean,
                        interceptLogSd,
                        slopeLogSd) {
+    z <- qnorm((1 - ciWidth)/2)
+    if (lb) {
+      z <- -z
+    }
+    # Simple grid search for upper bound where opt is still positive:
+    upper <- -9
+    while(opt(x = upper,
+              z = z,
+              logRr = logRr,
+              se = se,
+              interceptMean = interceptMean,
+              slopeMean = slopeMean,
+              interceptLogSd = interceptLogSd,
+              slopeLogSd = slopeLogSd) < 0) {
+      upper <- upper + 1
+    }
+    
     uniroot(f = opt,
-            interval = c(-7, 7),
-            ciWidth = ciWidth,
-            lb = lb,
+            interval = c(-10, upper),
+            z = z,
             logRr = logRr,
             se = se,
             interceptMean = interceptMean,

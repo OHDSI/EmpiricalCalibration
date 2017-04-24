@@ -5,7 +5,7 @@ plotCalibrationEffect(negControls$logRr, negControls$seLogRr, null = null)
 data <- simulateControls(n = 50 * 3, trueLogRr = log(c(1, 2, 4)))
 
 plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
-plotCoverage(data$logRr, data$seLogRr, data$trueLogRr)
+
 
 model <- fitSystematicErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
 
