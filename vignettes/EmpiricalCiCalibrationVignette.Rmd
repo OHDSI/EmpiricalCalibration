@@ -1,0 +1,126 @@
+---
+title: "Empirical calibration of confidence intervals"
+author: "Martijn J. Schuemie, Marc A. Suchard"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    number_sections: yes
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{Empirical calibration of confidence intervals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(EmpiricalCalibration)
+```
+
+# Introduction
+
+Observational studies are prone to bias, but unfortunately this bias is often brushed aside with a single comment in the discussion of a paper and is never quantified. Elsewhere we have proposed using negative controls (exposure-outcome pairs where the true relative risk is believed to be one) to produce an empirical bias distribution, and subsequently calibrate p-values. Here we extend this approach to calibrated confidence intervals (CIs), which requires the use of positive controls. Since real positive controls are problematic, we have generated synthetic positive controls by injection additional (simulated) outcomes on top of negative controls.
+
+In this document we use an example study to illustrate how CIs can be calibrated using the `EmpiricalCalibration` R package. In the example, we have replicated a previously published new-user cohort study comparing dabigatran to warfarin for the risk of GI bleeding. The study does not aply any
+adjustment for confounding. 
+
+The results from this study are available in the package, and can be loaded using the `data()` command:
+
+```{r}
+data(southworthReplication)
+```
+
+The estimate for the outcome of interest can in this dataset be identified because `trueLogRr` is NA:
+
+```{r}
+outcomeOfInterest <- southworthReplication[is.na(southworthReplication$trueLogRr), ]
+outcomeOfInterest
+computeTraditionalCi(outcomeOfInterest$logRr, outcomeOfInterest$seLogRr)
+```
+
+Here we see that the effect estimate for GI bleed for dabigatran versus warfarin is 0.7, with a very tight CI.
+
+# Negative controls
+
+Negative controls are drug-outcome pairs where we believe the drug does not cause (or prevent) the outcome. In other words, we believe the true effect size to be a relative risk of 1. We would prefer our negative controls to have some resemblance with out hypothesis of interest (in our example dabigatran vs warfarin and GI bleed), and we therefore typically pick negative controls where the outcome is the same (exposure controls), or the exposure is the same (outcome controls). In this example, we have opted for outcome controls, and have identified a set of outcomes not believed to be caused by either dabigatran or warfarin. We have executed exactly the same analysis for these outcomes, resulting in a set of effect size estimates, one per negative control:
+
+```{r}
+negatives <- southworthReplication[southworthReplication$trueLogRr == 0 &
+                                     !is.na(southworthReplication$trueLogRr), ]
+head(negatives)
+```
+
+# Positive controls
+
+Positive controls are drug-outcome pairs where we believe the drug does cause (or prevent) the outcome. In this case we have generated synthetic positive controls with various true effect sizes. Similar to the negative controls we have executed exactly the same analysis for these outcomes, resulting in a set of effect size estimates, one per positive control:
+
+```{r}
+data(southworthReplication)
+positives <- southworthReplication[southworthReplication$trueLogRr != 0 &
+                                     !is.na(southworthReplication$trueLogRr), ]
+head(positives)
+```
+
+## Plot control effect sizes
+
+We can start by creating a forest plot of our controls:
+
+```{r fig.height=7}
+controls <- southworthReplication[!is.na(southworthReplication$trueLogRr), ]
+plotTrueAndObserved(controls$logRr, controls$seLogRr, controls$trueLogRr)
+```
+
+The thick black lines indicate the true effect size, and the blue and orange dots and lines represent the effect size estimate and 95% confidence intervals of the controls. We see that many controls have a confidence interval that does not include the true effect size (orange lines), certainly more than the expected 5%. This indicates the analysis has systematic error.
+
+# Systematic error model
+
+## Fitting the systematic error model
+
+We can use the controls to estimate a model for the systematic error:
+
+
+```{r}
+model <- fitSystematicErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr)
+model
+```
+
+We see that the intercept of the mean is slightly lower than 0, indicating the analysis is negatively biased when the null is true. We can also visualize the model:
+
+```{r}
+plotErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr)
+```
+
+Here we see how systematic error changes as a function of the true effect size. As visible, the model assumes the mean and standard deviation (SD) of the error distribution are linearly related to the true effect size. For this plot, the mean and SD are also estimated at each true effect size independently, allowing us to evaluate whether the linearity assumption is far off. 
+
+## Evaluating the calibration
+
+To evaluate whether our estimation of the systematic error distribution is a good one, we can test whether the calibrated CI is truly calibrated, meaning the fraction of controls where truth is inside the calibrated CI is approximately the specified width of the CI. We also evaluate 'centeredness', whether truth outside of the CI is equally distributed above and below the CI:
+
+```{r}
+plotCiCoverage(controls$logRr,
+               controls$seLogRr,
+               controls$trueLogRr,
+               crossValidationGroup = controls$outcomeName)
+```
+
+The data shown here is produced using a leave-one-out cross-validation. It is important to remember that for this dataset positive controls were generated based on negative controls and will therefore be correlated. To perform an unbiased evaluation the 'one' in the leave-one-out should therefore be the group of a negative control *and* its derived positive controls, and this is achieved by specifying the `crossValidationGroup` argument. Thus, in this evaluation for each negative control and the positive controls derived from that negative control, we fit systematic error models using all other controls, and compute calibrated CIs for the left-out controls across a wide range of widths. 
+
+In the graph the dashed lines indicate a perfectly calibrated study. We see that the calibrated CIs are much closer to the ideal than the uncalibrated CIs.
+
+# Confidence interval calibration
+
+## Calibrating the confidence interval
+
+We can now use the estimated systematic error model to compute the calibrated CI for our outcome of interest:
+```{r}
+ci <- calibrateConfidenceInterval(outcomeOfInterest$logRr, outcomeOfInterest$seLogRr, model)
+ci
+exp(ci[,1:3])
+```
+
+In this case, even though the point estimate has not changed much, the calibrated CI is much wider than the uncalibrated one to take in to account the residual error due to lack of any adjustment for confounding.
+
+# References
+
+```{r tidy=TRUE,evale=TRUE}
+citation("EmpiricalCalibration")
+```

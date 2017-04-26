@@ -797,12 +797,13 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, fileName = NULL) {
   y <- exp(model[1] + model[2] * log(x))
   ymin <- exp(log(y) - exp(model[3] + model[4] * log(x)))
   ymax <- exp(log(y) + exp(model[3] + model[4] * log(x)))
-  plot <- with(simpleModels, {ggplot2::ggplot(data.frame(x = x, y = y, ymin = ymin, ymax = ymax),
-                                              ggplot2::aes(x = x,
-                                                           y = y,
-                                                           ymin = ymin,
-                                                           ymax = ymax),
-                                              environment = environment()) + 
+  data <- data.frame(x = x, y = y, ymin = ymin, ymax = ymax)
+  plot <- with(data, {ggplot2::ggplot(data,
+                                      ggplot2::aes(x = x,
+                                                   y = y,
+                                                   ymin = ymin,
+                                                   ymax = ymax),
+                                      environment = environment()) + 
       ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
       ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
       ggplot2::geom_vline(xintercept = 1, size = 1) +

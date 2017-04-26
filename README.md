@@ -59,7 +59,8 @@ install_github("ohdsi/EmpiricalCalibration")
   
 Getting Involved
 ================
-* Vignette: [Empirical calibration](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalCalibrationVignette.pdf)
+* Vignette: [Empirical calibration of p-values](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalPCalibrationVignette.pdf)
+* Vignette: [Empirical calibration of confidence intervals](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalCiCalibrationVignette.pdf)
 * Package manual: [EmpiricalCalibration.pdf](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/extras/EmpiricalCalibration.pdf) 
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
 * We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements

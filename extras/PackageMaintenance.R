@@ -25,8 +25,14 @@ OhdsiRTools::updateCopyrightYearFolder()
 shell("rm extras/EmpiricalCalibration.pdf")
 shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
 
-rmarkdown::render("vignettes/EmpiricalCalibrationVignette.Rmd",
-                  output_file = "../inst/doc/EmpiricalCalibrationVignette.pdf",
+rmarkdown::render("vignettes/EmpiricalPCalibrationVignette.Rmd",
+                  output_file = "../inst/doc/EmpiricalPCalibrationVignette.pdf",
+                  rmarkdown::pdf_document(latex_engine = "pdflatex",
+                                          toc = TRUE,
+                                          number_sections = TRUE))
+
+rmarkdown::render("vignettes/EmpiricalCICalibrationVignette.Rmd",
+                  output_file = "../inst/doc/EmpiricalCiCalibrationVignette.pdf",
                   rmarkdown::pdf_document(latex_engine = "pdflatex",
                                           toc = TRUE,
                                           number_sections = TRUE))
