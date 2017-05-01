@@ -5,17 +5,19 @@ plotCalibrationEffect(negControls$logRr, negControls$seLogRr, null = null)
 data <- simulateControls(n = 50 * 3, trueLogRr = log(c(1, 2, 4)))
 
 plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
-plotCoverage(data$logRr, data$seLogRr, data$trueLogRr)
+
 
 model <- fitSystematicErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
-
 
 cal <- calibrateConfidenceInterval(data$logRr, data$seLogRr, model)
 
 
 plotTrueAndObserved(cal$logRr, cal$seLogRr, data$trueLogRr)
-plotCoverage(cal$logRr, cal$seLogRr, data$trueLogRr)
 
+eval <- evaluateCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
+plotCiCalibration(evaluation = eval)
+plotCiCoverage(evaluation = eval, fileName = "s:/temp/plot.png")
+plotErrorModel(data$logRr, data$seLogRr, data$trueLogRr, fileName = "s:/temp/plot.png")
 
 logRr <- data$logRr
 seLogRr <- data$seLogRr
@@ -40,3 +42,5 @@ mean(mcmc$chain[, 2])
 p
 null <- fitNull(data$logRr, data$seLogRr)
 calibrateP(data$logRr[1], data$seLogRr[1], null, pValueConfidenceInterval = TRUE)
+
+

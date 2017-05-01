@@ -1,6 +1,6 @@
 # @file Plots.R
 #
-# Copyright 2015 Observational Health Data Sciences and Informatics
+# Copyright 2017 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
 # 
@@ -65,10 +65,26 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", title, f
                                  ymax = exp(logUb95Rr),
                                  colour = significant,
                                  fill = significant),
-                    environment = environment()) + ggplot2::geom_hline(yintercept = breaks,
-                                                                       colour = "#AAAAAA",
-                                                                       lty = 1,
-                                                                       size = 0.2) + ggplot2::geom_hline(yintercept = 1, size = 0.5) + ggplot2::geom_pointrange(shape = 23) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_flip(ylim = c(0.25, 10)) + ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = themeRA, axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.x = theme, strip.background = ggplot2::element_blank(), legend.position = "none")
+                    environment = environment()) + 
+      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
+      ggplot2::geom_hline(yintercept = 1, size = 0.5) + 
+      ggplot2::geom_pointrange(shape = 23) + 
+      ggplot2::scale_colour_manual(values = col) + 
+      ggplot2::scale_fill_manual(values = colFill) + 
+      ggplot2::coord_flip(ylim = c(0.25, 10)) +
+      ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
+                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
+                     panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), 
+                     axis.ticks = ggplot2::element_blank(), 
+                     axis.title.y = ggplot2::element_blank(), 
+                     axis.title.x = ggplot2::element_blank(), 
+                     axis.text.y = themeRA, 
+                     axis.text.x = theme, 
+                     legend.key = ggplot2::element_blank(), 
+                     strip.text.x = theme, 
+                     strip.background = ggplot2::element_blank(), 
+                     legend.position = "none")
   })
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
@@ -122,9 +138,9 @@ logRrtoSeUb <- function(logRr, p, null) {
     while (H >= L) {
       M <- L + (H - L)/2
       if (calibrateP(null, logRr, M, pValueOnly = FALSE)$ub95ci - p > precision) {
-        H <- M 
+        H <- M
       } else if (p - calibrateP(null, logRr, M, pValueOnly = FALSE)$ub95ci > precision) {
-        L <- M 
+        L <- M
       } else {
         return(M)
       }
@@ -153,9 +169,10 @@ logRrtoSeUb <- function(logRr, p, null) {
 #' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive
 #'                           controls.
 #' @param null               An object representing the fitted null distribution as created by the
-#'                           \code{fitNull} function. If not provided, a null will be fitted before plotting.
+#'                           \code{fitNull} function. If not provided, a null will be fitted before
+#'                           plotting.
 #' @param xLabel             The label on the x-axis: the name of the effect estimate.
-#' @param title      Optional: the main title for the plot
+#' @param title              Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the calibrated p = 0.05 boundary.
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function \code{ggsave} in the ggplot2 package for supported file
@@ -186,13 +203,13 @@ plotCalibrationEffect <- function(logRrNegatives,
     } else {
       null <- fitNull(logRrNegatives, seLogRrNegatives)
     }
-  } 
+  }
   if (showCis && is(null, "null"))
     stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
   
   x <- exp(seq(log(0.25), log(10), by = 0.01))
   y <- logRrtoSE(log(x), 0.05, null)
-  if (showCis){
+  if (showCis) {
     writeLines("Computing 95% credible interval bounds")
     yLb <- logRrtoSeLb(log(x), 0.05, null)
     yUb <- logRrtoSeUb(log(x), 0.05, null)
@@ -214,9 +231,9 @@ plotCalibrationEffect <- function(logRrNegatives,
                        alpha = 0.5)
   
   if (showCis) {
-    plot <- plot + ggplot2::geom_ribbon(ggplot2::aes(ymin = yLb, ymax = yUb),
-                                        fill = rgb(0.8, 0.2, 0.2),
-                                        alpha = 0.3) +
+    plot <- plot +
+      ggplot2::geom_ribbon(ggplot2::aes(ymin = yLb,
+                                        ymax = yUb), fill = rgb(0.8, 0.2, 0.2), alpha = 0.3) +
       ggplot2::geom_line(ggplot2::aes(y = yLb),
                          colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
                          size = 1) +
@@ -224,10 +241,11 @@ plotCalibrationEffect <- function(logRrNegatives,
                          colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
                          size = 1)
   }
-  plot <- plot + ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
-                                    fill = rgb(0, 0, 0),
-                                    colour = rgb(0, 0, 0, alpha = 0.1),
-                                    alpha = 0.1) +
+  plot <- plot +
+    ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
+                       fill = rgb(0, 0, 0),
+                       colour = rgb(0, 0, 0, alpha = 0.1),
+                       alpha = 0.1) +
     ggplot2::geom_line(ggplot2::aes(y = seTheoretical),
                        colour = rgb(0, 0, 0),
                        linetype = "dashed",
@@ -285,15 +303,17 @@ plotCalibrationEffect <- function(logRrNegatives,
 #' approximate the diagonal. The plot shows both theoretical (traditional) and empirically calibrated
 #' p-values.
 #'
-#' @param logRr      A numeric vector of effect estimates on the log scale
-#' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard
-#'                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                   estimate>))/qnorm(0.025)
-#' @param useMcmc    Use MCMC to estimate the calibrated P-value?
-#' @param legendPosition  Where should the legend be positioned? ("none", "left", "right", "bottom", "top")
-#' @param title      Optional: the main title for the plot
-#' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
-#'                   function \code{ggsave} in the ggplot2 package for supported file formats.
+#' @param logRr            A numeric vector of effect estimates on the log scale
+#' @param seLogRr          The standard error of the log of the effect estimates. Hint: often the
+#'                         standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                         log(<effect estimate>))/qnorm(0.025)
+#' @param useMcmc          Use MCMC to estimate the calibrated P-value?
+#' @param legendPosition   Where should the legend be positioned? ("none", "left", "right", "bottom",
+#'                         "top")
+#' @param title            Optional: the main title for the plot
+#' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
+#'                         the function \code{ggsave} in the ggplot2 package for supported file
+#'                         formats.
 #'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -304,7 +324,12 @@ plotCalibrationEffect <- function(logRrNegatives,
 #' plotCalibration(negatives$logRr, negatives$seLogRr)
 #'
 #' @export
-plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "right", title, fileName = NULL) {
+plotCalibration <- function(logRr,
+                            seLogRr,
+                            useMcmc = FALSE,
+                            legendPosition = "right",
+                            title,
+                            fileName = NULL) {
   if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     logRr <- logRr[!is.infinite(seLogRr)]
@@ -399,28 +424,36 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
 #' Create a confidence interval calibration plot
 #'
 #' @description
-#' \code{plotCalibration} creates a plot showing the calibration of our confidence interval calibration procedure
+#' \code{plotCalibration} creates a plot showing the calibration of our confidence interval
+#' calibration procedure
 #'
 #' @details
-#' Creates a calibration plot showing the fraction of effects within the confidence interval.
-#' The empirical calibration is performed using a leave-one-out design: The confidence interval of an effect is
-#' computed by fitting a null using all other controls. Ideally, the calibration line should
-#' approximate the diagonal. The plot shows the coverage for both theoretical (traditional) and empirically calibrated
-#' confidence intervals.
+#' Creates a calibration plot showing the fraction of effects within the confidence interval. The
+#' empirical calibration is performed using a leave-one-out design: The confidence interval of an
+#' effect is computed by fitting a null using all other controls. Ideally, the calibration line should
+#' approximate the diagonal. The plot shows the coverage for both theoretical (traditional) and
+#' empirically calibrated confidence intervals.
 #'
-#' @param logRr      A numeric vector of effect estimates on the log scale.
-#' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard
-#'                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                   estimate>))/qnorm(0.025).
-#' @param trueLogRr  The true log relative risk.
-#' @param strata     Variable used to stratify the plot. Set \code{strata = NULL} for no stratification.
-#' @param crossValidationGroup  What should be the unit for the cross-validation? By default the unit is a single control,
-#'                              but a different grouping can be provided, for example linking a negative control to synthetic
-#'                              positive controls derived from that negative control.
-#' @param legendPosition  Where should the legend be positioned? ("none", "left", "right", "bottom", "top").
-#' @param title      Optional: the main title for the plot
-#' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
-#'                   function \code{ggsave} in the ggplot2 package for supported file formats.
+#' @param logRr                  A numeric vector of effect estimates on the log scale.
+#' @param seLogRr                The standard error of the log of the effect estimates. Hint: often the
+#'                               standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                               log(<effect estimate>))/qnorm(0.025).
+#' @param trueLogRr              The true log relative risk.
+#' @param strata                 Variable used to stratify the plot. Set \code{strata = NULL} for no
+#'                               stratification.
+#' @param evaluation             A data frame as generated by the \code{\link{evaluateCiCalibration}}
+#'                               function. If provided, the logRr, seLogRr, trueLogRr, and strata 
+#'                               arguments will be ignored.
+#' @param crossValidationGroup   What should be the unit for the cross-validation? By default the unit
+#'                               is a single control, but a different grouping can be provided, for
+#'                               example linking a negative control to synthetic positive controls
+#'                               derived from that negative control.
+#' @param legendPosition         Where should the legend be positioned? ("none", "left", "right",
+#'                               "bottom", "top").
+#' @param title                  Optional: the main title for the plot
+#' @param fileName               Name of the file where the plot should be saved, for example
+#'                               'plot.png'. See the function \code{ggsave} in the ggplot2 package for
+#'                               supported file formats.
 #'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -431,93 +464,23 @@ plotCalibration <- function(logRr, seLogRr, useMcmc = FALSE, legendPosition = "r
 #' plotCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
 #' }
 #' @export
-plotCiCalibration <- function(logRr, 
-                              seLogRr, 
-                              trueLogRr, 
-                              strata = as.factor(trueLogRr), 
-                              crossValidationGroup = 1:length(logRr), 
-                              legendPosition = "top", 
-                              title, 
+plotCiCalibration <- function(logRr,
+                              seLogRr,
+                              trueLogRr,
+                              strata = as.factor(trueLogRr),
+                              crossValidationGroup = 1:length(logRr),
+                              evaluation,
+                              legendPosition = "top",
+                              title,
                               fileName = NULL) {
-  if (!is.null(strata) && !is.factor(strata)) 
-    stop("Strata argument should be a factor (or null)")
-  if (is.null(strata))
-    strata = as.factor(-1)
-  data <- data.frame(logRr = logRr, 
-                     seLogRr = seLogRr, 
-                     trueLogRr = trueLogRr, 
-                     strata = strata, 
-                     crossValidationGroup = crossValidationGroup)
-  if (any(is.infinite(data$seLogRr))) {
-    warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
-    data <- data[!is.infinite(seLogRr), ]
+  if (missing(evaluation) || is.null(evaluation)) {
+    evaluation <- evaluateCiCalibration(logRr = logRr,
+                                        seLogRr = seLogRr,
+                                        trueLogRr = trueLogRr,
+                                        strata = strata,
+                                        crossValidationGroup = crossValidationGroup)
   }
-  if (any(is.infinite(data$logRr))) {
-    warning("Estimate(s) with infinite logRr detected. Removing before fitting error model")
-    data <- data[!is.infinite(logRr), ]  
-  }
-  if (any(is.na(data$seLogRr))) {
-    warning("Estimate(s) with NA standard error detected. Removing before fitting error model")
-    data <- data[!is.na(seLogRr), ]
-  }
-  if (any(is.na(data$logRr))) {
-    warning("Estimate(s) with NA logRr detected. Removing before fitting error model")
-    data <- data[!is.na(logRr), ]
-  }
-  computeCoverage <- function(j, subResult, dataLeftOut, model) {
-    subset <- dataLeftOut[dataLeftOut$strata == subResult$strata[j],]
-    if (nrow(subset) == 0)
-      return(0)
-    ci <- EmpiricalCalibration::calibrateConfidenceInterval(logRr = subset$logRr,
-                                                            seLogRr = subset$seLogRr,
-                                                            ciWidth = subResult$ciWidth[j],
-                                                            model = model)
-    return(sum(ci$logLb95Rr <= subset$trueLogRr & ci$logUb95Rr >= subset$trueLogRr))
-  }
-  
-  computeTheoreticalCoverage <- function(j, subResult, dataLeftOut) {
-    subset <- dataLeftOut[dataLeftOut$strata == subResult$strata[j],]
-    ciWidth <- subResult$ciWidth[j]
-    return(sum((subset$trueLogRr >= subset$logRr + qnorm((1-ciWidth)/2)*subset$seLogRr) & (subset$trueLogRr <= subset$logRr - qnorm((1-ciWidth)/2)*subset$seLogRr)))
-  }
-  
-  computeLooCoverage <- function(leaveOutGroup, data) {
-    dataLeaveOneOut <- data[data$crossValidationGroup != leaveOutGroup, ]
-    dataLeftOut <- data[data$crossValidationGroup == leaveOutGroup, ]
-    if (nrow(dataLeaveOneOut) == 0 || nrow(dataLeftOut) == 0)
-      return(data.frame())
-    
-    model <- fitSystematicErrorModel(logRr = dataLeaveOneOut$logRr,
-                                     seLogRr = dataLeaveOneOut$seLogRr,
-                                     trueLogRr = dataLeaveOneOut$trueLogRr,
-                                     estimateCovarianceMatrix = FALSE)
-    
-    strata <- unique(dataLeftOut$strata)
-    ciWidth <- seq(0.01, 0.99, by = 0.01)
-    subResult <- expand.grid(strata, ciWidth)
-    names(subResult) <- c("strata", "ciWidth")
-    subResult$coverage <- sapply(1:nrow(subResult), computeCoverage, subResult = subResult, dataLeftOut = dataLeftOut, model = model)
-    subResult$theoreticalCoverage <- sapply(1:nrow(subResult), computeTheoreticalCoverage, subResult = subResult, dataLeftOut = dataLeftOut)
-    return(subResult)
-  }
-  writeLines("Fitting error models within leave-one-out cross-validation")
-  coverages <- lapply(unique(data$crossValidationGroup), computeLooCoverage, data = data)
-  coverage <- do.call("rbind", coverages)
-  data$count <- 1
-  counts <- aggregate(count ~ strata, data = data, sum)
-  coverageCali <- aggregate(coverage ~ strata + ciWidth, data = coverage, sum)
-  coverageCali <- merge(coverageCali, counts, by = "strata")
-  coverageCali$coverage <- coverageCali$coverage / coverageCali$count
-  coverageCali$label <- "Calibrated"
-  coverageTheoretical <- aggregate(theoreticalCoverage ~ strata + ciWidth, data = coverage, sum)
-  coverageTheoretical <- merge(coverageTheoretical, counts, by = "strata")
-  coverageTheoretical$coverage <- coverageTheoretical$theoreticalCoverage / coverageCali$count
-  coverageTheoretical$label <- "Uncalibrated"
-  vizData <- rbind(coverageCali[, c("strata", "label", "ciWidth", "coverage")],
-                   coverageTheoretical[, c("strata", "label", "ciWidth", "coverage")])
-  
-  names(vizData)[names(vizData) == "label"] <- "CI calculation"
-  vizData$trueRr <- as.factor(exp(as.numeric(as.character(vizData$strata))))
+  vizData <- evaluation[evaluation$label == "Within confidence interval", ]
   breaks <- c(0, 0.25, 0.5, 0.75, 1)
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
@@ -525,8 +488,8 @@ plotCiCalibration <- function(logRr,
     ggplot2::ggplot(vizData,
                     ggplot2::aes(x = ciWidth,
                                  y = coverage,
-                                 colour = `CI calculation`,
-                                 linetype = `CI calculation`),
+                                 colour = `Confidence interval calculation`,
+                                 linetype = `Confidence interval calculation`),
                     environment = environment()) + 
       ggplot2::geom_vline(xintercept = breaks,
                           colour = "#AAAAAA",
@@ -540,6 +503,7 @@ plotCiCalibration <- function(logRr,
       ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + 
       ggplot2::scale_x_continuous("Width of CI", limits = c(0, 1), breaks = c(breaks, 0.95), labels = c("0", ".25", ".50", ".75", "", ".95")) + 
       ggplot2::scale_y_continuous("Coverage", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + 
+      ggplot2::facet_grid(. ~ trueRr) +
       ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
                      panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
                      panel.grid.major = ggplot2::element_blank(), 
@@ -550,16 +514,11 @@ plotCiCalibration <- function(logRr,
                      strip.background = ggplot2::element_blank(), 
                      legend.position = legendPosition)
   })
-  if (length(strata) != 1 && strata != -1) {
-    plot <- with(vizData, {
-      plot + ggplot2::facet_grid(. ~ trueRr)
-    })
-  }
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
-    width <- 1 + 2 * length(levels(strata))
+    width <- 1 + 2 * length(levels(evaluation$trueRr))
     ggplot2::ggsave(fileName, plot, width = width, height = 3.5, dpi = 400)
   }
   return(plot)
@@ -580,7 +539,7 @@ plotCiCalibration <- function(logRr,
 #'                    estimate>))/qnorm(0.025).
 #' @param trueLogRr   A vector of the true effect sizes.
 #' @param xLabel      The label on the x-axis: the name of the effect estimate.
-#' @param title      Optional: the main title for the plot
+#' @param title       Optional: the main title for the plot
 #' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
 #'                    function \code{ggsave} in the ggplot2 package for supported file formats.
 #'
@@ -621,10 +580,27 @@ plotTrueAndObserved <- function(logRr,
                                  xmax = exp(logUb95Rr),
                                  colour = significant,
                                  fill = significant),
-                    environment = environment()) + ggplot2::geom_vline(xintercept = breaks,
-                                                                       colour = "#AAAAAA",
-                                                                       lty = 1,
-                                                                       size = 0.2) + ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) + ggplot2::geom_errorbarh(height = 0) + ggplot2::geom_point(shape = 21, size = 1.5) + ggplot2::scale_colour_manual(values = col) + ggplot2::scale_fill_manual(values = colFill) + ggplot2::coord_cartesian(xlim = c(0.25, 10)) + ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), axis.ticks = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank(), axis.text.x = theme, legend.key = ggplot2::element_blank(), strip.text.y = ggplot2::element_blank(), strip.background = ggplot2::element_blank(), legend.position = "none")
+                    environment = environment()) + 
+      ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
+      ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) + 
+      ggplot2::geom_errorbarh(height = 0) + 
+      ggplot2::geom_point(shape = 21, size = 1.5) + 
+      ggplot2::scale_colour_manual(values = col) + 
+      ggplot2::scale_fill_manual(values = colFill) + 
+      ggplot2::coord_cartesian(xlim = c(0.25, 10)) + 
+      ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
+      ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + 
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
+                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
+                     panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), 
+                     axis.ticks = ggplot2::element_blank(), 
+                     axis.title.y = ggplot2::element_blank(), 
+                     axis.title.x = ggplot2::element_blank(), 
+                     axis.text.y = ggplot2::element_blank(), 
+                     axis.text.x = theme, legend.key = ggplot2::element_blank(), 
+                     strip.text.y = ggplot2::element_blank(), 
+                     strip.background = ggplot2::element_blank(), 
+                     legend.position = "none")
   })
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
@@ -664,5 +640,196 @@ plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
   })
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 3.5, dpi = 400)
+  return(plot)
+}
+
+
+#' Create a confidence interval coverage plot
+#'
+#' @description
+#' \code{plotCiCoverage} creates a plot showing the coverage before and after confidence interval 
+#' calibration at various widths of the confidence interval.
+#'
+#' @details
+#' Creates a plot showing the fraction of effects above, within, and below the confidence interval. The
+#' empirical calibration is performed using a leave-one-out design: The confidence interval of an
+#' effect is computed by fitting a null using all other controls. The plot shows the coverage for 
+#' both theoretical (traditional) and empirically calibrated confidence intervals.
+#'
+#' @param logRr                  A numeric vector of effect estimates on the log scale.
+#' @param seLogRr                The standard error of the log of the effect estimates. Hint: often the
+#'                               standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                               log(<effect estimate>))/qnorm(0.025).
+#' @param trueLogRr              The true log relative risk.
+#' @param strata                 Variable used to stratify the plot. Set \code{strata = NULL} for no
+#'                               stratification.
+#' @param evaluation             A data frame as generated by the \code{\link{evaluateCiCalibration}}
+#'                               function. If provided, the logRr, seLogRr, trueLogRr, and strata 
+#'                               arguments will be ignored.
+#' @param crossValidationGroup   What should be the unit for the cross-validation? By default the unit
+#'                               is a single control, but a different grouping can be provided, for
+#'                               example linking a negative control to synthetic positive controls
+#'                               derived from that negative control.
+#' @param legendPosition         Where should the legend be positioned? ("none", "left", "right",
+#'                               "bottom", "top").
+#' @param title                  Optional: the main title for the plot
+#' @param fileName               Name of the file where the plot should be saved, for example
+#'                               'plot.png'. See the function \code{ggsave} in the ggplot2 package for
+#'                               supported file formats.
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
+#' \dontrun{
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
+#' plotCiCoverage(data$logRr, data$seLogRr, data$trueLogRr)
+#' }
+#' @export
+plotCiCoverage <- function(logRr,
+                           seLogRr,
+                           trueLogRr,
+                           strata = as.factor(trueLogRr),
+                           crossValidationGroup = 1:length(logRr),
+                           evaluation,
+                           legendPosition = "top",
+                           title,
+                           fileName = NULL) {
+  if (missing(evaluation) || is.null(evaluation)) {
+    evaluation <- evaluateCiCalibration(logRr = logRr,
+                                        seLogRr = seLogRr,
+                                        trueLogRr = trueLogRr,
+                                        strata = strata,
+                                        crossValidationGroup = crossValidationGroup)
+  }
+  evaluation$label <- factor(evaluation$label, levels = rev(c("Below confidence interval", "Within confidence interval", "Above confidence interval")))
+  evaluation$`Confidence interval calculation` <- factor(evaluation$`Confidence interval calculation`, levels = rev(c("Calibrated", "Uncalibrated")))
+  evaluation$trueRr <- paste0("True effect size = ", evaluation$trueRr)
+  breaks <- c(0, 0.25, 0.5, 0.75, 1)
+  theme <- ggplot2::element_text(colour = "#000000", size = 12)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
+  plot <- with(evaluation, {ggplot2::ggplot(evaluation,
+                                            ggplot2::aes(x = ciWidth,
+                                                         y = coverage,
+                                                         colour = label,
+                                                         fill = label,
+                                                         group = label),
+                                            environment = environment()) +
+      ggplot2::geom_vline(xintercept = breaks,
+                          colour = "#AAAAAA",
+                          lty = 1,
+                          size = 0.3) +
+      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) +
+      ggplot2::geom_area(position = "stack", alpha = 0.6) +
+      ggplot2::geom_abline(colour = "#000000", size = 1, intercept = 0.5, slope = 0.5, linetype = "dashed") +
+      ggplot2::geom_abline(colour = "#000000", size = 1, intercept = 0.5, slope = -0.5, linetype = "dashed") +
+      ggplot2::scale_colour_manual(values = c(rgb(0.8, 0, 0), rgb(0, 0, 0), rgb(0, 0, 0.8))) +
+      ggplot2::scale_fill_manual(values = c(rgb(0.8, 0, 0), rgb(0.75, 0.75, 0.75), rgb(0, 0, 0.8))) +
+      ggplot2::scale_x_continuous("Width of the confidence interval", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
+      ggplot2::scale_y_continuous("Fraction", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
+      ggplot2::facet_grid(`Confidence interval calculation` ~ trueRr) +
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                     panel.background = ggplot2::element_blank(),
+                     panel.grid.major = ggplot2::element_blank(),
+                     axis.ticks = ggplot2::element_blank(),
+                     axis.text.y = themeRA,
+                     axis.text.x = theme,
+                     strip.text.x = theme,
+                     strip.text.y = theme,
+                     strip.background = ggplot2::element_blank(),
+                     legend.position = legendPosition,
+                     legend.title = ggplot2::element_blank())
+  })
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
+  if (!is.null(fileName)) {
+    width <- 1 + 2 * length(levels(evaluation$trueRr))
+    ggplot2::ggsave(fileName, plot, width = width, height = 3.5, dpi = 400)
+  }
+  return(plot)
+}
+
+#' Plot the systematic error model
+#'
+#' @description
+#' \code{plotErrorModel} creates a plot showing the systematic error model.
+#'
+#' @details
+#' Creates a plot with the true effect size on the x-axis, and the mean plus and minus the standard 
+#' deviation shown on the y-axis. Also shown are simple error models fitted at each true relative 
+#' risk in the input.
+#'
+#' @param logRr                  A numeric vector of effect estimates on the log scale.
+#' @param seLogRr                The standard error of the log of the effect estimates. Hint: often the
+#'                               standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                               log(<effect estimate>))/qnorm(0.025).
+#' @param trueLogRr              The true log relative risk.
+#' @param title              Optional: the main title for the plot
+#' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
+#'                           See the function \code{ggsave} in the ggplot2 package for supported file
+#'                           formats.
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
+#' plotErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
+#' @export
+plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, fileName = NULL) {
+  model <- fitSystematicErrorModel(logRr = logRr, 
+                                   seLogRr = seLogRr, 
+                                   trueLogRr = trueLogRr)
+  fitSimpleModel <- function(selectedTrueLogRr){
+    idx <- trueLogRr == selectedTrueLogRr
+    return(fitNull(logRr[idx], seLogRr[idx]))
+  }
+  simpleModels <- as.data.frame(t(sapply(unique(trueLogRr), fitSimpleModel)))
+  simpleModels$trueRr <- exp(unique(trueLogRr))
+  simpleModels$y <- exp(simpleModels$mean)
+  simpleModels$ymin <- exp(simpleModels$mean - simpleModels$sd)
+  simpleModels$ymax <- exp(simpleModels$mean + simpleModels$sd)
+  
+  
+  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+  x <- exp(seq(log(0.25), log(10), by = 0.01))
+  y <- exp(model[1] + model[2] * log(x))
+  ymin <- exp(log(y) - exp(model[3] + model[4] * log(x)))
+  ymax <- exp(log(y) + exp(model[3] + model[4] * log(x)))
+  data <- data.frame(x = x, y = y, ymin = ymin, ymax = ymax)
+  plot <- with(data, {ggplot2::ggplot(data,
+                                      ggplot2::aes(x = x,
+                                                   y = y,
+                                                   ymin = ymin,
+                                                   ymax = ymax),
+                                      environment = environment()) + 
+      ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
+      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
+      ggplot2::geom_vline(xintercept = 1, size = 1) +
+      ggplot2::geom_hline(yintercept = 1, size = 1) +
+      ggplot2::geom_ribbon(fill = rgb(0, 0, 0.8), alpha = 0.3) +
+      ggplot2::geom_line(color = rgb(0, 0, 0.8)) +
+      ggplot2::geom_errorbar(ggplot2::aes(x = trueRr), width = 0.1, size = 1, color = rgb(0, 0, 0.8), data = simpleModels) +
+      ggplot2::scale_x_continuous("True effect size",
+                                  trans = "log10",
+                                  breaks = breaks,
+                                  labels = breaks) +
+      ggplot2::scale_y_continuous("Systematic error mean (plus and minus one SD)",
+                                  trans = "log10",
+                                  breaks = breaks,
+                                  labels = breaks) +
+      ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0.25, 10)) +
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
+                     panel.grid.major = ggplot2::element_blank(),
+                     axis.ticks = ggplot2::element_blank(),
+                     legend.position = "none")
+  })
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
+  if (!is.null(fileName))
+    ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
   return(plot)
 }

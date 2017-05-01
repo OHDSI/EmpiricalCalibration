@@ -1,6 +1,6 @@
 # @file PackageMaintenance
 #
-# Copyright 2015 Observational Health Data Sciences and Informatics
+# Copyright 2017 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
 # 
@@ -19,13 +19,20 @@
 # Format and check code:
 OhdsiRTools::formatRFolder()
 OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
+OhdsiRTools::updateCopyrightYearFolder()
 
 # Create manual and vignettes:
 shell("rm extras/EmpiricalCalibration.pdf")
 shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
 
-rmarkdown::render("vignettes/EmpiricalCalibrationVignette.Rmd",
-                  output_file = "../inst/doc/EmpiricalCalibrationVignette.pdf",
+rmarkdown::render("vignettes/EmpiricalPCalibrationVignette.Rmd",
+                  output_file = "../inst/doc/EmpiricalPCalibrationVignette.pdf",
+                  rmarkdown::pdf_document(latex_engine = "pdflatex",
+                                          toc = TRUE,
+                                          number_sections = TRUE))
+
+rmarkdown::render("vignettes/EmpiricalCICalibrationVignette.Rmd",
+                  output_file = "../inst/doc/EmpiricalCiCalibrationVignette.pdf",
                   rmarkdown::pdf_document(latex_engine = "pdflatex",
                                           toc = TRUE,
                                           number_sections = TRUE))

@@ -1,6 +1,6 @@
 # @file Simulation.R
 #
-# Copyright 2015 Observational Health Data Sciences and Informatics
+# Copyright 2017 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
 # 
@@ -44,5 +44,3 @@ simulateControls <- function(n = 50,
   data <- data.frame(logRr = logRr, seLogRr = seLogRr, trueLogRr = trueLogRr)
   return(data)
 }
-
-

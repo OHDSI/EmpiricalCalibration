@@ -1,47 +1,7 @@
-# @file ConfidenceIntervalCalibration.R
-#
-# Copyright 2017 Observational Health Data Sciences and Informatics
-#
-# This file is part of EmpiricalCalibration
-# 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# This is the code that is included as supplementary information for our CI calibration paper:
 
-#' Fit a systematic error model
-#'
-#' @details
-#' Fit a model of the systematic error as a function of true effect size. This model is an extention
-#' of the method for fitting the null distribution. The mean and log(standard deviations) of the error
-#' distributions are assumed to be linear with respect to the true effect size, and each component is
-#' therefore represented by an intercept and a slope.
-#'
-#' @param logRr                      A numeric vector of effect estimates on the log scale.
-#' @param seLogRr                    The standard error of the log of the effect estimates. Hint: often
-#'                                   the standard error = (log(<lower bound 95 percent confidence
-#'                                   interval>) - log(<effect estimate>))/qnorm(0.025).
-#' @param estimateCovarianceMatrix   should a covariance matrix be computed? If so, confidence
-#'                                   intervals for the model parameters will be available.
-#' @param trueLogRr                  A vector of the true effect sizes.
-#'
-#' @return
-#' An object of type \code{systematicErrorModel}.
-#'
-#' @examples
-#' controls <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' model <- fitSystematicErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr)
-#' model
-#'
-#' @export
-fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianceMatrix = TRUE) {
+
+fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr) {
   if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
     trueLogRr <- trueLogRr[!is.infinite(seLogRr)]
@@ -95,44 +55,17 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
   prop_sigma <- sqrt(diag(fisher_info))
   model <- fit$par
   names(model) <- c("meanIntercept", "meanSlope", "logSdIntercept", "logSdSlope")
-  if (estimateCovarianceMatrix) {
-    fisher_info <- solve(fit$hessian)
-    prop_sigma <- sqrt(diag(fisher_info))
-    attr(model, "CovarianceMatrix") <- fisher_info
-    attr(model, "LB95CI") <- fit$par + qnorm(0.025) * prop_sigma
-    attr(model, "UB95CI") <- fit$par + qnorm(0.975) * prop_sigma
-  }
+  fisher_info <- solve(fit$hessian)
+  prop_sigma <- sqrt(diag(fisher_info))
+  attr(model, "CovarianceMatrix") <- fisher_info
+  attr(model, "LB95CI") <- fit$par + qnorm(0.025) * prop_sigma
+  attr(model, "UB95CI") <- fit$par + qnorm(0.975) * prop_sigma
   class(model) <- "systematicErrorModel"
   model
 }
 
-#' Calibrate confidence intervals
-#'
-#' @details
-#' Compute calibrated confidence intervals based on a model of the systematic error.
-#'
-#' @param logRr     A numeric vector of effect estimates on the log scale.
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025).
-#' @param ciWidth   The width of the confidence interval. Typically this would be .95, for the 95
-#'                  percent confidence interval.
-#' @param model     An object of type \code{systematicErrorModel} as created by the
-#'                  \code{\link{fitSystematicErrorModel}} function.
-#'
-#' @return
-#' A data frame with calibrated confidence intervals and point estimates.
-#'
-#' @examples
-#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' model <- fitSystematicErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
-#' newData <- simulateControls(n = 15, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' result <- calibrateConfidenceInterval(newData$logRr, newData$seLogRr, model)
-#' result
-#'
-#' @export
 calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
-
+  
   opt <- function(x,
                   z,
                   logRr,
@@ -217,32 +150,4 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
   }
   result$seLogRr <- (result$logLb95Rr - result$logUb95Rr)/(2 * qnorm((1 - ciWidth)/2))
   return(result)
-}
-
-#' Compute the (traditional) confidence interval
-#'
-#' @description
-#' \code{computeTraditionalCi} computes the traditional confidence interval based on the log of the
-#' relative risk and the standerd error of the log of the relative risk.
-#'
-#' @param logRr     A numeric vector of one or more effect estimates on the log scale
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025)
-#' @param ciWidth   The width of the confidence interval. Typically this would be .95, for the 95
-#'                  percent confidence interval.
-#'
-#' @return
-#' The point estimate and confidence interval
-#'
-#' @examples
-#' data(sccs)
-#' positive <- sccs[sccs$groundTruth == 1, ]
-#' computeTraditionalCi(positive$logRr, positive$seLogRr)
-#'
-#' @export
-computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
-  return(c(rr = exp(logRr), 
-           lb = exp(logRr - qnorm(1  -ciWidth/2)*seLogRr), 
-           ub = exp(logRr + qnorm(1 - ciWidth/2)*seLogRr)))
 }

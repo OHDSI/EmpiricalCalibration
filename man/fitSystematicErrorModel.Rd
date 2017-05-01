@@ -10,14 +10,14 @@ fitSystematicErrorModel(logRr, seLogRr, trueLogRr,
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-estimate>))/qnorm(0.025).}
+\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often
+the standard error = (log(<lower bound 95 percent confidence
+interval>) - log(<effect estimate>))/qnorm(0.025).}
 
 \item{trueLogRr}{A vector of the true effect sizes.}
 
-\item{estimateCovarianceMatrix}{should a covariance matrix be computed? If so, confidence intervals for the model
-parameters will be available.}
+\item{estimateCovarianceMatrix}{should a covariance matrix be computed? If so, confidence
+intervals for the model parameters will be available.}
 }
 \value{
 An object of type \code{systematicErrorModel}.
@@ -27,7 +27,7 @@ Fit a systematic error model
 }
 \details{
 Fit a model of the systematic error as a function of true effect size. This model is an extention
-of the method for fitting the null distribution. The mean and standard deviations of the error
+of the method for fitting the null distribution. The mean and log(standard deviations) of the error
 distributions are assumed to be linear with respect to the true effect size, and each component is
 therefore represented by an intercept and a slope.
 }

@@ -16,7 +16,8 @@ estimate>))/qnorm(0.025).}
 \item{model}{An object of type \code{systematicErrorModel} as created by the
 \code{\link{fitSystematicErrorModel}} function.}
 
-\item{ciWidth}{The width of the confidence interval. Typically this would be .95, for the 95 percent confidence interval.}
+\item{ciWidth}{The width of the confidence interval. Typically this would be .95, for the 95
+percent confidence interval.}
 }
 \value{
 A data frame with calibrated confidence intervals and point estimates.
