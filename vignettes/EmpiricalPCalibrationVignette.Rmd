@@ -142,7 +142,18 @@ p <- calibrateP(null, drugOfInterest$logRr, drugOfInterest$seLogRr)
 p
 ```
 
-Note that there is uncertainty around the calibrated p-value as expressed in the 95% credible interval.
+Note that there is uncertainty around the calibrated p-value as expressed in the 95% credible interval. 
+
+We can also visualize the uncertainty in the p-value calibration by plotting the 95% credible interval of the boundary where calibrated p = 0.05, here indicated by the red band:
+
+```{r}
+plotCalibrationEffect(negatives$logRr,
+                      negatives$seLogRr, 
+                      drugOfInterest$logRr, 
+                      drugOfInterest$seLogRr, 
+                      null,
+                      showCis = TRUE)
+```
 
 # References
 
