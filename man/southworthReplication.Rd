@@ -17,7 +17,7 @@ Relative risks from an unadjusted new-user cohort design
 \details{
 A dataset containing the incidence rate ratios (and standard errors) produced using a new-user 
 cohort design that compares new-users of dabigatran to new-users of warfarin for the outcome of 
-GI hemorrhage. The dataset includes estimates both for the outcome ofinterest as well as negative
+GI hemorrhage. The dataset includes estimates both for the outcome of interest as well as negative
 and positive control outcomes. Subjects are required to have 183 days of continuous observation prior to 
 initiating treatment, a prior diagnosis of atrial fibrillation, and are required to have no prior 
 exposure to either dabigatran or warfarin. The study computes an incidence rate ratio without 

@@ -18,7 +18,7 @@ The two-sided (traditional) p-value.
 }
 \description{
 \code{computeTraditionalP} computes the traditional two-sided p-value based on the log of the
-relative risk and the standerd error of the log of the relative risk.
+relative risk and the standard error of the log of the relative risk.
 }
 \examples{
 data(sccs)

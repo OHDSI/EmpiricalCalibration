@@ -41,7 +41,7 @@ This function computes a calibrated two-sided p-value as described in Schuemie e
 \itemize{
 \item \code{null}: Computes the calibrated P-value using asymptotic assumptions.
 
-\item \code{mcmcNull}: Computes the calibrated P-value and 95 percent credibel interval using Markov Chain
+\item \code{mcmcNull}: Computes the calibrated P-value and 95 percent credible interval using Markov Chain
 Monte Carlo (MCMC).
 }}
 

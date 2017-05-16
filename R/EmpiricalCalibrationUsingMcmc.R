@@ -225,7 +225,7 @@ print.mcmcNull <- function(x, ...) {
 }
 
 #' @describeIn
-#' calibrateP Computes the calibrated P-value and 95 percent credibel interval using Markov Chain
+#' calibrateP Computes the calibrated P-value and 95 percent credible interval using Markov Chain
 #' Monte Carlo (MCMC).
 #'
 #' @param pValueOnly   If true, will return only the calibrated P-value itself, not the credible

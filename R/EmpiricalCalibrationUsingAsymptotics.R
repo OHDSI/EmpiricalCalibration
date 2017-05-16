@@ -161,7 +161,7 @@ calibrateP.null <- function(null, logRr, seLogRr, ...) {
 #'
 #' @description
 #' \code{computeTraditionalP} computes the traditional two-sided p-value based on the log of the
-#' relative risk and the standerd error of the log of the relative risk.
+#' relative risk and the standard error of the log of the relative risk.
 #'
 #' @param logRr     A numeric vector of one or more effect estimates on the log scale
 #' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard

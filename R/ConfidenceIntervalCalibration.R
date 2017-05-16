@@ -19,7 +19,7 @@
 #' Fit a systematic error model
 #'
 #' @details
-#' Fit a model of the systematic error as a function of true effect size. This model is an extention
+#' Fit a model of the systematic error as a function of true effect size. This model is an extension
 #' of the method for fitting the null distribution. The mean and log(standard deviations) of the error
 #' distributions are assumed to be linear with respect to the true effect size, and each component is
 #' therefore represented by an intercept and a slope.
