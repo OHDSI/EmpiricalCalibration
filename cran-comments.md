@@ -2,21 +2,25 @@ This is an update of the package
 
 NEW FEATURES
 
-* Ability to add credible intervals to calibration effect plot
+* Confidence interval calibration model StdDev transformed to log scale to prevent negative StdDev.
 
-* Plot CI calibration (using leave-one-out cross-validation)
+* Confidence interval calibration cross-validation now allows specification of leave-out groups.
+
+* various new plots for evaluating confidence interval calibration.
+
+* Added confidence interval calibration vignette.
+
+* Added example data for confidence interval calibration
 
 BUG FIXES
 
-* Fixed vignette name in index
-
-* Removed coverage plot (moved to MethodEvaluation package)
+* None
 
 ---
 
 ## Test environments
 * Ubuntu 12.04.5 LTS (Travis), R 3.2.5
-* Windows 7, R 3.3.1
+* Windows 7, R 3.4.0
 * win-builder
 
 ## R CMD check results

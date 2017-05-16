@@ -1,7 +1,7 @@
 EmpiricalCalibration
 ====================
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/EmpiricalCalibration)](http://cran.r-project.org/package=EmpiricalCalibration)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 
 Introduction
 ============
@@ -39,7 +39,7 @@ This is a pure R package.
 
 System requirements
 ===================
-Requires [R](http://cran.r-project.org/) (version 3.1.0 or newer).
+Requires R (version 3.1.0 or newer).
 
 Getting Started
 ===============

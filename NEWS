@@ -1,3 +1,23 @@
+EmpiricalCalibration v1.3.1 (Release date: 2017-05-16)
+==============
+
+NEW FEATURES
+
+* Confidence interval calibration model StdDev transformed to log scale to prevent negative StdDev.
+
+* Confidence interval calibration cross-validation now allows specification of leave-out groups.
+
+* various new plots for evaluating confidence interval calibration.
+
+* Added confidence interval calibration vignette.
+
+* Added example data for confidence interval calibration
+
+BUG FIXES
+
+* None
+
+
 EmpiricalCalibration v1.2.0 (Release date: 2016-08-15)
 ==============
 
