@@ -73,4 +73,3 @@ env:
   global:
 #     - R_BUILD_ARGS=" " 
 #     - R_CHECK_ARGS="--as-cran"  
-    secure: clBIB1ryoj28wttYw5YQClr4wTNw/s2rqs0OzjnvdnD3NAONxMz+8CXR7cmHow5nQ211J/zKP/+wnd8x0oCId2cJT2a8Kp99bjAMs6q0hvjAUBxmYQgQAJ3VQ8PNTXB4WglDimXPSJfYdExo3mqbQozWnqx9pu7Z+029/M7+h+M=
