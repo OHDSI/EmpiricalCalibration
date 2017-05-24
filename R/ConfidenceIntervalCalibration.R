@@ -132,7 +132,7 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
 #'
 #' @export
 calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
-
+  
   opt <- function(x,
                   z,
                   logRr,
@@ -167,19 +167,22 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
               interceptMean = interceptMean,
               slopeMean = slopeMean,
               interceptLogSd = interceptLogSd,
-              slopeLogSd = slopeLogSd) < 0) {
+              slopeLogSd = slopeLogSd) < 0 && upper < 1000) {
       upper <- upper + 1
     }
-    
-    uniroot(f = opt,
-            interval = c(-10, upper),
-            z = z,
-            logRr = logRr,
-            se = se,
-            interceptMean = interceptMean,
-            slopeMean = slopeMean,
-            interceptLogSd = interceptLogSd,
-            slopeLogSd = slopeLogSd)$root
+    if (upper == 1000) {
+      return(NA)
+    } else {
+      return(uniroot(f = opt,
+                     interval = c(-10, upper),
+                     z = z,
+                     logRr = logRr,
+                     se = se,
+                     interceptMean = interceptMean,
+                     slopeMean = slopeMean,
+                     interceptLogSd = interceptLogSd,
+                     slopeLogSd = slopeLogSd)$root)
+    }
   }
   
   result <- data.frame(logRr = rep(0, length(logRr)), logLb95Rr = 0, logUb95Rr = 0)
