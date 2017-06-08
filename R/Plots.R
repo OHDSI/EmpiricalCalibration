@@ -833,3 +833,153 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, fileName = NULL) {
     ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
   return(plot)
 }
+
+#' Plot the expected type 1 error as a function of standard error
+#'
+#' @description
+#' \code{plotExpectedType1Error} creates a plot showing the expected type 1 error as a function of standard error.
+#'
+#' @details
+#' Creates a plot with the standard error on the x-axis and the expected type 1 error on the y-axis. The 
+#' red line indicates the expected type 1 error given the estimated empirical null distribution. The
+#' dashed line indicated the nominal expected type 1 error rate given the theoretical null distribution.
+#' 
+#' If standard errors are provided for non-negative estimates these will be plotted on the red line as
+#' yellow diamonds.
+#'
+#' @param logRrNegatives     A numeric vector of effect estimates of the negative controls on the log
+#'                           scale.
+#' @param seLogRrNegatives   The standard error of the log of the effect estimates of the negative
+#'                           controls.
+#' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive
+#'                           controls.
+#' @param alpha              The alpha (nominal type 1 error) to be used.
+#' @param null               An object representing the fitted null distribution as created by the
+#'                           \code{fitNull} function. If not provided, a null will be fitted before
+#'                           plotting.
+#' @param title              Optional: the main title for the plot
+#' @param showCis            Show 95 percent credible intervals for the expected type 1 error.
+#' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
+#'                           See the function \code{ggsave} in the ggplot2 package for supported file
+#'                           formats.
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
+#' data(sccs)
+#' negatives <- sccs[sccs$groundTruth == 0, ]
+#' positive <- sccs[sccs$groundTruth == 1, ]
+#' plotExpectedType1Error(negatives$logRr, negatives$seLogRr, positive$seLogRr)
+#'
+#' @export
+plotExpectedType1Error <- function(logRrNegatives,
+                                   seLogRrNegatives,
+                                   seLogRrPositives,
+                                   alpha = 0.05,
+                                   null = NULL,
+                                   title,
+                                   showCis = FALSE,
+                                   fileName = NULL) {
+  if (is.null(null)) {
+    if (showCis) {
+      null <- fitMcmcNull(logRrNegatives, seLogRrNegatives)
+    } else {
+      null <- fitNull(logRrNegatives, seLogRrNegatives)
+    }
+  }
+  if (showCis && is(null, "null"))
+    stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
+  
+  se <- (1:100)/100
+  if (is(null, "null")) {
+    mean <- null[1]
+    sd <- sqrt(se^2 + null[2]^2) 
+    type1Error <- pnorm(qnorm(1-alpha/2, 0, se), mean, sd, lower.tail = FALSE) + 
+      pnorm(qnorm(alpha/2, 0, se), mean, sd, lower.tail = TRUE)
+  } else {
+    computeExpected <- function(se, chain) {
+      mean <- chain[, 1]
+      sd <- sqrt(se^2 + (1/sqrt(chain[, 2]))^2) 
+      type1Error <- pnorm(qnorm(1-alpha/2, 0, se), mean, sd, lower.tail = FALSE) + 
+        pnorm(qnorm(alpha/2, 0, se), mean, sd, lower.tail = TRUE)
+      return(quantile(type1Error, c(0.025, 0.5, 0.975)))
+    }
+    mcmc <- attr(null, "mcmc")
+    estimates <- sapply(se, computeExpected, chain = mcmc$chain)
+    type1Error <- estimates[2, ]
+    lb <- estimates[1, ]
+    ub <- estimates[3, ]
+  }
+  breaks <- 0:4 / 4
+  theme <- ggplot2::element_text(colour = "#000000", size = 12)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
+  plot <- ggplot2::ggplot(data.frame(se, type1Error),
+                          ggplot2::aes(x = se, y = type1Error),
+                          environment = environment()) +
+    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
+    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
+    ggplot2::geom_hline(yintercept = alpha,
+                        colour = rgb(0, 0, 0),
+                        linetype = "dashed",
+                        size = 1,
+                        alpha = 0.5) +
+    ggplot2::geom_text(label = paste("alpha ==", alpha), 
+                       hjust = 1, 
+                       vjust = 1, 
+                       data = data.frame(se = 1, type1Error = alpha - 0.001), 
+                       parse = TRUE) +  
+    ggplot2::geom_line(color = rgb(0.8, 0, 0),
+                       size = 1,
+                       alpha = 0.5)
+  
+  if (showCis) {
+    plot <- plot +
+      ggplot2::geom_ribbon(ggplot2::aes(ymin = lb,
+                                        ymax = ub), fill = rgb(0.8, 0.2, 0.2), alpha = 0.3) +
+      ggplot2::geom_line(ggplot2::aes(y = lb),
+                         colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                         size = 1) +
+      ggplot2::geom_line(ggplot2::aes(y = ub),
+                         colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                         size = 1)
+  }
+  plot <- plot +
+    ggplot2::scale_x_continuous("Standard error",
+                                limits = c(0, 1),
+                                breaks = breaks,
+                                labels = breaks) +
+    ggplot2::scale_y_continuous("Expected type 1 error", 
+                                limits = c(0, 1),
+                                breaks = breaks,
+                                labels = breaks) +
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
+                   panel.grid.major = ggplot2::element_blank(),
+                   axis.ticks = ggplot2::element_blank(),
+                   axis.text.y = themeRA,
+                   axis.text.x = theme,
+                   text = theme,
+                   legend.key = ggplot2::element_blank(),
+                   strip.text.x = theme,
+                   strip.background = ggplot2::element_blank(),
+                   legend.position = "none")
+  if (!missing(seLogRrPositives)) {
+    yPos <- type1Error[which.min(abs(seLogRrPositives - se))]
+    plot <- plot + ggplot2::geom_point(shape = 23,
+                                       ggplot2::aes(x, y),
+                                       data = data.frame(x = seLogRrPositives,
+                                                         y = yPos),
+                                       size = 4,
+                                       fill = rgb(1, 1, 0),
+                                       alpha = 0.8)
+  }
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
+  plot
+  if (!is.null(fileName))
+    ggplot2::ggsave(fileName, plot, width = 5, height = 5, dpi = 400)
+  return(plot)
+  
+}
