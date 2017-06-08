@@ -841,8 +841,9 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, fileName = NULL) {
 #'
 #' @details
 #' Creates a plot with the standard error on the x-axis and the expected type 1 error on the y-axis. The 
-#' red line indicates the expected type 1 error given the estimated empirical null distribution. The
-#' dashed line indicated the nominal expected type 1 error rate given the theoretical null distribution.
+#' red line indicates the expected type 1 error  given the estimated empirical null distribution if no 
+#' calibration is performed. The dashed line indicated the nominal expected type 1 error rate, assuming 
+#' the theoretical null distribution.
 #' 
 #' If standard errors are provided for non-negative estimates these will be plotted on the red line as
 #' yellow diamonds.
@@ -891,7 +892,7 @@ plotExpectedType1Error <- function(logRrNegatives,
   if (showCis && is(null, "null"))
     stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
   
-  se <- (1:100)/100
+  se <- (0:100)/100
   if (is(null, "null")) {
     mean <- null[1]
     sd <- sqrt(se^2 + null[2]^2) 
@@ -965,14 +966,18 @@ plotExpectedType1Error <- function(logRrNegatives,
                    strip.background = ggplot2::element_blank(),
                    legend.position = "none")
   if (!missing(seLogRrPositives)) {
-    yPos <- type1Error[which.min(abs(seLogRrPositives - se))]
-    plot <- plot + ggplot2::geom_point(shape = 23,
-                                       ggplot2::aes(x, y),
-                                       data = data.frame(x = seLogRrPositives,
-                                                         y = yPos),
-                                       size = 4,
-                                       fill = rgb(1, 1, 0),
-                                       alpha = 0.8)
+    yPos <- sapply(seLogRrPositives, FUN = function(x) {type1Error[which.min(abs(x - se))]})
+    posData <- data.frame(x = seLogRrPositives,
+                          y = yPos)
+    plot <- with(posData, {plot + ggplot2::geom_vline(ggplot2::aes(xintercept = x), 
+                                                      data = posData) +
+        ggplot2::geom_point(shape = 23,
+                            ggplot2::aes(x, y),
+                            data = posData,
+                            size = 4,
+                            fill = rgb(1, 1, 0),
+                            alpha = 0.8)
+    })
   }
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
@@ -981,5 +986,4 @@ plotExpectedType1Error <- function(logRrNegatives,
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 5, dpi = 400)
   return(plot)
-  
 }

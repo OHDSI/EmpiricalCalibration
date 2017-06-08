@@ -39,8 +39,9 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 }
 \details{
 Creates a plot with the standard error on the x-axis and the expected type 1 error on the y-axis. The 
-red line indicates the expected type 1 error given the estimated empirical null distribution. The
-dashed line indicated the nominal expected type 1 error rate given the theoretical null distribution.
+red line indicates the expected type 1 error  given the estimated empirical null distribution if no 
+calibration is performed. The dashed line indicated the nominal expected type 1 error rate, assuming 
+the theoretical null distribution.
 
 If standard errors are provided for non-negative estimates these will be plotted on the red line as
 yellow diamonds.
