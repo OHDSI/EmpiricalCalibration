@@ -5,8 +5,8 @@
 \title{Plot the effect of the calibration}
 \usage{
 plotCalibrationEffect(logRrNegatives, seLogRrNegatives, logRrPositives,
-  seLogRrPositives, null = NULL, xLabel = "Relative risk", title,
-  showCis = FALSE, fileName = NULL)
+  seLogRrPositives, null = NULL, alpha = 0.05, xLabel = "Relative risk",
+  title, showCis = FALSE, fileName = NULL)
 }
 \arguments{
 \item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log
@@ -22,14 +22,16 @@ scale.}
 controls.}
 
 \item{null}{An object representing the fitted null distribution as created by the
-\code{fitNull} function. If not provided, a null will be fitted before
-plotting.}
+\code{fitNull} or \code{fitMcmcNull} functions. If not provided, a null 
+will be fitted before plotting.}
+
+\item{alpha}{The alpha for the hypothesis test.}
 
 \item{xLabel}{The label on the x-axis: the name of the effect estimate.}
 
 \item{title}{Optional: the main title for the plot}
 
-\item{showCis}{Show 95 percent credible intervals for the calibrated p = 0.05 boundary.}
+\item{showCis}{Show 95 percent credible intervals for the calibrated p = alpha boundary.}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'.
 See the function \code{ggsave} in the ggplot2 package for supported file

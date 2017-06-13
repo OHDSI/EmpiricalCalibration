@@ -94,59 +94,11 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", title, f
   return(plot)
 }
 
-logRrtoSE <- function(logRr, p, null) {
-  sapply(logRr, function(logRr) {
-    precision <- 0.001
-    if (calibrateP(null, logRr, precision, pValueOnly = TRUE) > p)
-      return(0)
-    L <- 0
-    H <- 100
-    while (H >= L) {
-      M <- L + (H - L)/2
-      if (calibrateP(null, logRr, M, pValueOnly = TRUE) - p > precision)
-        H <- M else if (p - calibrateP(null, logRr, M, pValueOnly = TRUE) > precision)
-          L <- M else return(M)
-    }
-    return(L - 1)
-  })
-}
-
-logRrtoSeLb <- function(logRr, p, null) {
-  sapply(logRr, function(logRr) {
-    precision <- 0.001
-    if (calibrateP(null, logRr, precision, pValueOnly = FALSE)$lb95ci > p)
-      return(0)
-    L <- 0
-    H <- 100
-    while (H >= L) {
-      M <- L + (H - L)/2
-      if (calibrateP(null, logRr, M, pValueOnly = FALSE)$lb95ci - p > precision)
-        H <- M else if (p - calibrateP(null, logRr, M, pValueOnly = FALSE)$lb95ci > precision)
-          L <- M else return(M)
-    }
-    return(L - 1)
-  })
-}
-
-logRrtoSeUb <- function(logRr, p, null) {
-  sapply(logRr, function(logRr) {
-    precision <- 0.001
-    if (calibrateP(null, logRr, precision, pValueOnly = FALSE)$ub95ci > p)
-      return(0)
-    L <- 0
-    H <- 100
-    while (H >= L) {
-      M <- L + (H - L)/2
-      if (calibrateP(null, logRr, M, pValueOnly = FALSE)$ub95ci - p > precision) {
-        H <- M
-      } else if (p - calibrateP(null, logRr, M, pValueOnly = FALSE)$ub95ci > precision) {
-        L <- M
-      } else {
-        return(M)
-      }
-    }
-    return(L - 1)
-  })
+logRrtoSE <- function(logRr, alpha, mu, sigma) {
+  phi <- (mu-logRr)^2/qnorm(alpha/2)^2-sigma^2
+  phi[phi<0] <- 0
+  se <- sqrt(phi)
+  return(se)
 }
 
 #' Plot the effect of the calibration
@@ -169,11 +121,12 @@ logRrtoSeUb <- function(logRr, p, null) {
 #' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive
 #'                           controls.
 #' @param null               An object representing the fitted null distribution as created by the
-#'                           \code{fitNull} function. If not provided, a null will be fitted before
-#'                           plotting.
+#'                           \code{fitNull} or \code{fitMcmcNull} functions. If not provided, a null 
+#'                           will be fitted before plotting.
+#' @param alpha              The alpha for the hypothesis test.                         
 #' @param xLabel             The label on the x-axis: the name of the effect estimate.
 #' @param title              Optional: the main title for the plot
-#' @param showCis            Show 95 percent credible intervals for the calibrated p = 0.05 boundary.
+#' @param showCis            Show 95 percent credible intervals for the calibrated p = alpha boundary.
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function \code{ggsave} in the ggplot2 package for supported file
 #'                           formats.
@@ -193,6 +146,7 @@ plotCalibrationEffect <- function(logRrNegatives,
                                   logRrPositives,
                                   seLogRrPositives,
                                   null = NULL,
+                                  alpha = 0.05,
                                   xLabel = "Relative risk",
                                   title,
                                   showCis = FALSE,
@@ -208,14 +162,19 @@ plotCalibrationEffect <- function(logRrNegatives,
     stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
   
   x <- exp(seq(log(0.25), log(10), by = 0.01))
-  y <- logRrtoSE(log(x), 0.05, null)
-  if (showCis) {
-    writeLines("Computing 95% credible interval bounds")
-    yLb <- logRrtoSeLb(log(x), 0.05, null)
-    yUb <- logRrtoSeUb(log(x), 0.05, null)
+  if (is(null, "null")) {
+    y <- logRrtoSE(log(x), alpha, null[1], null[2])
+  } else {
+    chain <- attr(null, "mcmc")$chain
+    matrix <- apply(chain, 1, function(null) logRrtoSE(log(x), alpha, null[1], 1/sqrt(null[2])))
+    ys <- apply(matrix, 1, function(se) quantile(se, c(0.025, 0.50, 0.975), na.rm=TRUE))
+    rm(matrix)
+    y <- ys[2, ]
+    yLb <- ys[1, ]
+    yUb <- ys[3, ]
   }
   seTheoretical <- sapply(x, FUN = function(x) {
-    abs(log(x))/qnorm(0.975)
+    abs(log(x))/qnorm(1-alpha/2)
   })
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
@@ -982,7 +941,6 @@ plotExpectedType1Error <- function(logRrNegatives,
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
-  plot
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 5, dpi = 400)
   return(plot)
