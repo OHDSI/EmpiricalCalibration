@@ -795,48 +795,25 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, fileName = NULL) {
 
 plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives) {
   if (is(null, "mcmcNull")) {
-     null <- c(null[1], 1/sqrt(null[2])) 
+    null <- c(null[1], 1/sqrt(null[2])) 
   }
   x <- exp(seq(log(0.25), log(10), by = 0.01))
-  seTheoretical <- sapply(x, FUN = function(x) abs(log(x))/qnorm(1-alpha/2))
+  y <- sapply(x, FUN = function(x) abs(log(x))/qnorm(1-alpha/2))
   thresholds <- c(0.05, 0.25, 0.5, 0.75)
   isoBars <- lapply(thresholds, function(threshold) data.frame(x = x, 
                                                                y = logRrtoSE(log(x), threshold, null[1], null[2]), 
-                                                               ymax = seTheoretical,
+                                                               ymax = y,
                                                                threshold = threshold))
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
-  plot <- ggplot2::ggplot(data.frame(x, y, seTheoretical),
+  plot <- ggplot2::ggplot(data.frame(x, y),
                           ggplot2::aes(x = x, y = y),
                           environment = environment()) +
-    ggplot2::geom_vline(xintercept = breaks, colour = rgb(0,0,0), lty = 1, size = 0.5, alpha = 0.3) +
-    ggplot2::geom_hline(yintercept = 0:4/4, colour = rgb(0,0,0), lty = 1, size = 0.5, alpha = 0.3) +
-    ggplot2::geom_vline(xintercept = 1, size = 1) 
-  
-  for (isoBar in isoBars) {
-    isoBarLeft <- isoBar[isoBar$x < exp(null[1]), ]
-    isoBarRight <- isoBar[isoBar$x > exp(null[1]), ]
-    labelData <- data.frame(x = c(isoBarLeft$x[which.min(abs(isoBarLeft$y - 0.7))],
-                                  isoBarRight$x[which.min(abs(isoBarRight$y - 0.7))]),
-                            y = 0.7,
-                            label = isoBar$threshold[1])
-    plot <- plot + ggplot2::geom_ribbon(
-      ggplot2::aes(ymin = y, ymax = ymax),
-      fill = rgb(1, 0.5, 0, alpha=0.2),
-      data = isoBar[isoBar$y < isoBar$ymax, ]) +
-      ggplot2::geom_line(color = rgb(1, 0.5, 0),
-                         size = 1,
-                         alpha = 0.5,            
-                         data = isoBar) +
-      ggplot2::geom_text(ggplot2::aes(label = label),
-                         data = labelData)
-  }
-  if (!missing(seLogRrPositives)) {
-    plot <- plot + ggplot2::geom_hline(yintercept = seLogRrPositives)
-  }
-  plot <- plot + ggplot2::geom_line(ggplot2::aes(y = seTheoretical),
-                       colour = rgb(0, 0, 0),
+    ggplot2::geom_vline(xintercept = breaks, colour = rgb(0,0,0), lty = 1, size = 0.5, alpha = 0.2) +
+    ggplot2::geom_hline(yintercept = 0:4/4, colour = rgb(0,0,0), lty = 1, size = 0.5, alpha = 0.2) +
+    ggplot2::geom_vline(xintercept = 1, size = 1) +
+    ggplot2::geom_line(colour = rgb(0, 0, 0),
                        linetype = "dashed",
                        size = 1,
                        alpha = 0.5) +
@@ -856,6 +833,30 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
                    strip.text.x = theme,
                    strip.background = ggplot2::element_blank(),
                    legend.position = "none")
+  for (isoBar in isoBars) {
+    isoBarLeft <- isoBar[isoBar$x < exp(null[1]), ]
+    isoBarRight <- isoBar[isoBar$x > exp(null[1]), ]
+    labelData <- data.frame(x = c(isoBarLeft$x[which.min(abs(isoBarLeft$y - 0.625))],
+                                  isoBarRight$x[which.min(abs(isoBarRight$y - 0.625))]),
+                            y = 0.625,
+                            label = paste0(100*isoBar$threshold[1], "%"))
+    plot <- with(labelData, {plot + ggplot2::geom_ribbon(
+      ggplot2::aes(ymin = y, ymax = ymax),
+      fill = rgb(1, 0.5, 0, alpha=0.2),
+      data = isoBar[isoBar$y < isoBar$ymax, ]) +
+        ggplot2::geom_line(color = rgb(1, 0.5, 0),
+                           size = 1,
+                           alpha = 0.5,            
+                           data = isoBar) +
+        ggplot2::geom_label(ggplot2::aes(label = label),
+                            color = rgb(1, 0.5, 0),
+                            data = labelData) +
+        ggplot2::geom_text(ggplot2::aes(label = label),
+                           data = labelData)})
+  }
+  if (!missing(seLogRrPositives)) {
+    plot <- plot + ggplot2::geom_hline(yintercept = seLogRrPositives)
+  }
   return(plot)
 }
 
@@ -883,6 +884,7 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
 #' @param null               An object representing the fitted null distribution as created by the
 #'                           \code{fitNull} function. If not provided, a null will be fitted before
 #'                           plotting.
+#' @param xLabel             If showing effect sizes, what label should be used for the effect size axis?
 #' @param title              Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the expected type 1 error.
 #' @param showEffectSizes    Show the expected effect sizes alongside the expected type 1 error?
@@ -905,6 +907,7 @@ plotExpectedType1Error <- function(logRrNegatives,
                                    seLogRrPositives,
                                    alpha = 0.05,
                                    null = NULL,
+                                   xLabel = "Relative risk",
                                    title,
                                    showCis = FALSE,
                                    showEffectSizes = FALSE,
@@ -945,18 +948,13 @@ plotExpectedType1Error <- function(logRrNegatives,
   plot <- ggplot2::ggplot(data.frame(se, type1Error),
                           ggplot2::aes(x = se, y = type1Error),
                           environment = environment()) +
-    ggplot2::geom_vline(xintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.3) +
-    ggplot2::geom_hline(yintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.3) +
+    ggplot2::geom_vline(xintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
+    ggplot2::geom_hline(yintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
     ggplot2::geom_hline(yintercept = alpha,
                         colour = rgb(0, 0, 0),
                         linetype = "dashed",
                         size = 1,
                         alpha = 0.5) +
-    ggplot2::geom_text(label = paste("alpha ==", alpha), 
-                       hjust = 1, 
-                       vjust = 1, 
-                       data = data.frame(se = 1, type1Error = alpha - 0.001), 
-                       parse = TRUE) +  
     ggplot2::geom_line(color = rgb(0.8, 0, 0),
                        size = 1,
                        alpha = 0.5)
@@ -973,6 +971,10 @@ plotExpectedType1Error <- function(logRrNegatives,
                          size = 1)
   }
   plot <- plot +
+    ggplot2::geom_label(label = paste("alpha ==", alpha), 
+                        data = data.frame(se = 0.875 + showEffectSizes * 0.125, 
+                                          type1Error = alpha + showEffectSizes * 0.04), 
+                        parse = TRUE) +  
     ggplot2::scale_x_continuous("Standard error",
                                 limits = c(0, 1),
                                 breaks = breaks,
@@ -987,7 +989,6 @@ plotExpectedType1Error <- function(logRrNegatives,
                    axis.ticks = ggplot2::element_blank(),
                    axis.text.y = themeRA,
                    axis.text.x = theme,
-                   text = theme,
                    legend.key = ggplot2::element_blank(),
                    strip.text.x = theme,
                    strip.background = ggplot2::element_blank(),
@@ -1010,7 +1011,7 @@ plotExpectedType1Error <- function(logRrNegatives,
     plot <- plot + ggplot2::coord_flip() 
     plot <- plot + ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                                   axis.title.y = ggplot2::element_blank())
-    plot2 <- plotIsobars(null, alpha, seLogRrPositives = seLogRrPositives)
+    plot2 <- plotIsobars(null = null, alpha = alpha, xLabel = xLabel, seLogRrPositives = seLogRrPositives)
     plots <- list(plot2, plot)
     grobs <- heights <- list()
     for (i in 1:length(plots)) {

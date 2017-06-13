@@ -15,6 +15,7 @@ Description: Routines for performing empirical calibration of observational
 VignetteBuilder: knitr
 Imports:
     ggplot2 (>= 2.0.0),
+    gridExtra,
     methods
 Suggests:
     knitr,

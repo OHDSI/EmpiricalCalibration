@@ -5,8 +5,8 @@
 \title{Plot the expected type 1 error as a function of standard error}
 \usage{
 plotExpectedType1Error(logRrNegatives, seLogRrNegatives, seLogRrPositives,
-  alpha = 0.05, null = NULL, title, showCis = FALSE,
-  showEffectSizes = FALSE, fileName = NULL)
+  alpha = 0.05, null = NULL, xLabel = "Relative risk", title,
+  showCis = FALSE, showEffectSizes = FALSE, fileName = NULL)
 }
 \arguments{
 \item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log
@@ -23,6 +23,8 @@ controls.}
 \item{null}{An object representing the fitted null distribution as created by the
 \code{fitNull} function. If not provided, a null will be fitted before
 plotting.}
+
+\item{xLabel}{If showing effect sizes, what label should be used for the effect size axis?}
 
 \item{title}{Optional: the main title for the plot}
 
