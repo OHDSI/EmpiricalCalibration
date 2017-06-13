@@ -5,7 +5,8 @@
 \title{Plot the expected type 1 error as a function of standard error}
 \usage{
 plotExpectedType1Error(logRrNegatives, seLogRrNegatives, seLogRrPositives,
-  alpha = 0.05, null = NULL, title, showCis = FALSE, fileName = NULL)
+  alpha = 0.05, null = NULL, title, showCis = FALSE,
+  showEffectSizes = FALSE, fileName = NULL)
 }
 \arguments{
 \item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log
@@ -26,6 +27,8 @@ plotting.}
 \item{title}{Optional: the main title for the plot}
 
 \item{showCis}{Show 95 percent credible intervals for the expected type 1 error.}
+
+\item{showEffectSizes}{Show the expected effect sizes alongside the expected type 1 error?}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'.
 See the function \code{ggsave} in the ggplot2 package for supported file

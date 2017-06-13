@@ -793,6 +793,72 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, fileName = NULL) {
   return(plot)
 }
 
+plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives) {
+  if (is(null, "mcmcNull")) {
+     null <- c(null[1], 1/sqrt(null[2])) 
+  }
+  x <- exp(seq(log(0.25), log(10), by = 0.01))
+  seTheoretical <- sapply(x, FUN = function(x) abs(log(x))/qnorm(1-alpha/2))
+  thresholds <- c(0.05, 0.25, 0.5, 0.75)
+  isoBars <- lapply(thresholds, function(threshold) data.frame(x = x, 
+                                                               y = logRrtoSE(log(x), threshold, null[1], null[2]), 
+                                                               ymax = seTheoretical,
+                                                               threshold = threshold))
+  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+  theme <- ggplot2::element_text(colour = "#000000", size = 12)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
+  plot <- ggplot2::ggplot(data.frame(x, y, seTheoretical),
+                          ggplot2::aes(x = x, y = y),
+                          environment = environment()) +
+    ggplot2::geom_vline(xintercept = breaks, colour = rgb(0,0,0), lty = 1, size = 0.5, alpha = 0.3) +
+    ggplot2::geom_hline(yintercept = 0:4/4, colour = rgb(0,0,0), lty = 1, size = 0.5, alpha = 0.3) +
+    ggplot2::geom_vline(xintercept = 1, size = 1) 
+  
+  for (isoBar in isoBars) {
+    isoBarLeft <- isoBar[isoBar$x < exp(null[1]), ]
+    isoBarRight <- isoBar[isoBar$x > exp(null[1]), ]
+    labelData <- data.frame(x = c(isoBarLeft$x[which.min(abs(isoBarLeft$y - 0.7))],
+                                  isoBarRight$x[which.min(abs(isoBarRight$y - 0.7))]),
+                            y = 0.7,
+                            label = isoBar$threshold[1])
+    plot <- plot + ggplot2::geom_ribbon(
+      ggplot2::aes(ymin = y, ymax = ymax),
+      fill = rgb(1, 0.5, 0, alpha=0.2),
+      data = isoBar[isoBar$y < isoBar$ymax, ]) +
+      ggplot2::geom_line(color = rgb(1, 0.5, 0),
+                         size = 1,
+                         alpha = 0.5,            
+                         data = isoBar) +
+      ggplot2::geom_text(ggplot2::aes(label = label),
+                         data = labelData)
+  }
+  if (!missing(seLogRrPositives)) {
+    plot <- plot + ggplot2::geom_hline(yintercept = seLogRrPositives)
+  }
+  plot <- plot + ggplot2::geom_line(ggplot2::aes(y = seTheoretical),
+                       colour = rgb(0, 0, 0),
+                       linetype = "dashed",
+                       size = 1,
+                       alpha = 0.5) +
+    ggplot2::scale_x_continuous(xLabel,
+                                trans = "log10",
+                                breaks = breaks,
+                                labels = breaks) +
+    ggplot2::scale_y_continuous("Standard Error") +
+    ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0, 1)) +
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
+                   panel.grid.major = ggplot2::element_blank(),
+                   axis.ticks = ggplot2::element_blank(),
+                   axis.text.y = themeRA,
+                   axis.text.x = theme,
+                   legend.key = ggplot2::element_blank(),
+                   strip.text.x = theme,
+                   strip.background = ggplot2::element_blank(),
+                   legend.position = "none")
+  return(plot)
+}
+
 #' Plot the expected type 1 error as a function of standard error
 #'
 #' @description
@@ -819,6 +885,7 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, fileName = NULL) {
 #'                           plotting.
 #' @param title              Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the expected type 1 error.
+#' @param showEffectSizes    Show the expected effect sizes alongside the expected type 1 error?
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function \code{ggsave} in the ggplot2 package for supported file
 #'                           formats.
@@ -840,6 +907,7 @@ plotExpectedType1Error <- function(logRrNegatives,
                                    null = NULL,
                                    title,
                                    showCis = FALSE,
+                                   showEffectSizes = FALSE,
                                    fileName = NULL) {
   if (is.null(null)) {
     if (showCis) {
@@ -877,8 +945,8 @@ plotExpectedType1Error <- function(logRrNegatives,
   plot <- ggplot2::ggplot(data.frame(se, type1Error),
                           ggplot2::aes(x = se, y = type1Error),
                           environment = environment()) +
-    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
-    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
+    ggplot2::geom_vline(xintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.3) +
+    ggplot2::geom_hline(yintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.3) +
     ggplot2::geom_hline(yintercept = alpha,
                         colour = rgb(0, 0, 0),
                         linetype = "dashed",
@@ -938,10 +1006,33 @@ plotExpectedType1Error <- function(logRrNegatives,
                             alpha = 0.8)
     })
   }
-  if (!missing(title)) {
-    plot <- plot + ggplot2::ggtitle(title)
+  if (showEffectSizes) {
+    plot <- plot + ggplot2::coord_flip() 
+    plot <- plot + ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                                  axis.title.y = ggplot2::element_blank())
+    plot2 <- plotIsobars(null, alpha, seLogRrPositives = seLogRrPositives)
+    plots <- list(plot2, plot)
+    grobs <- heights <- list()
+    for (i in 1:length(plots)) {
+      grobs[[i]] <- ggplot2::ggplotGrob(plots[[i]])
+      heights[[i]] <- grobs[[i]]$heights[6:9]
+    }
+    maxHeight <- do.call(grid::unit.pmax, heights)
+    for (i in 1:length(grobs)) {
+      grobs[[i]]$heights[6:9] <- as.list(maxHeight)
+    }
+    if (missing(title)) {
+      title <- NULL
+    }
+    plot <- gridExtra::grid.arrange(grobs[[1]], grobs[[2]],  nrow = 1, ncol = 2, widths = c(2,1), top = title)
+    if (!is.null(fileName))
+      ggplot2::ggsave(fileName, plot, width = 10, height = 5, dpi = 400)
+  } else {
+    if (!missing(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+    if (!is.null(fileName))
+      ggplot2::ggsave(fileName, plot, width = 5, height = 5, dpi = 400)
   }
-  if (!is.null(fileName))
-    ggplot2::ggsave(fileName, plot, width = 5, height = 5, dpi = 400)
   return(plot)
 }
