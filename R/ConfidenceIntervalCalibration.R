@@ -91,8 +91,6 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
                method = "BFGS",
                hessian = TRUE,
                control = list(parscale = c(1, 1, 10, 10)))
-  fisher_info <- solve(fit$hessian)
-  prop_sigma <- sqrt(diag(fisher_info))
   model <- fit$par
   names(model) <- c("meanIntercept", "meanSlope", "logSdIntercept", "logSdSlope")
   if (estimateCovarianceMatrix) {
@@ -159,7 +157,7 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
       z <- -z
     }
     # Simple grid search for upper bound where opt is still positive:
-    upper <- -9
+    upper <- -100
     while(opt(x = upper,
               z = z,
               logRr = logRr,
@@ -167,14 +165,14 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
               interceptMean = interceptMean,
               slopeMean = slopeMean,
               interceptLogSd = interceptLogSd,
-              slopeLogSd = slopeLogSd) < 0 && upper < 1000) {
+              slopeLogSd = slopeLogSd) < 0 && upper < 100) {
       upper <- upper + 1
     }
-    if (upper == 1000) {
+    if (upper == -100 | upper == 100) {
       return(NA)
     } else {
       return(uniroot(f = opt,
-                     interval = c(-10, upper),
+                     interval = c(-100, upper),
                      z = z,
                      logRr = logRr,
                      se = se,
