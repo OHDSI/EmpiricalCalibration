@@ -141,7 +141,15 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                   slopeLogSd) {
     mean <- interceptMean + slopeMean * x
     sd <- exp(interceptLogSd + slopeLogSd * x)
-    return(z + (mean - logRr)/sqrt((sd)^2 + (se)^2))
+    numerator <- mean - logRr
+    denominator <- sqrt((sd)^2 + (se)^2)
+    if (is.infinite(denominator)) {
+      if (numerator > 0)
+        return(z + 1e-10)
+      else
+        return(z - 1e-10)
+    }
+    return(z + numerator/denominator)
   }
   
   logBound <- function(ciWidth,
@@ -157,30 +165,48 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
       z <- -z
     }
     # Simple grid search for upper bound where opt is still positive:
-    upper <- -100
-    while(opt(x = upper,
-              z = z,
-              logRr = logRr,
-              se = se,
-              interceptMean = interceptMean,
-              slopeMean = slopeMean,
-              interceptLogSd = interceptLogSd,
-              slopeLogSd = slopeLogSd) < 0 && upper < 100) {
-      upper <- upper + 1
-    }
-    if (upper == -100 | upper == 100) {
-      return(NA)
+    if (slopeLogSd > 0) {
+      lower <- -100
+      upper <- lower
+      while(opt(x = upper,
+                z = z,
+                logRr = logRr,
+                se = se,
+                interceptMean = interceptMean,
+                slopeMean = slopeMean,
+                interceptLogSd = interceptLogSd,
+                slopeLogSd = slopeLogSd) < 0 && upper < 100) {
+        upper <- upper + 1
+      }
+      if (upper == lower | upper == 100) {
+        return(NA)
+      } 
     } else {
-      return(uniroot(f = opt,
-                     interval = c(-100, upper),
-                     z = z,
-                     logRr = logRr,
-                     se = se,
-                     interceptMean = interceptMean,
-                     slopeMean = slopeMean,
-                     interceptLogSd = interceptLogSd,
-                     slopeLogSd = slopeLogSd)$root)
+      upper <- 100
+      lower <- upper
+      while(opt(x = lower,
+                z = z,
+                logRr = logRr,
+                se = se,
+                interceptMean = interceptMean,
+                slopeMean = slopeMean,
+                interceptLogSd = interceptLogSd,
+                slopeLogSd = slopeLogSd) > 0 && lower > -100) {
+        lower <- lower - 1
+      }
+      if (upper == lower | lower == -100) {
+        return(NA)
+      }  
     }
+    return(uniroot(f = opt,
+                   interval = c(lower, upper),
+                   z = z,
+                   logRr = logRr,
+                   se = se,
+                   interceptMean = interceptMean,
+                   slopeMean = slopeMean,
+                   interceptLogSd = interceptLogSd,
+                   slopeLogSd = slopeLogSd)$root)
   }
   
   result <- data.frame(logRr = rep(0, length(logRr)), logLb95Rr = 0, logUb95Rr = 0)
