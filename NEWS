@@ -1,3 +1,16 @@
+EmpiricalCalibration v1.3.6 (Release date: 2017-05-16)
+==============
+
+NEW FEATURES
+
+* Added plots showing expected type 1 error given an estimated empirical null distribution.
+
+* Closed form solution for RR vs SE plot for faster computation (especially when plotting credible intervals).
+
+BUG FIXES
+
+* Several improvements of the robustness of fitting systematic error models.
+
 EmpiricalCalibration v1.3.1 (Release date: 2017-05-16)
 ==============
 
