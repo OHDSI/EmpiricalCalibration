@@ -28,6 +28,7 @@ This is an experimental function for computing the 95 percent credible interval 
 p-value using Markov-Chain Monte Carlo (MCMC).
 }
 \examples{
+\dontrun{
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
 null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
@@ -35,5 +36,5 @@ null
 plotMcmcTrace(null)
 positive <- sccs[sccs$groundTruth == 1, ]
 calibrateP(null, positive$logRr, positive$seLogRr)
-
+}
 }

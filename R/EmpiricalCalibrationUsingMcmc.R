@@ -157,6 +157,7 @@ binarySearchSigma <- function(modeMu,
 #' scale) of the null distribution, as well as the MCMC trace.
 #'
 #' @examples
+#' \dontrun{
 #' data(sccs)
 #' negatives <- sccs[sccs$groundTruth == 0, ]
 #' null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
@@ -164,7 +165,7 @@ binarySearchSigma <- function(modeMu,
 #' plotMcmcTrace(null)
 #' positive <- sccs[sccs$groundTruth == 1, ]
 #' calibrateP(null, positive$logRr, positive$seLogRr)
-#'
+#' }
 #' @export
 fitMcmcNull <- function(logRr, seLogRr, iter = 10000) {
   if (any(is.infinite(seLogRr))) {
