@@ -580,11 +580,12 @@ plotTrueAndObserved <- function(logRr,
 #'                   function \code{ggsave} in the ggplot2 package for supported file formats.
 #'
 #' @examples
+#' \dontrun{
 #' data(sccs)
 #' negatives <- sccs[sccs$groundTruth == 0, ]
 #' null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
 #' plotMcmcTrace(null)
-#'
+#' }
 #' @export
 plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
   mcmc <- attr(mcmcNull, "mcmc")

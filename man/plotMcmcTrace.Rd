@@ -20,9 +20,10 @@ Plot the MCMC trace
 Plot the trace of the MCMC for diagnostics purposes.
 }
 \examples{
+\dontrun{
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
 null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
 plotMcmcTrace(null)
-
+}
 }
