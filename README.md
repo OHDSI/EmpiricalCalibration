@@ -2,7 +2,7 @@ EmpiricalCalibration
 ====================
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
-[![CRAN_Status_Badge](http://cranlogs.r-pkg.org/badges/EmpiricalCalibration)]((https://cran.r-project.org/package=EmpiricalCalibration))
+[![CRAN_Status_Badge](http://cranlogs.r-pkg.org/badges/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 
 Introduction
 ============
