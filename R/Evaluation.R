@@ -89,9 +89,12 @@ evaluateCiCalibration <- function(logRr,
                                                             seLogRr = subset$seLogRr,
                                                             ciWidth = subResult$ciWidth[j],
                                                             model = model)
+    ci$logLb95Rr[is.na(ci$logLb95Rr)] <- 0
+    ci$logUb95Rr[is.na(ci$logUb95Rr)] <- 999
     below <- sum(subset$trueLogRr < ci$logLb95Rr)
     within <- sum(ci$logLb95Rr <= subset$trueLogRr & ci$logUb95Rr >= subset$trueLogRr)
     above <- sum(subset$trueLogRr > ci$logUb95Rr)
+
     return(c(below, within, above))
   }
   

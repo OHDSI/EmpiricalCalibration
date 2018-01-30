@@ -698,14 +698,15 @@ plotCiCoverage <- function(logRr,
                      strip.text.y = theme,
                      strip.background = ggplot2::element_blank(),
                      legend.position = legendPosition,
-                     legend.title = ggplot2::element_blank())
+                     legend.title = ggplot2::element_blank(),
+                     legend.text = theme)
   })
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
-    width <- 1 + 2 * length(levels(evaluation$trueRr))
-    ggplot2::ggsave(fileName, plot, width = width, height = 3.5, dpi = 400)
+    width <- 1 + 1.8 * length(levels(as.factor(evaluation$trueRr)))
+    ggplot2::ggsave(fileName, plot, width = width, height = 5, dpi = 400)
   }
   return(plot)
 }
