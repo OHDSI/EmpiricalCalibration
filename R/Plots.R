@@ -95,8 +95,8 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", title, f
 }
 
 logRrtoSE <- function(logRr, alpha, mu, sigma) {
-  phi <- (mu-logRr)^2/qnorm(alpha/2)^2-sigma^2
-  phi[phi<0] <- 0
+  phi <- (mu - logRr)^2/qnorm(alpha/2)^2 - sigma^2
+  phi[phi < 0] <- 0
   se <- sqrt(phi)
   return(se)
 }
@@ -116,9 +116,9 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #'                           scale.
 #' @param seLogRrNegatives   The standard error of the log of the effect estimates of the negative
 #'                           controls.
-#' @param logRrPositives     A numeric vector of effect estimates of the positive controls on the log
+#' @param logRrPositives     Optional: A numeric vector of effect estimates of the positive controls on the log
 #'                           scale.
-#' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive
+#' @param seLogRrPositives   Optional: The standard error of the log of the effect estimates of the positive
 #'                           controls.
 #' @param null               An object representing the fitted null distribution as created by the
 #'                           \code{fitNull} or \code{fitMcmcNull} functions. If not provided, a null 
@@ -143,8 +143,8 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' @export
 plotCalibrationEffect <- function(logRrNegatives,
                                   seLogRrNegatives,
-                                  logRrPositives,
-                                  seLogRrPositives,
+                                  logRrPositives = NULL,
+                                  seLogRrPositives = NULL,
                                   null = NULL,
                                   alpha = 0.05,
                                   xLabel = "Relative risk",
@@ -167,14 +167,14 @@ plotCalibrationEffect <- function(logRrNegatives,
   } else {
     chain <- attr(null, "mcmc")$chain
     matrix <- apply(chain, 1, function(null) logRrtoSE(log(x), alpha, null[1], 1/sqrt(null[2])))
-    ys <- apply(matrix, 1, function(se) quantile(se, c(0.025, 0.50, 0.975), na.rm=TRUE))
+    ys <- apply(matrix, 1, function(se) quantile(se, c(0.025, 0.50, 0.975), na.rm = TRUE))
     rm(matrix)
     y <- ys[2, ]
     yLb <- ys[1, ]
     yUb <- ys[3, ]
   }
   seTheoretical <- sapply(x, FUN = function(x) {
-    abs(log(x))/qnorm(1-alpha/2)
+    abs(log(x))/qnorm(1 - alpha/2)
   })
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
@@ -210,19 +210,20 @@ plotCalibrationEffect <- function(logRrNegatives,
                        linetype = "dashed",
                        size = 1,
                        alpha = 0.5) +
-    ggplot2::geom_point(shape = 21,
+    ggplot2::geom_point(shape = 16,
                         ggplot2::aes(x, y),
                         data = data.frame(x = exp(logRrNegatives), y = seLogRrNegatives),
                         size = 2,
-                        fill = rgb(0, 0, 1, alpha = 0.5),
-                        colour = rgb(0, 0, 0.8)) +
+                        alpha = 0.5,
+                        color = rgb(0, 0, 0.8)) +
     ggplot2::geom_hline(yintercept = 0) +
     ggplot2::scale_x_continuous(xLabel,
                                 trans = "log10",
                                 limits = c(0.25, 10),
                                 breaks = breaks,
                                 labels = breaks) +
-    ggplot2::scale_y_continuous("Standard Error", limits = c(0, 1.5)) +
+    ggplot2::scale_y_continuous("Standard Error") +
+    ggplot2::coord_cartesian(ylim = c(0, 1.5)) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
                    panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
                    panel.grid.major = ggplot2::element_blank(),
@@ -518,7 +519,6 @@ plotTrueAndObserved <- function(logRr,
                                 fileName = NULL) {
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 6)
-  themeRA <- ggplot2::element_text(colour = "#000000", size = 5, hjust = 1)
   col <- c(rgb(0, 0, 0.8, alpha = 1), rgb(0.8, 0.4, 0, alpha = 1))
   colFill <- c(rgb(0, 0, 1, alpha = 0.5), rgb(1, 0.4, 0, alpha = 0.5))
   data <- data.frame(logRr = logRr,
@@ -1037,5 +1037,128 @@ plotExpectedType1Error <- function(logRrNegatives,
     if (!is.null(fileName))
       ggplot2::ggsave(fileName, plot, width = 5, height = 5, dpi = 400)
   }
+  return(plot)
+}
+
+
+#' Plot true and observed values
+#'
+#' @description
+#' Creates a plot with the effect estimate on the x-axis and the standard error on the y-axis. The plot
+#' is trellised by true effect size. Negative and positive controls are shown as blue dots. The area below the
+#' dashed line indicated estimates that are statistically significant different from the true effect size (p < 0.05). 
+#' The orange area indicates estimates with calibrated p < 0.05.
+#'
+#' @param logRr       A numeric vector of effect estimates on the log scale.
+#' @param seLogRr     The standard error of the log of the effect estimates. Hint: often the standard
+#'                    error = (log(<lower bound 95 percent confidence interval>) - log(<effect
+#'                    estimate>))/qnorm(0.025).
+#' @param trueLogRr   A vector of the true effect sizes.
+#' @param model       The fitted systematic error model. If not provided, it will be fitted on the
+#'                    provided data.
+#' @param xLabel      The label on the x-axis: the name of the effect estimate.
+#' @param title       Optional: the main title for the plot
+#' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
+#'                    function \code{ggsave} in the ggplot2 package for supported file formats.
+#'
+#' @return
+#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#'
+#' @examples
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
+#' plotCiCalibrationEffect(data$logRr, data$seLogRr, data$trueLogRr)
+#'
+#' @export
+plotCiCalibrationEffect <- function(logRr,
+                                    seLogRr,
+                                    trueLogRr,
+                                    model = NULL,
+                                    xLabel = "Relative risk",
+                                    title,
+                                    fileName = NULL) {
+  alpha <- 0.05
+  if (is.null(model)) {
+    model <- fitSystematicErrorModel(logRr = logRr, 
+                                     seLogRr = seLogRr, 
+                                     trueLogRr = trueLogRr,
+                                     estimateCovarianceMatrix = FALSE)
+  }
+  d <- data.frame(logRr = logRr, 
+                  seLogRr = seLogRr, 
+                  trueLogRr = trueLogRr, 
+                  trueRr = exp(trueLogRr),
+                  logCi95lb = logRr + qnorm(0.025) * seLogRr,
+                  logCi95ub = logRr + qnorm(0.975) * seLogRr)
+  d <- d[!is.na(d$logRr), ]
+  d <- d[!is.na(d$seLogRr), ]
+  if (nrow(d) == 0) {
+    return(NULL)
+  }
+  d$Group <- as.factor(d$trueRr)
+  d$Significant <- d$logCi95lb > d$trueLogRr | d$logCi95ub < d$trueLogRr
+  
+  temp1 <- aggregate(Significant ~ trueRr, data = d, length)
+  temp2 <- aggregate(Significant ~ trueRr, data = d, mean)
+  temp1$nLabel <- paste0(formatC(temp1$Significant, big.mark = ","), " estimates")
+  temp1$Significant <- NULL
+  temp2$meanLabel <- paste0(formatC(100 * (1 - temp2$Significant), digits = 1, format = "f"),
+                            "% of CIs includes ",
+                            temp2$trueRr)
+  temp2$Significant <- NULL
+  dd <- merge(temp1, temp2)
+  
+  breaks <- c(0.1, 0.25, 0.5, 1, 2, 4, 6, 8, 10)
+  theme <- ggplot2::element_text(colour = "#000000", size = 12)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
+  
+  d$Group <- paste("True", tolower(xLabel), "=", d$trueRr)
+  dd$Group <- paste("True", tolower(xLabel), "=", dd$trueRr)
+  
+  x <- seq(log(0.1), log(10), by = 0.01)
+  calBounds <- data.frame()
+  for (i in 1:nrow(dd)) {
+    mu <- model[1] + model[2]*log(dd$trueRr[i])
+    sigma <- exp(model[3] + model[4]*log(dd$trueRr[i]))
+    calBounds <- rbind(calBounds,
+                       data.frame(logRr = x,
+                                  seLogRr = logRrtoSE(x, alpha, mu, sigma),
+                                  Group = dd$Group[i]))
+  }
+  plot <- ggplot2::ggplot(d, ggplot2::aes(x = logRr, y = seLogRr), environment = environment()) +
+    ggplot2::geom_vline(xintercept = log(breaks), colour = "#AAAAAA", lty = 1, size = 0.5) +
+    ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
+                       color = rgb(1, 0.5, 0),
+                       size = 1,
+                       alpha = 0.5, data = calBounds) +
+    ggplot2::geom_abline(ggplot2::aes(intercept = (-log(trueRr))/qnorm(0.025), slope = 1/qnorm(0.025)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
+    ggplot2::geom_abline(ggplot2::aes(intercept = (-log(trueRr))/qnorm(0.975), slope = 1/qnorm(0.975)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
+    ggplot2::geom_point(shape = 16,
+                        size = 2,
+                        alpha = 0.5,
+                        color = rgb(0, 0, 0.8)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    ggplot2::geom_label(x = log(0.15), y = 0.95, alpha = 1, hjust = "left", ggplot2::aes(label = nLabel), size = 5, data = dd) +
+    ggplot2::geom_label(x = log(0.15), y = 0.8, alpha = 1, hjust = "left", ggplot2::aes(label = meanLabel), size = 5, data = dd) +
+    ggplot2::scale_x_continuous(xLabel, limits = log(c(0.1, 10)), breaks = log(breaks), labels = breaks) +
+    ggplot2::scale_y_continuous("Standard Error") +
+    ggplot2::coord_cartesian(ylim = c(0,1)) +
+    ggplot2::facet_grid(. ~ Group) +
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+          panel.background = ggplot2::element_blank(),
+          panel.grid.major = ggplot2::element_blank(),
+          axis.ticks = ggplot2::element_blank(),
+          axis.text.y = themeRA,
+          axis.text.x = theme,
+          axis.title = theme,
+          legend.key = ggplot2::element_blank(),
+          strip.text.x = theme,
+          strip.text.y = theme,
+          strip.background = ggplot2::element_blank(),
+          legend.position = "none")
+  if (!missing(title)) {
+    plot <- plot + ggplot2::ggtitle(title)
+  }
+  if (!is.null(fileName))
+    ggplot2::ggsave(fileName, plot, width = 2 + 3.5 * nrow(dd), height = 2.8, dpi = 400)
   return(plot)
 }

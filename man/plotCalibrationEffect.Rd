@@ -4,9 +4,9 @@
 \alias{plotCalibrationEffect}
 \title{Plot the effect of the calibration}
 \usage{
-plotCalibrationEffect(logRrNegatives, seLogRrNegatives, logRrPositives,
-  seLogRrPositives, null = NULL, alpha = 0.05, xLabel = "Relative risk",
-  title, showCis = FALSE, fileName = NULL)
+plotCalibrationEffect(logRrNegatives, seLogRrNegatives, logRrPositives = NULL,
+  seLogRrPositives = NULL, null = NULL, alpha = 0.05,
+  xLabel = "Relative risk", title, showCis = FALSE, fileName = NULL)
 }
 \arguments{
 \item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log
@@ -15,10 +15,10 @@ scale.}
 \item{seLogRrNegatives}{The standard error of the log of the effect estimates of the negative
 controls.}
 
-\item{logRrPositives}{A numeric vector of effect estimates of the positive controls on the log
+\item{logRrPositives}{Optional: A numeric vector of effect estimates of the positive controls on the log
 scale.}
 
-\item{seLogRrPositives}{The standard error of the log of the effect estimates of the positive
+\item{seLogRrPositives}{Optional: The standard error of the log of the effect estimates of the positive
 controls.}
 
 \item{null}{An object representing the fitted null distribution as created by the
