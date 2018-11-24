@@ -1124,7 +1124,7 @@ plotCiCalibrationEffect <- function(logRr,
                                   seLogRr = logRrtoSE(x, alpha, mu, sigma),
                                   Group = dd$Group[i]))
   }
-  plot <- ggplot2::ggplot(d, ggplot2::aes(x = logRr, y = seLogRr), environment = environment()) +
+  plot <- with(d, ggplot2::ggplot(d, ggplot2::aes(x = logRr, y = seLogRr), environment = environment()) +
     ggplot2::geom_vline(xintercept = log(breaks), colour = "#AAAAAA", lty = 1, size = 0.5) +
     ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
                        color = rgb(1, 0.5, 0),
@@ -1154,7 +1154,7 @@ plotCiCalibrationEffect <- function(logRr,
           strip.text.x = theme,
           strip.text.y = theme,
           strip.background = ggplot2::element_blank(),
-          legend.position = "none")
+          legend.position = "none"))
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }

@@ -1,10 +1,10 @@
-This update adds 2 extra features and some bugfixes (see NEWS)
+This update adds 1 one new plot and one bugfix (see NEWS)
 
 ---
 
 ## Test environments
-* Ubuntu 14.04.5 LTS (Travis), R 3.4.2
-* Windows 7, R 3.4.1
+* Ubuntu 14.04.5 LTS (Travis), R 3.5.0
+* Windows 7, R 3.5.1
 
 ## R CMD check results
 
