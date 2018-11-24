@@ -1,5 +1,16 @@
-EmpiricalCalibration v1.3.6 (Release date: 2017-05-16)
-==============
+EmpiricalCalibration 1.4.0
+==========================
+
+NEW FEATURES
+
+* Added plot showing effec of confidence interval calibration, similar to p-value plot.
+
+BUG FIXES
+
+* Fixed 'unknown aesthetics' warning when calling plotTrueAndObserved.
+
+EmpiricalCalibration 1.3.6
+==========================
 
 NEW FEATURES
 
@@ -11,8 +22,8 @@ BUG FIXES
 
 * Several improvements of the robustness of fitting systematic error models.
 
-EmpiricalCalibration v1.3.1 (Release date: 2017-05-16)
-==============
+EmpiricalCalibration 1.3.1
+===========================
 
 NEW FEATURES
 
@@ -31,8 +42,8 @@ BUG FIXES
 * None
 
 
-EmpiricalCalibration v1.2.0 (Release date: 2016-08-15)
-==============
+EmpiricalCalibration 1.2.0
+==========================
 
 NEW FEATURES
 
@@ -47,7 +58,7 @@ BUG FIXES
 * Removed coverage plot (moved to MethodEvaluation package)
 
 
-EmpiricalCalibration v1.1.0 (Release date: 2016-02-15)
-==============
+EmpiricalCalibration 1.1.0
+==========================
 
 Changes: initial submission to CRAN

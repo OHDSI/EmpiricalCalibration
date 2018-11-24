@@ -6,3 +6,5 @@ extras
 ^deploy_container.sh$
 ^cran-comments.md$
 compare_versions
+_pkgdown.yml
+docs

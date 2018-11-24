@@ -2,16 +2,32 @@ citHeader("To cite EmpiricalCalibration in publications use:")
 
 bibentry(bibtype = "Article",
         author = personList(as.person("M. J. Schuemie"),
-		                    as.person("P. B. Ryan"),
-		                    as.person("W. DuMouchel"),
-		                    as.person("M. A. Suchard"),
+                            as.person("P. B. Ryan"),
+                            as.person("W. DuMouchel"),
+                            as.person("M. A. Suchard"),
                             as.person("D. Madigan")),
         title = "Interpreting observational studies: 
 		why empirical calibration is needed to correct p-values",
         journal = "Statistics in Medicine",
         volume = "33",
-		number = "2",
+        number = "2",
         pages = "209-218",
         year = "2014",
-        url = "http://onlinelibrary.wiley.com/doi/10.1002/sim.5925/abstract"
+        url = "http://dx.doi.org/10.1002/sim.5925"
+)
+
+bibentry(bibtype = "Article",
+        author = personList(as.person("M. J. Schuemie"),
+                            as.person("G. Hripcsak"),
+                            as.person("P. B. Ryan"),
+                            as.person("D. Madigan"),
+                            as.person("M. A. Suchard")),
+        title="{{E}mpirical confidence interval calibration for population-level effect estimation studies in observational healthcare data}",
+        journal="Proc. Natl. Acad. Sci. U.S.A.",
+        year="2018",
+        volume="115",
+        number="11",
+        pages="2571--2577",
+        month="03",
+        url = "https://doi.org/10.1073/pnas.1708282114"
 )

@@ -4,7 +4,8 @@
 \alias{plotCiCalibration}
 \title{Create a confidence interval calibration plot}
 \usage{
-plotCiCalibration(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr),
+plotCiCalibration(logRr, seLogRr, trueLogRr,
+  strata = as.factor(trueLogRr),
   crossValidationGroup = 1:length(logRr), evaluation,
   legendPosition = "top", title, fileName = NULL)
 }

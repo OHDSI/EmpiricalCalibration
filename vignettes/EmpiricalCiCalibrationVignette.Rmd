@@ -91,6 +91,12 @@ plotErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr)
 
 Here we see how systematic error changes as a function of the true effect size. As visible, the model assumes the mean and standard deviation (SD) of the error distribution are linearly related to the true effect size. For this plot, the mean and SD are also estimated at each true effect size independently, allowing us to evaluate whether the linearity assumption is far off. 
 
+There is also another way to plot the error model, and its subsequent calibration:
+
+```{r fig.width=13, fig.height=2.8, out.width="100%"}
+plotCiCalibrationEffect(controls$logRr, controls$seLogRr, controls$trueLogRr)
+```
+
 ## Evaluating the calibration
 
 To evaluate whether our estimation of the systematic error distribution is a good one, we can test whether the calibrated CI is truly calibrated, meaning the fraction of controls where truth is inside the calibrated CI is approximately the specified width of the CI. We also evaluate 'centeredness', whether truth outside of the CI is equally distributed above and below the CI:

@@ -1,24 +1,31 @@
 EmpiricalCalibration
 ====================
 
+[![Build Status](https://travis-ci.org/OHDSI/EmpiricalCalibration.svg?branch=master)](https://travis-ci.org/OHDSI/EmpiricalCalibration)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 [![CRAN_Status_Badge](http://cranlogs.r-pkg.org/badges/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
+
+EmpiricalCalibration is part of the [OHDSI Methods Library](https://ohdsi.github.io/MethodsLibrary).
 
 Introduction
 ============
 
-This R package contains routines for performing empirical calibration of observational study estimates. By using a set of negative control hypotheses we can estimate the empirical null distribution of a particular observational study setup. This empirical null distribution can be used to compute a calibrated p-value, which reflects the probability of observing an estimated effect size when the null hypothesis is true taking both random and systematic error into account, as described in the paper [Interpreting observational studies: why empirical calibration is needed to correct p-values.] (http://dx.doi.org/10.1002/sim.5925).
+This R package contains routines for performing empirical calibration of observational study estimates. By using a set of negative control hypotheses we can estimate the empirical null distribution of a particular observational study setup. This empirical null distribution can be used to compute a calibrated p-value, which reflects the probability of observing an estimated effect size when the null hypothesis is true taking both random and systematic error into account, as described in the paper [Interpreting observational studies: why empirical calibration is needed to correct p-values](http://dx.doi.org/10.1002/sim.5925). 
+
+Also supported is empirical calibration of confidence intervals, based on the results for a set of negative and positive controls, as described in the paper [Empirical confidence interval calibration for population-level effect estimation studies in observational healthcare data](https://doi.org/10.1073/pnas.1708282114).
 
 Features
 ========
-- Estimate the empirical null distribution given the effect estimates of a set of negative controls 
-- Estimate the calibrated p-value of a given hypothesis given the  estimated empirical null distribution
-- Produce various plots for evaluating the empirical calibration
-- Contains the data sets from the paper for illustration
+- Estimate the empirical null distribution given the effect estimates of a set of negative controls. 
+- Estimate the calibrated p-value of a given hypothesis given the estimated empirical null distribution.
+- Estimate a systematic error distribution given the effect estimates for a set of negative and positive controls.
+- Estimate the calibrated confidence interval for a given estimate given the systematic error distribution.
+- Produce various plots for evaluating the empirical calibration.
+- Contains the data sets from the papers for illustration.
 
 Screenshots and examples
 ========================
-<img src="https://github.com/OHDSI/EmpiricalCalibration/blob/master/extras/plot.png" alt="Calibration effect plot" title="Calibration effect plot" />
+<img src="https://github.com/OHDSI/EmpiricalCalibration/raw/master/extras/plot.png" alt="Calibration effect plot" title="Calibration effect plot" />
 
 ```r
 data(sccs) #Load one of the included data sets
@@ -46,8 +53,8 @@ System requirements
 ===================
 Requires R (version 3.1.0 or newer).
 
-Getting Started
-===============
+Installation
+============
 In R, use the following commands to install the latest stable version from CRAN:
 
 ```r
@@ -62,13 +69,16 @@ library(devtools)
 install_github("ohdsi/EmpiricalCalibration")
 ```
   
-Getting Involved
-================
+User Documentation
+==================
 * Vignette: [Empirical calibration of p-values](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalPCalibrationVignette.pdf)
 * Vignette: [Empirical calibration of confidence intervals](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalCiCalibrationVignette.pdf)
 * Package manual: [EmpiricalCalibration.pdf](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/extras/EmpiricalCalibration.pdf) 
+
+Support
+=======
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
-* We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements
+* We use the <a href="https://github.com/OHDSI/EmpiricalCalibration/issues">GitHub issue tracker</a> for all bugs/issues/enhancements
   
 License
 =======
@@ -79,7 +89,6 @@ Development
 This package has been developed in RStudio.
 
 ### Development status
-[![Build Status](https://travis-ci.org/OHDSI/EmpiricalCalibration.svg?branch=master)](https://travis-ci.org/OHDSI/EmpiricalCalibration)
 
 This package is ready for use.
 

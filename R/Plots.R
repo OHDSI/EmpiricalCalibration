@@ -541,7 +541,7 @@ plotTrueAndObserved <- function(logRr,
                                  fill = significant),
                     environment = environment()) + 
       ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
-      ggplot2::geom_errorbarh(ggplot2::aes(x = trueRr, xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) + 
+      ggplot2::geom_errorbarh(ggplot2::aes(xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) +
       ggplot2::geom_errorbarh(height = 0) + 
       ggplot2::geom_point(shape = 21, size = 1.5) + 
       ggplot2::scale_colour_manual(values = col) + 
@@ -1108,8 +1108,8 @@ plotCiCalibrationEffect <- function(logRr,
   dd <- merge(temp1, temp2)
   
   breaks <- c(0.1, 0.25, 0.5, 1, 2, 4, 6, 8, 10)
-  theme <- ggplot2::element_text(colour = "#000000", size = 12)
-  themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
+  theme <- ggplot2::element_text(colour = "#000000", size = 10)
+  themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
   
   d$Group <- paste("True", tolower(xLabel), "=", d$trueRr)
   dd$Group <- paste("True", tolower(xLabel), "=", dd$trueRr)
@@ -1137,8 +1137,8 @@ plotCiCalibrationEffect <- function(logRr,
                         alpha = 0.5,
                         color = rgb(0, 0, 0.8)) +
     ggplot2::geom_hline(yintercept = 0) +
-    ggplot2::geom_label(x = log(0.15), y = 0.95, alpha = 1, hjust = "left", ggplot2::aes(label = nLabel), size = 5, data = dd) +
-    ggplot2::geom_label(x = log(0.15), y = 0.8, alpha = 1, hjust = "left", ggplot2::aes(label = meanLabel), size = 5, data = dd) +
+    ggplot2::geom_label(x = log(0.15), y = 0.95, alpha = 1, hjust = "left", ggplot2::aes(label = nLabel), size = 3.5, data = dd) +
+    ggplot2::geom_label(x = log(0.15), y = 0.8, alpha = 1, hjust = "left", ggplot2::aes(label = meanLabel), size = 3.5, data = dd) +
     ggplot2::scale_x_continuous(xLabel, limits = log(c(0.1, 10)), breaks = log(breaks), labels = breaks) +
     ggplot2::scale_y_continuous("Standard Error") +
     ggplot2::coord_cartesian(ylim = c(0,1)) +
