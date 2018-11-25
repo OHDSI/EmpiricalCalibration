@@ -1,3 +1,4 @@
+^CRAN-RELEASE$
 extras
 ^.*\.Rproj$
 ^\.Rproj\.user$

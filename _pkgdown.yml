@@ -6,3 +6,41 @@ home:
   links:
   - text: Ask a question
     href: http://forums.ohdsi.org
+
+reference:
+  - title: "P-value calibration"
+    desc: >
+      Functions for calibrating p-values based on an empirical null distribution estimated using negative controls.
+    contents:
+      - fitNull 
+      - fitMcmcNull 
+      - computeTraditionalP 
+      - calibrateP 
+      - plotMcmcTrace 
+      - plotForest 
+      - plotCalibration 
+      - plotCalibrationEffect 
+      - plotExpectedType1Error 
+  - title: "Confidence interval calibration"
+    desc: >
+      Functions for calibrating confidence intervals based on a systematic error model fitted using negative and positive controls.
+    contents:
+      - fitSystematicErrorModel 
+      - computeTraditionalCi     
+      - calibrateConfidenceInterval 
+      - plotTrueAndObserved 
+      - evaluateCiCalibration 
+      - plotCiCalibration 
+      - plotCiCalibrationEffect 
+      - plotCiCoverage 
+      - plotErrorModel 
+  - title: "Data"
+    desc: >
+      Data (real and simulated) for testing and demonstrating empirical calibration.
+    contents:
+      - sccs
+      - caseControl 
+      - cohortMethod 
+      - southworthReplication 
+      - grahamReplication       
+      - simulateControls 

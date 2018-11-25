@@ -126,58 +126,16 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-p-value-calibration" class="hasAnchor"><a href="#section-p-value-calibration" class="anchor"></a>P-value calibration</h2>
+          <p class="section-desc"><p>Functions for calibrating p-values based on an empirical null distribution estimated using negative controls.</p></p>
         </th>
       </tr>
       <tr>
         
         <td>
-          <p><code><a href="calibrateConfidenceInterval.html">calibrateConfidenceInterval()</a></code> </p>
+          <p><code><a href="fitNull.html">fitNull()</a></code> </p>
         </td>
-        <td><p>Calibrate confidence intervals</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="calibrateP.html">calibrateP()</a></code> </p>
-        </td>
-        <td><p>Calibrate the p-value</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="caseControl.html">caseControl</a></code> </p>
-        </td>
-        <td><p>Odds ratios from a case-control design</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="cohortMethod.html">cohortMethod</a></code> </p>
-        </td>
-        <td><p>Relative risks from a new-user cohort design</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="computeTraditionalCi.html">computeTraditionalCi()</a></code> </p>
-        </td>
-        <td><p>Compute the (traditional) confidence interval</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="computeTraditionalP.html">computeTraditionalP()</a></code> </p>
-        </td>
-        <td><p>Compute the (traditional) p-value</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="EmpiricalCalibration.html">EmpiricalCalibration</a></code> </p>
-        </td>
-        <td><p>EmpiricalCalibration</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="evaluateCiCalibration.html">evaluateCiCalibration()</a></code> </p>
-        </td>
-        <td><p>Evaluate confidence interval calibration</p></td>
+        <td><p>Fit the null distribution</p></td>
       </tr><tr>
         
         <td>
@@ -187,21 +145,27 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="fitNull.html">fitNull()</a></code> </p>
+          <p><code><a href="computeTraditionalP.html">computeTraditionalP()</a></code> </p>
         </td>
-        <td><p>Fit the null distribution</p></td>
+        <td><p>Compute the (traditional) p-value</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="fitSystematicErrorModel.html">fitSystematicErrorModel()</a></code> </p>
+          <p><code><a href="calibrateP.html">calibrateP()</a></code> </p>
         </td>
-        <td><p>Fit a systematic error model</p></td>
+        <td><p>Calibrate the p-value</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="grahamReplication.html">grahamReplication</a></code> </p>
+          <p><code><a href="plotMcmcTrace.html">plotMcmcTrace()</a></code> </p>
         </td>
-        <td><p>Relative risks from an adjusted new-user cohort design</p></td>
+        <td><p>Plot the MCMC trace</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="plotForest.html">plotForest()</a></code> </p>
+        </td>
+        <td><p>Create a forest plot</p></td>
       </tr><tr>
         
         <td>
@@ -214,6 +178,50 @@
           <p><code><a href="plotCalibrationEffect.html">plotCalibrationEffect()</a></code> </p>
         </td>
         <td><p>Plot the effect of the calibration</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="plotExpectedType1Error.html">plotExpectedType1Error()</a></code> </p>
+        </td>
+        <td><p>Plot the expected type 1 error as a function of standard error</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-confidence-interval-calibration" class="hasAnchor"><a href="#section-confidence-interval-calibration" class="anchor"></a>Confidence interval calibration</h2>
+          <p class="section-desc"><p>Functions for calibrating confidence intervals based on a systematic error model fitted using negative and positive controls.</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="fitSystematicErrorModel.html">fitSystematicErrorModel()</a></code> </p>
+        </td>
+        <td><p>Fit a systematic error model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="computeTraditionalCi.html">computeTraditionalCi()</a></code> </p>
+        </td>
+        <td><p>Compute the (traditional) confidence interval</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="calibrateConfidenceInterval.html">calibrateConfidenceInterval()</a></code> </p>
+        </td>
+        <td><p>Calibrate confidence intervals</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="plotTrueAndObserved.html">plotTrueAndObserved()</a></code> </p>
+        </td>
+        <td><p>Plot true and observed values</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="evaluateCiCalibration.html">evaluateCiCalibration()</a></code> </p>
+        </td>
+        <td><p>Evaluate confidence interval calibration</p></td>
       </tr><tr>
         
         <td>
@@ -238,31 +246,15 @@
           <p><code><a href="plotErrorModel.html">plotErrorModel()</a></code> </p>
         </td>
         <td><p>Plot the systematic error model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plotExpectedType1Error.html">plotExpectedType1Error()</a></code> </p>
-        </td>
-        <td><p>Plot the expected type 1 error as a function of standard error</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plotForest.html">plotForest()</a></code> </p>
-        </td>
-        <td><p>Create a forest plot</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plotMcmcTrace.html">plotMcmcTrace()</a></code> </p>
-        </td>
-        <td><p>Plot the MCMC trace</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plotTrueAndObserved.html">plotTrueAndObserved()</a></code> </p>
-        </td>
-        <td><p>Plot true and observed values</p></td>
-      </tr><tr>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-data" class="hasAnchor"><a href="#section-data" class="anchor"></a>Data</h2>
+          <p class="section-desc"><p>Data (real and simulated) for testing and demonstrating empirical calibration.</p></p>
+        </th>
+      </tr>
+      <tr>
         
         <td>
           <p><code><a href="sccs.html">sccs</a></code> </p>
@@ -271,15 +263,33 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="simulateControls.html">simulateControls()</a></code> </p>
+          <p><code><a href="caseControl.html">caseControl</a></code> </p>
         </td>
-        <td><p>Simulate (negative) controls</p></td>
+        <td><p>Odds ratios from a case-control design</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="cohortMethod.html">cohortMethod</a></code> </p>
+        </td>
+        <td><p>Relative risks from a new-user cohort design</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="southworthReplication.html">southworthReplication</a></code> </p>
         </td>
         <td><p>Relative risks from an unadjusted new-user cohort design</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="grahamReplication.html">grahamReplication</a></code> </p>
+        </td>
+        <td><p>Relative risks from an adjusted new-user cohort design</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="simulateControls.html">simulateControls()</a></code> </p>
+        </td>
+        <td><p>Simulate (negative) controls</p></td>
       </tr>
     </tbody>
     </table>
@@ -288,7 +298,9 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-p-value-calibration">P-value calibration</a></li>
+      <li><a href="#section-confidence-interval-calibration">Confidence interval calibration</a></li>
+      <li><a href="#section-data">Data</a></li>
     </ul>
   </div>
 </div>

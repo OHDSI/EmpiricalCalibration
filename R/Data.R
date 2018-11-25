@@ -145,8 +145,9 @@ NULL
 #' The standard error of the log of the incidence rate ratio} }
 #' 
 #' @references
-#' Schuemie MJ, Hripcsak GM, Ryan PB, Suchard MA, Madigan D. Negative and positive outcome controls to 
-#' calibrate confidence intervals in observational healthcare studies. Submitted.
+#' Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA. Empirical confidence interval calibration 
+#' for population-level effect estimation studies in observational healthcare data. Proc Natl Acad Sci 
+#' U S A. 2018 Mar 13;115(11):2571-2577
 #' 
 #' Southworth MR, Reichman ME, Unger EF. Dabigatran and postmarketing reports of bleeding. N Engl 
 #' J Med 368(14):1272-1274, 2013
@@ -184,9 +185,10 @@ NULL
 #' The standard error of the log of the incidence rate ratio} }
 #' 
 #' @references
-#' Schuemie MJ, Hripcsak GM, Ryan PB, Suchard MA, Madigan D. Negative and positive outcome controls to 
-#' calibrate confidence intervals in observational healthcare studies. Submitted.
-#' 
+#' Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA. Empirical confidence interval calibration 
+#' for population-level effect estimation studies in observational healthcare data. Proc Natl Acad Sci 
+#' U S A. 2018 Mar 13;115(11):2571-2577
+#'  
 #' Graham DJ, Reichman ME, Wernecke M, Hsueh YH, Izem R, Southworth MR, Wei Y, Liao J, Goulding MR, Mott K, 
 #' Chillarige Y, MaCurdy TE, Worrall C, Kelman JA.  Stroke, Bleeding, and Mortality Risks in Elderly Medicare 
 #' Beneficiaries Treated With Dabigatran or Rivaroxaban for Nonvalvular Atrial Fibrillation. JAMA Intern 

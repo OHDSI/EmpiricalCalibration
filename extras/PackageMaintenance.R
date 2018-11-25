@@ -40,6 +40,8 @@ rmarkdown::render("vignettes/EmpiricalCICalibrationVignette.Rmd",
 pkgdown::build_site()
 
 # Release package:
-devtools::build_win()
+devtools::check_win_devel()
+
+devtools::check_rhub()
 
 devtools::release()
