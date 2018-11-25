@@ -28,8 +28,9 @@ dabigatran-exposed and 19,155 warfarin-exposed subjects. For more information on
 Schuemie et al (2017).
 }
 \references{
-Schuemie MJ, Hripcsak GM, Ryan PB, Suchard MA, Madigan D. Negative and positive outcome controls to 
-calibrate confidence intervals in observational healthcare studies. Submitted.
+Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA. Empirical confidence interval calibration 
+for population-level effect estimation studies in observational healthcare data. Proc Natl Acad Sci 
+U S A. 2018 Mar 13;115(11):2571-2577
 
 Southworth MR, Reichman ME, Unger EF. Dabigatran and postmarketing reports of bleeding. N Engl 
 J Med 368(14):1272-1274, 2013

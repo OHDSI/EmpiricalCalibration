@@ -33,9 +33,10 @@ Truven Medicare Supplementary Beneficiaries database. We analyze 15,796 dabigatr
 warfarin-exposed subjects. For more information on this set see Schuemie et al (2017).
 }
 \references{
-Schuemie MJ, Hripcsak GM, Ryan PB, Suchard MA, Madigan D. Negative and positive outcome controls to 
-calibrate confidence intervals in observational healthcare studies. Submitted.
-
+Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA. Empirical confidence interval calibration 
+for population-level effect estimation studies in observational healthcare data. Proc Natl Acad Sci 
+U S A. 2018 Mar 13;115(11):2571-2577
+ 
 Graham DJ, Reichman ME, Wernecke M, Hsueh YH, Izem R, Southworth MR, Wei Y, Liao J, Goulding MR, Mott K, 
 Chillarige Y, MaCurdy TE, Worrall C, Kelman JA.  Stroke, Bleeding, and Mortality Risks in Elderly Medicare 
 Beneficiaries Treated With Dabigatran or Rivaroxaban for Nonvalvular Atrial Fibrillation. JAMA Intern 
