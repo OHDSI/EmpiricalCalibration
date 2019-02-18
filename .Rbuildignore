@@ -4,7 +4,7 @@ extras
 ^\.Rproj\.user$
 ^\R\Temp*
 ^\.travis\.yml$
-^deploy_container.sh$
+^deploy.sh$
 ^cran-comments.md$
 compare_versions
 _pkgdown.yml
