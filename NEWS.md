@@ -1,3 +1,10 @@
+EmpiricalCalibration 1.4.1
+==========================
+
+NEW FEATURES
+
+* Added convertNullToErrorModel function to allow confidence interval calibration using only negative controls (requiring the user to make some assumptions).
+
 EmpiricalCalibration 1.4.0
 ==========================
 

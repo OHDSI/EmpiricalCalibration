@@ -18,9 +18,13 @@ library(EmpiricalCalibration)
 
 # Introduction
 
-Observational studies are prone to bias, but unfortunately this bias is often brushed aside with a single comment in the discussion of a paper and is never quantified. Elsewhere we have proposed using negative controls (exposure-outcome pairs where the true relative risk is believed to be one) to produce an empirical bias distribution, and subsequently calibrate p-values. Here we extend this approach to calibrated confidence intervals (CIs), which requires the use of positive controls. Since real positive controls are problematic, we have generated synthetic positive controls by injection additional (simulated) outcomes on top of negative controls.
+Observational studies are prone to bias, but unfortunately this bias is often brushed aside with a single comment in the discussion of a paper and is never quantified. Elsewhere we have proposed using negative controls (exposure-outcome pairs where the true relative risk is believed to be one) to produce an empirical bias distribution, and subsequently calibrate p-values. Here we extend this approach to calibrated confidence intervals (CIs). However, this requires us to specify how systematic error changes with true effect size. We currently support two approaches:
 
-In this document we use an example study to illustrate how CIs can be calibrated using the `EmpiricalCalibration` R package. In the example, we have replicated a previously published new-user cohort study comparing dabigatran to warfarin for the risk of GI bleeding. The study does not aply any
+The first is for the researcher to specify an assumption, for example to specify that systematic error doesn't change as a function of true effect size. Although this is likely to be correct in many instances, if an estimation method is for example biased towards the null the assumption will be violated, and the calibrated confidence intervals will have a lower than nominal coverage.
+
+The second approach is to us positive controls to empirically derive how systematic error changes with true effect size. Since real positive controls are problematic, we typically generate synthetic positive controls by injection additional (simulated) outcomes on top of negative controls.
+
+In this document we use an example study to illustrate how CIs can be calibrated using the `EmpiricalCalibration` R package. In the example, we have replicated a previously published new-user cohort study comparing dabigatran to warfarin for the risk of GI bleeding. The study does not apply any
 adjustment for confounding. 
 
 The results from this study are available in the package, and can be loaded using the `data()` command:
@@ -73,17 +77,30 @@ The thick black lines indicate the true effect size, and the blue and orange dot
 
 # Systematic error model
 
-## Fitting the systematic error model
+## Fitting the empirical null, and specifying an assumption
 
-We can use the controls to estimate a model for the systematic error:
+If we only have negative controls and no positive controls, we might still want to calibrate CIs. This requires us to make an assumption how systematic error changes as a function of the true effect size. The most obvious (and therefore default) assumption is that the systematic error does not change as a function of true effect size. We can fit the empirical null distribution, and convert it to a systematic error model:
 
+```{r}
+null <- fitNull(negatives$logRr, negatives$seLogRr)
+model <- convertNullToErrorModel(null)
+```
+
+See `?convertNullToErrorModel` for how to use a different assumption.
+
+
+## Fitting the systematic error model using positive controls
+
+If we do have positive controls, like in this example, we do not have to make an assumption, but instead can estimate the full systematic error model using the estimates for both negative and positive controls:
 
 ```{r}
 model <- fitSystematicErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr)
 model
 ```
 
-We see that the intercept of the mean is slightly lower than 0, indicating the analysis is negatively biased when the null is true. We can also visualize the model:
+We see that the intercept of the mean (`meanIntercept`) is slightly lower than 0, indicating the analysis is negatively biased when the null is true. Also note that the slope for the mean (`meanSlope`) is slightly lower than 1, meaning that the method appears to be somewhat biased towards the null; the negative bias tends to become larger as the true effect size increases.
+
+We can also visualize the model:
 
 ```{r}
 plotErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr)

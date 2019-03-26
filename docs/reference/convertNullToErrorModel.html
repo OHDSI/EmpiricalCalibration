@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot the MCMC trace — plotMcmcTrace • EmpiricalCalibration</title>
+<title>Convert empirical null distribution to systematic error model — convertNullToErrorModel • EmpiricalCalibration</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,17 @@
 
 
 
-<meta property="og:title" content="Plot the MCMC trace — plotMcmcTrace" />
+<meta property="og:title" content="Convert empirical null distribution to systematic error model — convertNullToErrorModel" />
 
-<meta property="og:description" content="Plot the MCMC trace" />
+<meta property="og:description" content="This function converts an empirical null distribution, fitted using estimates only for negative controls,
+into a systematic error distribution that can be used to calibrate confidence intervals in addition to
+p-values.
+Whereas the fitSystematicErrorModel uses positive controls to determine how the error 
+distribution changes with true effect size, this function requires the user to make an assumption. The
+default assumption, meanSlope = 1 and logSdSlope = 0, specify a belief that the error 
+distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
+however, if an estimation method is biased towards the null this assumption will be violated, causing the
+calibrated confidence intervals to have lower than nominal coverage." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -117,53 +125,69 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot the MCMC trace</h1>
-    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/Plots.R'><code>R/Plots.R</code></a></small>
-    <div class="hidden name"><code>plotMcmcTrace.Rd</code></div>
+    <h1>Convert empirical null distribution to systematic error model</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/ConfidenceIntervalCalibration.R'><code>R/ConfidenceIntervalCalibration.R</code></a></small>
+    <div class="hidden name"><code>convertNullToErrorModel.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Plot the MCMC trace</p>
+    <p>This function converts an empirical null distribution, fitted using estimates only for negative controls,
+into a systematic error distribution that can be used to calibrate confidence intervals in addition to
+p-values.</p>
+<p>Whereas the <code><a href='fitSystematicErrorModel.html'>fitSystematicErrorModel</a></code> uses positive controls to determine how the error 
+distribution changes with true effect size, this function requires the user to make an assumption. The
+default assumption, <code>meanSlope = 1</code> and <code>logSdSlope = 0</code>, specify a belief that the error 
+distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
+however, if an estimation method is biased towards the null this assumption will be violated, causing the
+calibrated confidence intervals to have lower than nominal coverage.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>plotMcmcTrace</span>(<span class='no'>mcmcNull</span>, <span class='kw'>fileName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>convertNullToErrorModel</span>(<span class='no'>null</span>, <span class='kw'>meanSlope</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>logSdSlope</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>mcmcNull</th>
-      <td><p>An object of type <code>mcmcNull</code> as generated using the <code>fitMcmcNull</code>
-function.</p></td>
+      <th>null</th>
+      <td><p>The empirical null distribution fitted using eith the <code><a href='fitNull.html'>fitNull</a></code>
+or the <code><a href='fitMcmcNull.html'>fitMcmcNull</a></code> function.</p></td>
     </tr>
     <tr>
-      <th>fileName</th>
-      <td><p>Name of the file where the plot should be saved, for example 'plot.png'. See the
-function <code>ggsave</code> in the ggplot2 package for supported file formats.</p></td>
+      <th>meanSlope</th>
+      <td><p>The slope for the mean of the error distribution. A slope of 1 means the error
+is the same for different values of the true relative risk.</p></td>
+    </tr>
+    <tr>
+      <th>logSdSlope</th>
+      <td><p>The slope for the log of the standard deviation of the error distribution. A slope
+of 0 means the standard deviation is the same for different values of the true 
+relative risk.</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Plot the trace of the MCMC for diagnostics purposes.</p>
+    <p>An object of type <code>systematicErrorModel</code>.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>sccs</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>sccs</span>)
 <span class='no'>negatives</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>0</span>, ]
-<span class='no'>null</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fitMcmcNull.html'>fitMcmcNull</a></span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>)
-<span class='fu'>plotMcmcTrace</span>(<span class='no'>null</span>)
-<span class='co'># }</span></pre>
+<span class='no'>null</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fitNull.html'>fitNull</a></span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>)
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>convertNullToErrorModel</span>(<span class='no'>null</span>)
+<span class='no'>positive</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>1</span>, ]
+<span class='fu'><a href='calibrateConfidenceInterval.html'>calibrateConfidenceInterval</a></span>(<span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>, <span class='no'>model</span>)</div><div class='output co'>#&gt;         logRr  logLb95Rr logUb95Rr   seLogRr
+#&gt; 1 -0.05947242 -0.6334062 0.5144614 0.2928287</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#details">Details</a></li>
+      <li><a href="#value">Value</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

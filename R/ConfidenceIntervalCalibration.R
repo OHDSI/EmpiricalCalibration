@@ -168,7 +168,7 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
     if (slopeLogSd > 0) {
       lower <- -100
       upper <- lower
-      while(opt(x = upper,
+      while (opt(x = upper,
                 z = z,
                 logRr = logRr,
                 se = se,
@@ -184,7 +184,7 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
     } else {
       upper <- 100
       lower <- upper
-      while(opt(x = lower,
+      while (opt(x = lower,
                 z = z,
                 logRr = logRr,
                 se = se,
@@ -270,6 +270,52 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
 #' @export
 computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
   return(c(rr = exp(logRr), 
-           lb = exp(logRr - qnorm(1  -ciWidth/2)*seLogRr), 
+           lb = exp(logRr - qnorm(1 - ciWidth/2)*seLogRr), 
            ub = exp(logRr + qnorm(1 - ciWidth/2)*seLogRr)))
+}
+
+#' Convert empirical null distribution to systematic error model
+#' 
+#' @description 
+#' This function converts an empirical null distribution, fitted using estimates only for negative controls,
+#' into a systematic error distribution that can be used to calibrate confidence intervals in addition to
+#' p-values. 
+#' 
+#' Whereas the \code{\link{fitSystematicErrorModel}} uses positive controls to determine how the error 
+#' distribution changes with true effect size, this function requires the user to make an assumption. The
+#' default assumption, \code{meanSlope = 1} and \code{logSdSlope = 0}, specify a belief that the error 
+#' distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
+#' however, if an estimation method is biased towards the null this assumption will be violated, causing the
+#' calibrated confidence intervals to have lower than nominal coverage.
+#'
+#' @param null         The empirical null distribution fitted using eith the \code{\link{fitNull}}
+#'                     or the \code{\link{fitMcmcNull}} function.
+#' @param meanSlope    The slope for the mean of the error distribution. A slope of 1 means the error
+#'                     is the same for different values of the true relative risk.
+#' @param logSdSlope   The slope for the log of the standard deviation of the error distribution. A slope
+#'                     of 0 means the standard deviation is the same for different values of the true 
+#'                     relative risk.
+#'                     
+#' @return An object of type \code{systematicErrorModel}.
+#' 
+#' @examples 
+#' data(sccs)
+#' negatives <- sccs[sccs$groundTruth == 0, ]
+#' null <- fitNull(negatives$logRr, negatives$seLogRr)
+#' model <- convertNullToErrorModel(null)
+#' positive <- sccs[sccs$groundTruth == 1, ]
+#' calibrateConfidenceInterval(positive$logRr, positive$seLogRr, model)
+#' 
+#' @export
+convertNullToErrorModel <- function(null, meanSlope = 1, logSdSlope = 0) {
+  if (class(null) == "null") {
+    model <- c(null[1], meanSlope, log(null[2]), logSdSlope)
+  } else if (class(null) == "mcmcNull") {
+    model <- c(null[1], meanSlope, log(1/sqrt(null[2])), logSdSlope)
+  } else {
+    stop("Null argument should be of type 'null' or 'mcmcNull'") 
+  }
+  names(model) <- c("meanIntercept", "meanSlope", "logSdIntercept", "logSdSlope")
+  class(model) <- "systematicErrorModel"
+  model
 }
