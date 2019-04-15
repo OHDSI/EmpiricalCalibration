@@ -4,26 +4,26 @@ Title: Routines for Performing Empirical Calibration of Observational Study Esti
 Version: 1.4.1
 Date: 2019-03-26
 Authors@R: c(
-    person("Martijn", "Schuemie", , "schuemie@ohdsi.org", role = c("aut", "cre")),
-    person("Marc", "Suchard", role = c("aut"))
-    )
+  person("Martijn", "Schuemie", , "schuemie@ohdsi.org", role = c("aut", "cre")),
+  person("Marc", "Suchard", role = c("aut"))
+  )
 Maintainer: Martijn Schuemie <schuemie@ohdsi.org>
 Description: Routines for performing empirical calibration of observational
-    study estimates. By using a set of negative control hypotheses we can
-    estimate the empirical null distribution of a particular observational
-    study setup. This empirical null distribution can be used to compute a
-    calibrated p-value, which reflects the probability of observing an
-    estimated effect size when the null hypothesis is true taking both random
-    and systematic error into account. A similar approach can be used to
-	calibrate confidence intervals, using both negative and positive controls.
+  study estimates. By using a set of negative control hypotheses we can
+  estimate the empirical null distribution of a particular observational
+  study setup. This empirical null distribution can be used to compute a
+  calibrated p-value, which reflects the probability of observing an
+  estimated effect size when the null hypothesis is true taking both random
+  and systematic error into account. A similar approach can be used to
+  calibrate confidence intervals, using both negative and positive controls.
 VignetteBuilder: knitr
 Imports:
-    ggplot2 (>= 2.0.0),
-    gridExtra,
-    methods
+  ggplot2 (>= 2.0.0),
+  gridExtra,
+  methods
 Suggests:
-    knitr,
-    rmarkdown
+  knitr,
+  rmarkdown
 License: Apache License 2.0
 URL: https://ohdsi.github.io/EmpiricalCalibration, https://github.com/OHDSI/EmpiricalCalibration
 BugReports: https://github.com/OHDSI/EmpiricalCalibration/issues
