@@ -16,6 +16,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ll <- function(theta, logRr, seLogRr, trueLogRr) {
+  estimateLl <- function(i) {
+    mean <- theta[1] + theta[2] * trueLogRr[i]
+    sd <- theta[3] + theta[4] * abs(trueLogRr[i])
+    if (sd < 0) {
+      return(Inf)
+    } else {
+      return(-log(gaussianProduct(logRr[i], mean, seLogRr[i], sd)))
+    }
+  }
+  result <- sum(sapply(1:length(logRr), estimateLl))
+  if (is.infinite(result) || is.na(result))
+    result <- 99999
+  result
+}
+
+llLegacy <- function(theta, logRr, seLogRr, trueLogRr) {
+  result <- 0
+  for (i in 1:length(logRr)) {
+    mean <- theta[1] + theta[2] * trueLogRr[i]
+    sd <- exp(theta[3] + theta[4] * trueLogRr[i])
+    result <- result - log(gaussianProduct(logRr[i], mean, seLogRr[i], sd))
+  }
+  if (is.infinite(result) || is.na(result))
+    result <- 99999
+  result
+}
+
 #' Fit a systematic error model
 #'
 #' @details
@@ -28,9 +56,12 @@
 #' @param seLogRr                    The standard error of the log of the effect estimates. Hint: often
 #'                                   the standard error = (log(<lower bound 95 percent confidence
 #'                                   interval>) - log(<effect estimate>))/qnorm(0.025).
-#' @param estimateCovarianceMatrix   should a covariance matrix be computed? If so, confidence
-#'                                   intervals for the model parameters will be available.
 #' @param trueLogRr                  A vector of the true effect sizes.
+#' @param estimateCovarianceMatrix   Should a covariance matrix be computed? If so, confidence
+#'                                   intervals for the model parameters will be available.
+#' @param legacy                     If true, a legacy error model will be fitted, meaning standard 
+#'                                   deviation is linear on the log scale. If false, standard deviation
+#'                                   is assumed to be simply linear.
 #'
 #' @return
 #' An object of type \code{systematicErrorModel}.
@@ -41,7 +72,11 @@
 #' model
 #'
 #' @export
-fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianceMatrix = TRUE) {
+fitSystematicErrorModel <- function(logRr, 
+                                    seLogRr, 
+                                    trueLogRr, 
+                                    estimateCovarianceMatrix = FALSE,
+                                    legacy = FALSE) {
   if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
     trueLogRr <- trueLogRr[!is.infinite(seLogRr)]
@@ -67,32 +102,30 @@ fitSystematicErrorModel <- function(logRr, seLogRr, trueLogRr, estimateCovarianc
     logRr <- logRr[!is.na(logRr)]
   }
   
-  gaussianProduct <- function(mu1, mu2, sd1, sd2) {
-    (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
+  if (legacy) {
+    theta <- c(0, 1, -2, 0)
+    logLikelihood <- llLegacy
+    parscale <- c(1, 1, 10, 10)
+  } else {
+    theta <- c(0, 1, 0.1, 0)
+    logLikelihood <- ll
+    parscale <- c(1, 1, 1, 1)
   }
   
-  LL <- function(theta, logRr, seLogRr, trueLogRr) {
-    result <- 0
-    for (i in 1:length(logRr)) {
-      mean <- theta[1] + theta[2] * trueLogRr[i]
-      sd <- exp(theta[3] + theta[4] * trueLogRr[i])
-      result <- result - log(gaussianProduct(logRr[i], mean, seLogRr[i], sd))
-    }
-    if (is.infinite(result))
-      result <- 99999
-    result
-  }
-  theta <- c(0, 1, -2, 0)
   fit <- optim(theta,
-               LL,
+               logLikelihood,
                logRr = logRr,
                seLogRr = seLogRr,
                trueLogRr = trueLogRr,
                method = "BFGS",
                hessian = TRUE,
-               control = list(parscale = c(1, 1, 10, 10)))
+               control = list(parscale = parscale))
   model <- fit$par
-  names(model) <- c("meanIntercept", "meanSlope", "logSdIntercept", "logSdSlope")
+  if (legacy) {
+    names(model) <- c("meanIntercept", "meanSlope", "logSdIntercept", "logSdSlope")
+  } else {
+    names(model) <- c("meanIntercept", "meanSlope", "sdIntercept", "sdSlope")
+  }
   if (estimateCovarianceMatrix) {
     fisher_info <- solve(fit$hessian)
     prop_sigma <- sqrt(diag(fisher_info))
@@ -137,10 +170,15 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                   se,
                   interceptMean,
                   slopeMean,
-                  interceptLogSd,
-                  slopeLogSd) {
+                  interceptSd,
+                  slopeSd,
+                  legacy) {
     mean <- interceptMean + slopeMean * x
-    sd <- exp(interceptLogSd + slopeLogSd * x)
+    if (legacy) {
+      sd <- exp(interceptSd + slopeSd * x)
+    } else {
+      sd <- interceptSd + slopeSd * abs(x)
+    }
     numerator <- mean - logRr
     denominator <- sqrt((sd)^2 + (se)^2)
     if (is.infinite(denominator)) {
@@ -158,45 +196,53 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                        se,
                        interceptMean,
                        slopeMean,
-                       interceptLogSd,
-                       slopeLogSd) {
+                       interceptSd,
+                       slopeSd,
+                       legacy) {
     z <- qnorm((1 - ciWidth)/2)
     if (lb) {
       z <- -z
     }
-    # Simple grid search for upper bound where opt is still positive:
-    if (slopeLogSd > 0) {
-      lower <- -100
-      upper <- lower
-      while (opt(x = upper,
-                z = z,
-                logRr = logRr,
-                se = se,
-                interceptMean = interceptMean,
-                slopeMean = slopeMean,
-                interceptLogSd = interceptLogSd,
-                slopeLogSd = slopeLogSd) < 0 && upper < 100) {
-        upper <- upper + 1
+    if (legacy) {
+      # Simple grid search for upper bound where opt is still positive:
+      if (slopeSd > 0) {
+        lower <- -100
+        upper <- lower
+        while (opt(x = upper,
+                   z = z,
+                   logRr = logRr,
+                   se = se,
+                   interceptMean = interceptMean,
+                   slopeMean = slopeMean,
+                   interceptSd = interceptSd,
+                   slopeSd = slopeSd,
+                   legacy = legacy) < 0 && upper < 100) {
+          upper <- upper + 1
+        }
+        if (upper == lower | upper == 100) {
+          return(NA)
+        }
+      } else {
+        upper <- 100
+        lower <- upper
+        while (opt(x = lower,
+                   z = z,
+                   logRr = logRr,
+                   se = se,
+                   interceptMean = interceptMean,
+                   slopeMean = slopeMean,
+                   interceptSd = interceptSd,
+                   slopeSd = slopeSd,
+                   legacy = legacy) > 0 && lower > -100) {
+          lower <- lower - 1
+        }
+        if (upper == lower | lower == -100) {
+          return(NA)
+        }
       }
-      if (upper == lower | upper == 100) {
-        return(NA)
-      } 
     } else {
-      upper <- 100
-      lower <- upper
-      while (opt(x = lower,
-                z = z,
-                logRr = logRr,
-                se = se,
-                interceptMean = interceptMean,
-                slopeMean = slopeMean,
-                interceptLogSd = interceptLogSd,
-                slopeLogSd = slopeLogSd) > 0 && lower > -100) {
-        lower <- lower - 1
-      }
-      if (upper == lower | lower == -100) {
-        return(NA)
-      }  
+      lower = -100
+      upper = 100
     }
     return(uniroot(f = opt,
                    interval = c(lower, upper),
@@ -205,10 +251,12 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                    se = se,
                    interceptMean = interceptMean,
                    slopeMean = slopeMean,
-                   interceptLogSd = interceptLogSd,
-                   slopeLogSd = slopeLogSd)$root)
+                   interceptSd = interceptSd,
+                   slopeSd = slopeSd,
+                   legacy = legacy)$root)
   }
   
+  legacy <- (names(model)[3] == "logSdIntercept") 
   result <- data.frame(logRr = rep(0, length(logRr)), logLb95Rr = 0, logUb95Rr = 0)
   for (i in 1:nrow(result)) {
     if (is.infinite(logRr[i]) || is.na(logRr[i]) || is.infinite(seLogRr[i]) || is.na(seLogRr[i])) {
@@ -223,7 +271,8 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                                   model[1],
                                   model[2],
                                   model[3],
-                                  model[4])
+                                  model[4],
+                                  legacy)
       result$logLb95Rr[i] <- logBound(ciWidth,
                                       TRUE,
                                       logRr[i],
@@ -231,7 +280,8 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                                       model[1],
                                       model[2],
                                       model[3],
-                                      model[4])
+                                      model[4],
+                                      legacy)
       result$logUb95Rr[i] <- logBound(ciWidth,
                                       FALSE,
                                       logRr[i],
@@ -239,7 +289,8 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
                                       model[1],
                                       model[2],
                                       model[3],
-                                      model[4])
+                                      model[4],
+                                      legacy)
     }
   }
   result$seLogRr <- (result$logLb95Rr - result$logUb95Rr)/(2 * qnorm((1 - ciWidth)/2))
@@ -270,8 +321,8 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
 #' @export
 computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
   return(c(rr = exp(logRr), 
-           lb = exp(logRr - qnorm(1 - ciWidth/2)*seLogRr), 
-           ub = exp(logRr + qnorm(1 - ciWidth/2)*seLogRr)))
+           lb = exp(logRr + qnorm((1 - ciWidth)/2)*seLogRr), 
+           ub = exp(logRr - qnorm((1 - ciWidth)/2)*seLogRr)))
 }
 
 #' Convert empirical null distribution to systematic error model
@@ -283,7 +334,7 @@ computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
 #' 
 #' Whereas the \code{\link{fitSystematicErrorModel}} uses positive controls to determine how the error 
 #' distribution changes with true effect size, this function requires the user to make an assumption. The
-#' default assumption, \code{meanSlope = 1} and \code{logSdSlope = 0}, specify a belief that the error 
+#' default assumption, \code{meanSlope = 1} and \code{sdSlope = 0}, specify a belief that the error 
 #' distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
 #' however, if an estimation method is biased towards the null this assumption will be violated, causing the
 #' calibrated confidence intervals to have lower than nominal coverage.
@@ -292,7 +343,7 @@ computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
 #'                     or the \code{\link{fitMcmcNull}} function.
 #' @param meanSlope    The slope for the mean of the error distribution. A slope of 1 means the error
 #'                     is the same for different values of the true relative risk.
-#' @param logSdSlope   The slope for the log of the standard deviation of the error distribution. A slope
+#' @param sdSlope   The slope for the log of the standard deviation of the error distribution. A slope
 #'                     of 0 means the standard deviation is the same for different values of the true 
 #'                     relative risk.
 #'                     
@@ -307,15 +358,15 @@ computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
 #' calibrateConfidenceInterval(positive$logRr, positive$seLogRr, model)
 #' 
 #' @export
-convertNullToErrorModel <- function(null, meanSlope = 1, logSdSlope = 0) {
+convertNullToErrorModel <- function(null, meanSlope = 1, sdSlope = 0) {
   if (class(null) == "null") {
-    model <- c(null[1], meanSlope, log(null[2]), logSdSlope)
+    model <- c(null[1], meanSlope, log(null[2]), sdSlope)
   } else if (class(null) == "mcmcNull") {
-    model <- c(null[1], meanSlope, log(1/sqrt(null[2])), logSdSlope)
+    model <- c(null[1], meanSlope, log(1/sqrt(null[2])), sdSlope)
   } else {
     stop("Null argument should be of type 'null' or 'mcmcNull'") 
   }
-  names(model) <- c("meanIntercept", "meanSlope", "logSdIntercept", "logSdSlope")
+  names(model) <- c("meanIntercept", "meanSlope", "sdIntercept", "sdSlope")
   class(model) <- "systematicErrorModel"
   model
 }

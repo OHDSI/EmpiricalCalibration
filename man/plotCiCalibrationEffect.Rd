@@ -4,8 +4,8 @@
 \alias{plotCiCalibrationEffect}
 \title{Plot true and observed values}
 \usage{
-plotCiCalibrationEffect(logRr, seLogRr, trueLogRr, model = NULL,
-  xLabel = "Relative risk", title, fileName = NULL)
+plotCiCalibrationEffect(logRr, seLogRr, trueLogRr, legacy = FALSE,
+  model = NULL, xLabel = "Relative risk", title, fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -15,6 +15,10 @@ error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 estimate>))/qnorm(0.025).}
 
 \item{trueLogRr}{A vector of the true effect sizes.}
+
+\item{legacy}{If true, a legacy error model will be fitted, meaning standard 
+deviation is linear on the log scale. If false, standard deviation
+is assumed to be simply linear.}
 
 \item{model}{The fitted systematic error model. If not provided, it will be fitted on the
 provided data.}

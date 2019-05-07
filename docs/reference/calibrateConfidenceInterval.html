@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -169,22 +169,22 @@ percent confidence interval.</p></td>
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fitSystematicErrorModel.html'>fitSystematicErrorModel</a></span>(<span class='no'>data</span>$<span class='no'>logRr</span>, <span class='no'>data</span>$<span class='no'>seLogRr</span>, <span class='no'>data</span>$<span class='no'>trueLogRr</span>)
 <span class='no'>newData</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulateControls.html'>simulateControls</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>mean</span> <span class='kw'>=</span> <span class='fl'>0.25</span>, <span class='kw'>sd</span> <span class='kw'>=</span> <span class='fl'>0.25</span>, <span class='kw'>trueLogRr</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Log'>log</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>4</span>)))
 <span class='no'>result</span> <span class='kw'>&lt;-</span> <span class='fu'>calibrateConfidenceInterval</span>(<span class='no'>newData</span>$<span class='no'>logRr</span>, <span class='no'>newData</span>$<span class='no'>seLogRr</span>, <span class='no'>model</span>)
-<span class='no'>result</span></div><div class='output co'>#&gt;          logRr   logLb95Rr logUb95Rr   seLogRr
-#&gt; 1   0.36350963 -0.24659678 0.9148503 0.2962930
-#&gt; 2   0.77220734  0.14500527 1.3450397 0.3061369
-#&gt; 3   1.14760577  0.50088803 1.7436546 0.3170381
-#&gt; 4  -0.09755186 -0.71994784 0.4608153 0.3012206
-#&gt; 5   1.10715701  0.42699638 1.7362556 0.3340008
-#&gt; 6   1.45242876  0.91982588 1.9372183 0.2595436
-#&gt; 7  -0.16183782 -0.79404318 0.4055753 0.3060307
-#&gt; 8   0.38112649 -0.26834657 0.9720699 0.3164386
-#&gt; 9   1.15434234  0.56612643 1.6919716 0.2872107
-#&gt; 10  0.13632723 -0.47886298 0.6902019 0.2982363
-#&gt; 11  0.62553176 -0.07932124 1.2744683 0.3453608
-#&gt; 12  1.38457995  0.78211126 1.9386010 0.2950283
-#&gt; 13  0.11314228 -0.49417956 0.6589144 0.2941620
-#&gt; 14  0.39818292 -0.24899732 0.9870224 0.3153169
-#&gt; 15  1.49812389  0.85572361 2.0930850 0.3156592</div><div class='input'>
+<span class='no'>result</span></div><div class='output co'>#&gt;         logRr  logLb95Rr logUb95Rr   seLogRr
+#&gt; 1   0.3633442 -0.2215560 0.9160445 0.2902095
+#&gt; 2   0.7721447  0.1459751 1.3463734 0.3062297
+#&gt; 3   1.1476296  0.5005040 1.7445525 0.3173651
+#&gt; 4  -0.0978154 -0.6475848 0.4608360 0.2827656
+#&gt; 5   1.1071717  0.4268373 1.7371203 0.3342620
+#&gt; 6   1.4525291  0.9184392 1.9378269 0.2600527
+#&gt; 7  -0.1621166 -0.7149772 0.4053362 0.2857995
+#&gt; 8   0.3809725 -0.2428391 0.9731956 0.3102186
+#&gt; 9   1.1543678  0.5655266 1.6930417 0.2876367
+#&gt; 10  0.1361149 -0.4309147 0.6909088 0.2861847
+#&gt; 11  0.6254329 -0.0715306 1.2756716 0.3436803
+#&gt; 12  1.3846512  0.7810774 1.9391390 0.2954293
+#&gt; 13  0.1129226 -0.4440026 0.6595497 0.2815236
+#&gt; 14  0.3980328 -0.2251682 0.9882119 0.3095414
+#&gt; 15  1.4982276  0.8546360 2.0932464 0.3159778</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

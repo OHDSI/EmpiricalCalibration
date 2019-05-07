@@ -4,7 +4,7 @@
 \alias{convertNullToErrorModel}
 \title{Convert empirical null distribution to systematic error model}
 \usage{
-convertNullToErrorModel(null, meanSlope = 1, logSdSlope = 0)
+convertNullToErrorModel(null, meanSlope = 1, sdSlope = 0)
 }
 \arguments{
 \item{null}{The empirical null distribution fitted using eith the \code{\link{fitNull}}
@@ -13,7 +13,7 @@ or the \code{\link{fitMcmcNull}} function.}
 \item{meanSlope}{The slope for the mean of the error distribution. A slope of 1 means the error
 is the same for different values of the true relative risk.}
 
-\item{logSdSlope}{The slope for the log of the standard deviation of the error distribution. A slope
+\item{sdSlope}{The slope for the log of the standard deviation of the error distribution. A slope
 of 0 means the standard deviation is the same for different values of the true 
 relative risk.}
 }
@@ -27,7 +27,7 @@ p-values.
 
 Whereas the \code{\link{fitSystematicErrorModel}} uses positive controls to determine how the error 
 distribution changes with true effect size, this function requires the user to make an assumption. The
-default assumption, \code{meanSlope = 1} and \code{logSdSlope = 0}, specify a belief that the error 
+default assumption, \code{meanSlope = 1} and \code{sdSlope = 0}, specify a belief that the error 
 distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
 however, if an estimation method is biased towards the null this assumption will be violated, causing the
 calibrated confidence intervals to have lower than nominal coverage.

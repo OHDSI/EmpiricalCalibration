@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -86,7 +86,7 @@
       <h1>Empirical calibration of confidence intervals</h1>
                         <h4 class="author">Martijn J. Schuemie, Marc A. Suchard</h4>
             
-            <h4 class="date">2019-03-26</h4>
+            <h4 class="date">2019-05-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/master/vignettes/EmpiricalCiCalibrationVignette.Rmd"><code>vignettes/EmpiricalCiCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalCiCalibrationVignette.Rmd</code></div>
@@ -111,7 +111,7 @@
 ## 1     GiBleed        NA -0.3575234 0.06668903</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="../reference/computeTraditionalCi.html">computeTraditionalCi</a></span>(outcomeOfInterest<span class="op">$</span>logRr, outcomeOfInterest<span class="op">$</span>seLogRr)</a></code></pre></div>
 <pre><code>##        rr        lb        ub 
-## 0.6994063 0.6964876 0.7023372</code></pre>
+## 0.6994063 0.6137108 0.7970680</code></pre>
 <p>Here we see that the effect estimate for GI bleed for dabigatran versus warfarin is 0.7, with a very tight CI.</p>
 </div>
 <div id="negative-controls" class="section level1">
@@ -171,18 +171,8 @@
 <p>If we do have positive controls, like in this example, we do not have to make an assumption, but instead can estimate the full systematic error model using the estimates for both negative and positive controls:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitSystematicErrorModel.html">fitSystematicErrorModel</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2">model</a></code></pre></div>
-<pre><code>##  meanIntercept      meanSlope logSdIntercept     logSdSlope 
-##    -0.06655103     0.93329424    -1.67417066     0.01575879 
-## attr(,"CovarianceMatrix")
-##               [,1]          [,2]          [,3]          [,4]
-## [1,]  5.645229e-04 -0.0005483258  9.364782e-05 -0.0001833231
-## [2,] -5.483258e-04  0.0009044631 -1.934024e-04  0.0003556884
-## [3,]  9.364782e-05 -0.0001934024  9.131157e-03 -0.0087454417
-## [4,] -1.833231e-04  0.0003556884 -8.745442e-03  0.0137776815
-## attr(,"LB95CI")
-## [1] -0.1131192  0.8743497 -1.8614591 -0.2142986
-## attr(,"UB95CI")
-## [1] -0.01998289  0.99223878 -1.48688221  0.24581617
+<pre><code>## meanIntercept     meanSlope   sdIntercept       sdSlope 
+##  -0.066550795   0.933292141   0.187468405   0.002979502 
 ## attr(,"class")
 ## [1] "systematicErrorModel"</code></pre>
 <p>We see that the intercept of the mean (<code>meanIntercept</code>) is slightly lower than 0, indicating the analysis is negatively biased when the null is true. Also note that the slope for the mean (<code>meanSlope</code>) is slightly lower than 1, meaning that the method appears to be somewhat biased towards the null; the negative bias tends to become larger as the true effect size increases.</p>
@@ -217,11 +207,11 @@
 <p>We can now use the estimated systematic error model to compute the calibrated CI for our outcome of interest:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">ci &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calibrateConfidenceInterval.html">calibrateConfidenceInterval</a></span>(outcomeOfInterest<span class="op">$</span>logRr, outcomeOfInterest<span class="op">$</span>seLogRr, model)</a>
 <a class="sourceLine" id="cb18-2" data-line-number="2">ci</a></code></pre></div>
-<pre><code>##        logRr  logLb95Rr logUb95Rr   seLogRr
-## 1 -0.3117815 -0.7254078 0.1067071 0.2122781</code></pre>
+<pre><code>##        logRr logLb95Rr logUb95Rr   seLogRr
+## 1 -0.3117702 -0.733957 0.1067054 0.2144587</code></pre>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(ci[,<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>])</a></code></pre></div>
 <pre><code>##       logRr logLb95Rr logUb95Rr
-## 1 0.7321415 0.4841271  1.112608</code></pre>
+## 1 0.7321498 0.4800058  1.112606</code></pre>
 <p>In this case, even though the point estimate has not changed much, the calibrated CI is much wider than the uncalibrated one to take in to account the residual error due to lack of any adjustment for confounding.</p>
 </div>
 </div>

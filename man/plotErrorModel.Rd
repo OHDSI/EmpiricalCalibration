@@ -4,7 +4,8 @@
 \alias{plotErrorModel}
 \title{Plot the systematic error model}
 \usage{
-plotErrorModel(logRr, seLogRr, trueLogRr, title, fileName = NULL)
+plotErrorModel(logRr, seLogRr, trueLogRr, title, legacy = FALSE,
+  fileName = NULL)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -16,6 +17,10 @@ log(<effect estimate>))/qnorm(0.025).}
 \item{trueLogRr}{The true log relative risk.}
 
 \item{title}{Optional: the main title for the plot}
+
+\item{legacy}{If true, a legacy error model will be fitted, meaning standard 
+deviation is linear on the log scale. If false, standard deviation
+is assumed to be simply linear.}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'.
 See the function \code{ggsave} in the ggplot2 package for supported file

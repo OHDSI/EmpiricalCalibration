@@ -37,6 +37,9 @@
 #'                               is a single control, but a different grouping can be provided, for
 #'                               example linking a negative control to synthetic positive controls
 #'                               derived from that negative control.
+#' @param legacy                 If true, a legacy error model will be fitted, meaning standard 
+#'                               deviation is linear on the log scale. If false, standard deviation
+#'                               is assumed to be simply linear.
 #'
 #' @return
 #' A data frame specifying the coverage per strata (usually true effect size) for a wide range of widths
@@ -53,7 +56,8 @@ evaluateCiCalibration <- function(logRr,
                                   seLogRr,
                                   trueLogRr,
                                   strata = as.factor(trueLogRr),
-                                  crossValidationGroup = 1:length(logRr)) {
+                                  crossValidationGroup = 1:length(logRr),
+                                  legacy = FALSE) {
   if (!is.null(strata) && !is.factor(strata))
     stop("Strata argument should be a factor (or null)")
   if (is.null(strata))
@@ -83,8 +87,8 @@ evaluateCiCalibration <- function(logRr,
     subset <- dataLeftOut[dataLeftOut$strata == subResult$strata[j],]
     if (nrow(subset) == 0)
       return(0)
-    #writeLines(paste0("ciWidth: ", subResult$ciWidth[j], ", strata: ", subResult$strata[j], ", model: ", paste(model, collapse = ",")))
-    #writeLines(paste0("ciWidth: ", subResult$ciWidth[j], ", logRr: ", paste(subset$logRr, collapse = ","), ", seLogRr:", paste(subset$seLogRr, collapse = ","), ", model: ", paste(model, collapse = ",")))
+    # writeLines(paste0("ciWidth: ", subResult$ciWidth[j], ", strata: ", subResult$strata[j], ", model: ", paste(model, collapse = ",")))
+    # writeLines(paste0("ciWidth: ", subResult$ciWidth[j], ", logRr: ", paste(subset$logRr, collapse = ","), ", seLogRr:", paste(subset$seLogRr, collapse = ","), ", model: ", paste(model, collapse = ",")))
     ci <- EmpiricalCalibration::calibrateConfidenceInterval(logRr = subset$logRr,
                                                             seLogRr = subset$seLogRr,
                                                             ciWidth = subResult$ciWidth[j],
@@ -101,15 +105,15 @@ evaluateCiCalibration <- function(logRr,
   computeTheoreticalCoverage <- function(j, subResult, dataLeftOut) {
     subset <- dataLeftOut[dataLeftOut$strata == subResult$strata[j],]
     ciWidth <- subResult$ciWidth[j]
-    logLb95Rr <- subset$logRr + qnorm((1-ciWidth)/2)*subset$seLogRr
-    logUb95Rr <- subset$logRr - qnorm((1-ciWidth)/2)*subset$seLogRr
+    logLb95Rr <- subset$logRr + qnorm((1 - ciWidth)/2)*subset$seLogRr
+    logUb95Rr <- subset$logRr - qnorm((1 - ciWidth)/2)*subset$seLogRr
     below <- sum(subset$trueLogRr < logLb95Rr)
     within <- sum(subset$trueLogRr >= logLb95Rr & subset$trueLogRr <= logUb95Rr)
     above <- sum(subset$trueLogRr > logUb95Rr)
     return(c(below, within, above))
   }
   
-  computeLooCoverage <- function(leaveOutGroup, data) {
+  computeLooCoverage <- function(leaveOutGroup, data, legacy) {
     dataLeaveOneOut <- data[data$crossValidationGroup != leaveOutGroup, ]
     dataLeftOut <- data[data$crossValidationGroup == leaveOutGroup, ]
     if (nrow(dataLeaveOneOut) == 0 || nrow(dataLeftOut) == 0)
@@ -118,8 +122,8 @@ evaluateCiCalibration <- function(logRr,
     model <- fitSystematicErrorModel(logRr = dataLeaveOneOut$logRr,
                                      seLogRr = dataLeaveOneOut$seLogRr,
                                      trueLogRr = dataLeaveOneOut$trueLogRr,
-                                     estimateCovarianceMatrix = FALSE)
-    
+                                     estimateCovarianceMatrix = FALSE,
+                                     legacy = legacy)
     strata <- unique(dataLeftOut$strata)
     ciWidth <- seq(0.01, 0.99, by = 0.01)
     subResult <- expand.grid(strata, ciWidth)
@@ -135,7 +139,7 @@ evaluateCiCalibration <- function(logRr,
     return(subResult)
   }
   writeLines("Fitting error models within leave-one-out cross-validation")
-  coverages <- lapply(unique(data$crossValidationGroup), computeLooCoverage, data = data)
+  coverages <- lapply(unique(data$crossValidationGroup), computeLooCoverage, data = data, legacy = legacy)
   coverage <- do.call("rbind", coverages)
   data$count <- 1
   counts <- aggregate(count ~ strata, data = data, sum)

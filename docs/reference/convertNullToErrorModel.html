@@ -37,7 +37,7 @@ into a systematic error distribution that can be used to calibrate confidence in
 p-values.
 Whereas the fitSystematicErrorModel uses positive controls to determine how the error 
 distribution changes with true effect size, this function requires the user to make an assumption. The
-default assumption, meanSlope = 1 and logSdSlope = 0, specify a belief that the error 
+default assumption, meanSlope = 1 and sdSlope = 0, specify a belief that the error 
 distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
 however, if an estimation method is biased towards the null this assumption will be violated, causing the
 calibrated confidence intervals to have lower than nominal coverage." />
@@ -71,7 +71,7 @@ calibrated confidence intervals to have lower than nominal coverage." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -137,14 +137,14 @@ into a systematic error distribution that can be used to calibrate confidence in
 p-values.</p>
 <p>Whereas the <code><a href='fitSystematicErrorModel.html'>fitSystematicErrorModel</a></code> uses positive controls to determine how the error 
 distribution changes with true effect size, this function requires the user to make an assumption. The
-default assumption, <code>meanSlope = 1</code> and <code>logSdSlope = 0</code>, specify a belief that the error 
+default assumption, <code>meanSlope = 1</code> and <code>sdSlope = 0</code>, specify a belief that the error 
 distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
 however, if an estimation method is biased towards the null this assumption will be violated, causing the
 calibrated confidence intervals to have lower than nominal coverage.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>convertNullToErrorModel</span>(<span class='no'>null</span>, <span class='kw'>meanSlope</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>logSdSlope</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+    <pre class="usage"><span class='fu'>convertNullToErrorModel</span>(<span class='no'>null</span>, <span class='kw'>meanSlope</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>sdSlope</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,7 +160,7 @@ or the <code><a href='fitMcmcNull.html'>fitMcmcNull</a></code> function.</p></td
 is the same for different values of the true relative risk.</p></td>
     </tr>
     <tr>
-      <th>logSdSlope</th>
+      <th>sdSlope</th>
       <td><p>The slope for the log of the standard deviation of the error distribution. A slope
 of 0 means the standard deviation is the same for different values of the true 
 relative risk.</p></td>
@@ -178,8 +178,8 @@ relative risk.</p></td>
 <span class='no'>null</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fitNull.html'>fitNull</a></span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>)
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>convertNullToErrorModel</span>(<span class='no'>null</span>)
 <span class='no'>positive</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>1</span>, ]
-<span class='fu'><a href='calibrateConfidenceInterval.html'>calibrateConfidenceInterval</a></span>(<span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>, <span class='no'>model</span>)</div><div class='output co'>#&gt;         logRr  logLb95Rr logUb95Rr   seLogRr
-#&gt; 1 -0.05947242 -0.6334062 0.5144614 0.2928287</div><div class='input'>
+<span class='fu'><a href='calibrateConfidenceInterval.html'>calibrateConfidenceInterval</a></span>(<span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>, <span class='no'>model</span>)</div><div class='output co'>#&gt;         logRr logLb95Rr logUb95Rr  seLogRr
+#&gt; 1 -0.05947242 -2.535016  2.416071 1.263056</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

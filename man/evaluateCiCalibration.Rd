@@ -6,7 +6,7 @@
 \usage{
 evaluateCiCalibration(logRr, seLogRr, trueLogRr,
   strata = as.factor(trueLogRr),
-  crossValidationGroup = 1:length(logRr))
+  crossValidationGroup = 1:length(logRr), legacy = FALSE)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -24,6 +24,10 @@ stratification.}
 is a single control, but a different grouping can be provided, for
 example linking a negative control to synthetic positive controls
 derived from that negative control.}
+
+\item{legacy}{If true, a legacy error model will be fitted, meaning standard 
+deviation is linear on the log scale. If false, standard deviation
+is assumed to be simply linear.}
 }
 \value{
 A data frame specifying the coverage per strata (usually true effect size) for a wide range of widths

@@ -1,3 +1,10 @@
+EmpiricalCalibration 2.0.0
+==========================
+
+NEW FEATURES
+
+* Adding new method for fitting systematic error models that drops the assumption that SD is linear in the log scale, but rather just linear (in the logRr space). Setting that to default, but allowing users to use legacy model if they choose.
+
 EmpiricalCalibration 1.4.1
 ==========================
 

@@ -64,7 +64,7 @@ confidence intervals." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@ confidence intervals.</p>
 
     <pre class="usage"><span class='fu'>evaluateCiCalibration</span>(<span class='no'>logRr</span>, <span class='no'>seLogRr</span>, <span class='no'>trueLogRr</span>,
   <span class='kw'>strata</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/factor'>as.factor</a></span>(<span class='no'>trueLogRr</span>),
-  <span class='kw'>crossValidationGroup</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>logRr</span>))</pre>
+  <span class='kw'>crossValidationGroup</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>logRr</span>), <span class='kw'>legacy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -162,6 +162,12 @@ stratification.</p></td>
 is a single control, but a different grouping can be provided, for
 example linking a negative control to synthetic positive controls
 derived from that negative control.</p></td>
+    </tr>
+    <tr>
+      <th>legacy</th>
+      <td><p>If true, a legacy error model will be fitted, meaning standard 
+deviation is linear on the log scale. If false, standard deviation
+is assumed to be simply linear.</p></td>
     </tr>
     </table>
     

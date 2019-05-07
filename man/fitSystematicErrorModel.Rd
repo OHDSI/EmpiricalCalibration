@@ -5,7 +5,7 @@
 \title{Fit a systematic error model}
 \usage{
 fitSystematicErrorModel(logRr, seLogRr, trueLogRr,
-  estimateCovarianceMatrix = TRUE)
+  estimateCovarianceMatrix = FALSE, legacy = FALSE)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
@@ -16,8 +16,12 @@ interval>) - log(<effect estimate>))/qnorm(0.025).}
 
 \item{trueLogRr}{A vector of the true effect sizes.}
 
-\item{estimateCovarianceMatrix}{should a covariance matrix be computed? If so, confidence
+\item{estimateCovarianceMatrix}{Should a covariance matrix be computed? If so, confidence
 intervals for the model parameters will be available.}
+
+\item{legacy}{If true, a legacy error model will be fitted, meaning standard 
+deviation is linear on the log scale. If false, standard deviation
+is assumed to be simply linear.}
 }
 \value{
 An object of type \code{systematicErrorModel}.

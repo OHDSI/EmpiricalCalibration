@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -128,7 +128,8 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>plotErrorModel</span>(<span class='no'>logRr</span>, <span class='no'>seLogRr</span>, <span class='no'>trueLogRr</span>, <span class='no'>title</span>, <span class='kw'>fileName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>plotErrorModel</span>(<span class='no'>logRr</span>, <span class='no'>seLogRr</span>, <span class='no'>trueLogRr</span>, <span class='no'>title</span>, <span class='kw'>legacy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fileName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,6 +151,12 @@ log(&lt;effect estimate&gt;))/qnorm(0.025).</p></td>
     <tr>
       <th>title</th>
       <td><p>Optional: the main title for the plot</p></td>
+    </tr>
+    <tr>
+      <th>legacy</th>
+      <td><p>If true, a legacy error model will be fitted, meaning standard 
+deviation is linear on the log scale. If false, standard deviation
+is assumed to be simply linear.</p></td>
     </tr>
     <tr>
       <th>fileName</th>
