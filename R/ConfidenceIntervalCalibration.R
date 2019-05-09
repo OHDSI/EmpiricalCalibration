@@ -241,8 +241,29 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
         }
       }
     } else {
-      lower = -100
-      upper = 100
+      lower <- -100
+      upper <- 100
+      lowerValue <- opt(x = lower,
+                        z = z,
+                        logRr = logRr,
+                        se = se,
+                        interceptMean = interceptMean,
+                        slopeMean = slopeMean,
+                        interceptSd = interceptSd,
+                        slopeSd = slopeSd,
+                        legacy = legacy) 
+      upperValue <- opt(x = upper,
+                        z = z,
+                        logRr = logRr,
+                        se = se,
+                        interceptMean = interceptMean,
+                        slopeMean = slopeMean,
+                        interceptSd = interceptSd,
+                        slopeSd = slopeSd,
+                        legacy = legacy) 
+      if ((lowerValue < 0 && upperValue < 0) || (lowerValue > 0 && upperValue > 0)) {
+        return(NA)
+      }
     }
     return(uniroot(f = opt,
                    interval = c(lower, upper),
