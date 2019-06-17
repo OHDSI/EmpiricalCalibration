@@ -86,7 +86,7 @@
       <h1>Empirical calibration of p-values</h1>
                         <h4 class="author">Martijn J. Schuemie, Marc A. Suchard</h4>
             
-            <h4 class="date">2019-05-07</h4>
+            <h4 class="date">2019-06-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/master/vignettes/EmpiricalPCalibrationVignette.Rmd"><code>vignettes/EmpiricalPCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalPCalibrationVignette.Rmd</code></div>
@@ -101,14 +101,14 @@
 <p>In observational studies, there is always the possibility that an effect size estimate is biased. This can be true even for advanced, well thought out study designs, because of unmeasured or unmodeled confounding. Negative controls (test-hypotheses where the exposure is not believed to cause the outcome) can be used to detect the potential for bias in a study, and with enough negative controls we can start to estimate the systematic error distribution inherent in an observational analysis. We can then use this estimated distribution to compute a calibrated p-value, which reflects the probability of observing an effect size estimate when the null hypothesis (of no effect) is true, taking both systematic and random error into account.</p>
 <p>In this document we will use an example study to illustrate how this can be done using the <code>EmpiricalCalibration</code> R package. In the example, we will try to answer the question whether sertraline (an SSRI) causes GI bleeding. We use a Self-Controlled Case Series (SCCS) design, and have applied this to a large insurance claims database.</p>
 <p>The results from this study are available in the package, and can be loaded using the <code><a href="https://www.rdocumentation.org/packages/utils/topics/data">data()</a></code> command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(sccs)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">drugOfInterest &lt;-<span class="st"> </span>sccs[sccs<span class="op">$</span>groundTruth <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, ]</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">drugOfInterest</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(sccs)</a>
+<a class="sourceLine" id="cb1-2" title="2">drugOfInterest &lt;-<span class="st"> </span>sccs[sccs<span class="op">$</span>groundTruth <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, ]</a>
+<a class="sourceLine" id="cb1-3" title="3">drugOfInterest</a></code></pre></div>
 <pre><code>##     drugName groundTruth     logRr    seLogRr
 ## 6 Sertraline           1 0.7326235 0.07371708</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(drugOfInterest<span class="op">$</span>logRr)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(drugOfInterest<span class="op">$</span>logRr)</a></code></pre></div>
 <pre><code>## [1] 2.080532</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/computeTraditionalP.html">computeTraditionalP</a></span>(drugOfInterest<span class="op">$</span>logRr, drugOfInterest<span class="op">$</span>seLogRr)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw"><a href="../reference/computeTraditionalP.html">computeTraditionalP</a></span>(drugOfInterest<span class="op">$</span>logRr, drugOfInterest<span class="op">$</span>seLogRr)</a></code></pre></div>
 <pre><code>## [1] 0</code></pre>
 <p>Here we see that the effect estimate for sertraline is 2.1, with a p-value that is so small R rounds it to 0.</p>
 </div>
@@ -116,9 +116,9 @@
 <h1 class="hasAnchor">
 <a href="#negative-controls" class="anchor"></a>Negative controls</h1>
 <p>Negative controls are drug-outcome pairs where we believe the drug does not cause (or prevent) the outcome. In other words, we believe the true effect size to be a relative risk of 1. We would prefer our negative controls to have some resemblance with out hypothesis of interest (in our example sertraline - GI bleed), and we therefore typically pick negative controls where the outcome is the same (exposure controls), or the exposure is the same (outcome controls). In this example, we have opted for exposure controls, and have identified a set of drugs not believed to cause GI bleed. We have executed exactly the same analysis for these exposures, resulting in a set of effect size estimates, one per negative control:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(sccs)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">negatives &lt;-<span class="st"> </span>sccs[sccs<span class="op">$</span>groundTruth <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, ]</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(negatives)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(sccs)</a>
+<a class="sourceLine" id="cb7-2" title="2">negatives &lt;-<span class="st"> </span>sccs[sccs<span class="op">$</span>groundTruth <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, ]</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(negatives)</a></code></pre></div>
 <pre><code>##           drugName groundTruth     logRr   seLogRr
 ## 1      Thiothixene           0 0.4339021 0.7617538
 ## 2    Methocarbamol           0 0.6363184 0.1839892
@@ -130,7 +130,12 @@
 <h2 class="hasAnchor">
 <a href="#plot-negative-control-effect-sizes" class="anchor"></a>Plot negative control effect sizes</h2>
 <p>We can start by creating a forest plot of our negative controls:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/plotForest.html">plotForest</a></span>(negatives<span class="op">$</span>logRr, negatives<span class="op">$</span>seLogRr, negatives<span class="op">$</span>drugName)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw"><a href="../reference/plotForest.html">plotForest</a></span>(negatives<span class="op">$</span>logRr, negatives<span class="op">$</span>seLogRr, negatives<span class="op">$</span>drugName)</a></code></pre></div>
+<pre><code>## Registered S3 methods overwritten by 'ggplot2':
+##   method         from 
+##   [.quosures     rlang
+##   c.quosures     rlang
+##   print.quosures rlang</code></pre>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>Here we see that many negative controls have a confidence interval that does not include a relative risk of 1 (orange lines), certainly more than the expected 5%. This indicates the analysis has systematic error.</p>
 </div>
@@ -142,8 +147,8 @@
 <h2 class="hasAnchor">
 <a href="#fitting-the-null-distribution" class="anchor"></a>Fitting the null distribution</h2>
 <p>We can use the negative controls to estimate the systematic error distribution. We assume the distribution is a Gaussian distribution, which we have found to give good performance in the past.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">null &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitNull.html">fitNull</a></span>(negatives<span class="op">$</span>logRr, negatives<span class="op">$</span>seLogRr)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">null</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">null &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitNull.html">fitNull</a></span>(negatives<span class="op">$</span>logRr, negatives<span class="op">$</span>seLogRr)</a>
+<a class="sourceLine" id="cb11-2" title="2">null</a></code></pre></div>
 <pre><code>## Estimated null distribution
 ## 
 ##      Estimate
@@ -155,7 +160,7 @@
 <h2 class="hasAnchor">
 <a href="#evaluating-the-calibration" class="anchor"></a>Evaluating the calibration</h2>
 <p>To evaluate whether our estimation of the systematic error distribution is a good one, we can test whether the calibrated p-value is truly calibrated, meaning the fraction of negative controls with a p-value below alpha is approximately the same as alpha:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/plotCalibration.html">plotCalibration</a></span>(negatives<span class="op">$</span>logRr,negatives<span class="op">$</span>seLogRr)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw"><a href="../reference/plotCalibration.html">plotCalibration</a></span>(negatives<span class="op">$</span>logRr,negatives<span class="op">$</span>seLogRr)</a></code></pre></div>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 <p>This method uses a leave-one-out design: for every negative control, the null distribution is fitted using all other negative controls, and the calibrated p-value for that negative control is computed.</p>
 <p>In the graph we see that the calibrated p-value is much closer to the diagonal than the uncalibrated p-value.</p>
@@ -164,7 +169,7 @@
 <h2 class="hasAnchor">
 <a href="#plotting-the-null-distribution" class="anchor"></a>Plotting the null distribution</h2>
 <p>We can create a graphical representation of the null distribution, together with the negative controls used to estimate that distribution:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="../reference/plotCalibrationEffect.html">plotCalibrationEffect</a></span>(negatives<span class="op">$</span>logRr,negatives<span class="op">$</span>seLogRr, <span class="dt">null =</span> null)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw"><a href="../reference/plotCalibrationEffect.html">plotCalibrationEffect</a></span>(negatives<span class="op">$</span>logRr,negatives<span class="op">$</span>seLogRr, <span class="dt">null =</span> null)</a></code></pre></div>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>In this graph, the blue dots represent the negative controls. Any estimates below the gray dashed lines will have a traditional p-value below .05. In contrast, only estimates that fall within the orange areas will have a calibrated p-value below .05.</p>
 </div>
@@ -176,8 +181,8 @@
 <h2 class="hasAnchor">
 <a href="#calibrating-the-p-value" class="anchor"></a>Calibrating the p-value</h2>
 <p>We can now use the estimated null distribution to compute the calibrated p-value for our drug of interest:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">p &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calibrateP.html">calibrateP</a></span>(null, drugOfInterest<span class="op">$</span>logRr, drugOfInterest<span class="op">$</span>seLogRr)</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">p</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">p &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calibrateP.html">calibrateP</a></span>(null, drugOfInterest<span class="op">$</span>logRr, drugOfInterest<span class="op">$</span>seLogRr)</a>
+<a class="sourceLine" id="cb15-2" title="2">p</a></code></pre></div>
 <pre><code>## [1] 0.8390598</code></pre>
 <p>In this case, the calibrated p-value is 0.84, meaning we have very little confidence we can reject the null hypothesis.</p>
 </div>
@@ -185,11 +190,11 @@
 <h2 class="hasAnchor">
 <a href="#plotting-the-null-distribution-1" class="anchor"></a>Plotting the null distribution</h2>
 <p>A visual representation of the calibration makes it clear why we are no longer certain we can reject the null hypothesis:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw"><a href="../reference/plotCalibrationEffect.html">plotCalibrationEffect</a></span>(negatives<span class="op">$</span>logRr,</a>
-<a class="sourceLine" id="cb16-2" data-line-number="2">                      negatives<span class="op">$</span>seLogRr, </a>
-<a class="sourceLine" id="cb16-3" data-line-number="3">                      drugOfInterest<span class="op">$</span>logRr, </a>
-<a class="sourceLine" id="cb16-4" data-line-number="4">                      drugOfInterest<span class="op">$</span>seLogRr, </a>
-<a class="sourceLine" id="cb16-5" data-line-number="5">                      null)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw"><a href="../reference/plotCalibrationEffect.html">plotCalibrationEffect</a></span>(negatives<span class="op">$</span>logRr,</a>
+<a class="sourceLine" id="cb17-2" title="2">                      negatives<span class="op">$</span>seLogRr, </a>
+<a class="sourceLine" id="cb17-3" title="3">                      drugOfInterest<span class="op">$</span>logRr, </a>
+<a class="sourceLine" id="cb17-4" title="4">                      drugOfInterest<span class="op">$</span>seLogRr, </a>
+<a class="sourceLine" id="cb17-5" title="5">                      null)</a></code></pre></div>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>In this plot we see that, even though the drug of interest (the yellow diamond) has a high relative risk, it is indistinguishable from our negative controls.</p>
 </div>
@@ -198,52 +203,51 @@
 <h1 class="hasAnchor">
 <a href="#computing-the-credible-interval" class="anchor"></a>Computing the credible interval</h1>
 <p>Depending on how much information we have in terms of number of negative controls, or precision of those negative controls, we will be more or less certain about the parameters of the null distribution and therefore about the calibrated p-value. To estimate our uncertainty we can compute the 95% credible interval using Markov Chain Monte Carlo (MCMC). We can apply the <code>fitMcmcNull</code> function for this purpose:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">null &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitMcmcNull.html">fitMcmcNull</a></span>(negatives<span class="op">$</span>logRr, negatives<span class="op">$</span>seLogRr)</a>
-<a class="sourceLine" id="cb17-2" data-line-number="2">null</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">null &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitMcmcNull.html">fitMcmcNull</a></span>(negatives<span class="op">$</span>logRr, negatives<span class="op">$</span>seLogRr)</a>
+<a class="sourceLine" id="cb18-2" title="2">null</a></code></pre></div>
 <pre><code>## Estimated null distribution (using MCMC)
 ## 
 ##           Estimate lower .95 upper .95
-## Mean       0.79320   0.67492     0.912
-## Precision 12.54091   6.06572    23.051
+## Mean       0.78967   0.67195     0.906
+## Precision 12.55622   5.92882    22.638
 ## 
-## Acceptance rate: 0.32966703329667</code></pre>
+## Acceptance rate: 0.327967203279672</code></pre>
 <p>We see that there is uncertainty around the estimates of the mean and precision (= 1/SD^2), as expressed in the 95% credible intervals. This uncertainty can be reduced by either increasing the number of negative controls, or by increasing the power for the existing controls (e.g. by waiting for more data to accumulate).</p>
 <p>The acceptance rate of the MCMC seems reasonable (ideal values are typically between 0.2 and 0.6), but we can investigate the trace just to be sure:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw"><a href="../reference/plotMcmcTrace.html">plotMcmcTrace</a></span>(null)</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw"><a href="../reference/plotMcmcTrace.html">plotMcmcTrace</a></span>(null)</a></code></pre></div>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <p>For both variables the trace should look like ‘random noise’, as is the case above. When we see auto-correlation, meaning that one value of the trace depends on the previous value of the trace, the MCMC might not be reliable and we should not trust the 95% credible interval.</p>
 <p>We can use the new null object to compute the calibrated p-value as well as the 95% credible interval:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">p &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calibrateP.html">calibrateP</a></span>(null, drugOfInterest<span class="op">$</span>logRr, drugOfInterest<span class="op">$</span>seLogRr)</a>
-<a class="sourceLine" id="cb20-2" data-line-number="2">p</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">p &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calibrateP.html">calibrateP</a></span>(null, drugOfInterest<span class="op">$</span>logRr, drugOfInterest<span class="op">$</span>seLogRr)</a>
+<a class="sourceLine" id="cb21-2" title="2">p</a></code></pre></div>
 <pre><code>##           p    lb95ci    ub95ci
-## 1 0.8287628 0.5349875 0.9934297</code></pre>
+## 1 0.8410512 0.5482223 0.9906853</code></pre>
 <p>Note that there is uncertainty around the calibrated p-value as expressed in the 95% credible interval.</p>
 <p>We can also visualize the uncertainty in the p-value calibration by plotting the 95% credible interval of the boundary where calibrated p = 0.05, here indicated by the red band:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw"><a href="../reference/plotCalibrationEffect.html">plotCalibrationEffect</a></span>(negatives<span class="op">$</span>logRr,</a>
-<a class="sourceLine" id="cb22-2" data-line-number="2">                      negatives<span class="op">$</span>seLogRr, </a>
-<a class="sourceLine" id="cb22-3" data-line-number="3">                      drugOfInterest<span class="op">$</span>logRr, </a>
-<a class="sourceLine" id="cb22-4" data-line-number="4">                      drugOfInterest<span class="op">$</span>seLogRr, </a>
-<a class="sourceLine" id="cb22-5" data-line-number="5">                      null,</a>
-<a class="sourceLine" id="cb22-6" data-line-number="6">                      <span class="dt">showCis =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="kw"><a href="../reference/plotCalibrationEffect.html">plotCalibrationEffect</a></span>(negatives<span class="op">$</span>logRr,</a>
+<a class="sourceLine" id="cb23-2" title="2">                      negatives<span class="op">$</span>seLogRr, </a>
+<a class="sourceLine" id="cb23-3" title="3">                      drugOfInterest<span class="op">$</span>logRr, </a>
+<a class="sourceLine" id="cb23-4" title="4">                      drugOfInterest<span class="op">$</span>seLogRr, </a>
+<a class="sourceLine" id="cb23-5" title="5">                      null,</a>
+<a class="sourceLine" id="cb23-6" title="6">                      <span class="dt">showCis =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
 <div id="references" class="section level1">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation</a></span>(<span class="st">"EmpiricalCalibration"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation</a></span>(<span class="st">"EmpiricalCalibration"</span>)</a></code></pre></div>
 <pre><code>## 
 ## To cite EmpiricalCalibration in publications use:
 ## 
-## Schuemie MJ, Ryan PB, DuMouchel W, Suchard MA and Madigan D
-## (2014). "Interpreting observational studies: why empirical
-## calibration is needed to correct p-values." _Statistics in
-## Medicine_, *33*(2), pp. 209-218. &lt;URL:
-## http://dx.doi.org/10.1002/sim.5925&gt;.
+## Schuemie MJ, Ryan PB, DuMouchel W, Suchard MA, Madigan D (2014).
+## "Interpreting observational studies: why empirical calibration is
+## needed to correct p-values." _Statistics in Medicine_, *33*(2),
+## 209-218. &lt;URL: http://dx.doi.org/10.1002/sim.5925&gt;.
 ## 
-## Schuemie MJ, Hripcsak G, Ryan PB, Madigan D and Suchard MA (2018).
+## Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA (2018).
 ## "Empirical confidence interval calibration for population-level
 ## effect estimation studies in observational healthcare data."
-## _Proc. Natl. Acad. Sci. U.S.A._, *115*(11), pp. 2571-2577. &lt;URL:
+## _Proc. Natl. Acad. Sci. U.S.A._, *115*(11), 2571-2577. &lt;URL:
 ## https://doi.org/10.1073/pnas.1708282114&gt;.
 ## 
 ## To see these entries in BibTeX format, use 'print(&lt;citation&gt;,
