@@ -1,10 +1,10 @@
-This update adds 1 one new plot and one bugfix (see NEWS)
+This update adds one important update to the confidence interval calibration algorithm (see NEWS)
 
 ---
 
 ## Test environments
-* Ubuntu 14.04.5 LTS (Travis), R 3.5.0
-* Windows 7, R 3.5.1
+* Ubuntu 14.04.5 LTS (Travis), R 3.6.0
+* Windows 7, R 3.6.0
 
 ## R CMD check results
 
