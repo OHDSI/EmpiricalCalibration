@@ -1,8 +1,8 @@
 Package: EmpiricalCalibration
 Type: Package
 Title: Routines for Performing Empirical Calibration of Observational Study Estimates
-Version: 2.0.0
-Date: 2019-07-08
+Version: 2.0.1
+Date: 2019-07-19
 Authors@R: c(
   person("Martijn", "Schuemie", , "schuemie@ohdsi.org", role = c("aut", "cre")),
   person("Marc", "Suchard", role = c("aut"))
