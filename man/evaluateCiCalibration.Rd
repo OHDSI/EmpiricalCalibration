@@ -4,9 +4,14 @@
 \alias{evaluateCiCalibration}
 \title{Evaluate confidence interval calibration}
 \usage{
-evaluateCiCalibration(logRr, seLogRr, trueLogRr,
+evaluateCiCalibration(
+  logRr,
+  seLogRr,
+  trueLogRr,
   strata = as.factor(trueLogRr),
-  crossValidationGroup = 1:length(logRr), legacy = FALSE)
+  crossValidationGroup = 1:length(logRr),
+  legacy = FALSE
+)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}

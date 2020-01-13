@@ -3,7 +3,6 @@
 \docType{package}
 \name{EmpiricalCalibration}
 \alias{EmpiricalCalibration}
-\alias{EmpiricalCalibration-package}
 \title{EmpiricalCalibration}
 \description{
 EmpiricalCalibration

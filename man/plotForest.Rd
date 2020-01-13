@@ -4,8 +4,14 @@
 \alias{plotForest}
 \title{Create a forest plot}
 \usage{
-plotForest(logRr, seLogRr, names, xLabel = "Relative risk", title,
-  fileName = NULL)
+plotForest(
+  logRr,
+  seLogRr,
+  names,
+  xLabel = "Relative risk",
+  title,
+  fileName = NULL
+)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale}

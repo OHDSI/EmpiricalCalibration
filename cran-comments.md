@@ -1,10 +1,10 @@
-This update adds one important update to the confidence interval calibration algorithm (see NEWS)
+This update provides one bugfix and one new feature (see NEWS)
 
 ---
 
 ## Test environments
-* Ubuntu 14.04.5 LTS (Travis), R 3.6.0
-* Windows 7, R 3.6.0
+* Ubuntu 14.04.5 LTS (Travis), R 3.6.2
+* Windows 7, R 3.6.1
 
 ## R CMD check results
 

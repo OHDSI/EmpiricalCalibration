@@ -4,8 +4,13 @@
 \alias{fitSystematicErrorModel}
 \title{Fit a systematic error model}
 \usage{
-fitSystematicErrorModel(logRr, seLogRr, trueLogRr,
-  estimateCovarianceMatrix = FALSE, legacy = FALSE)
+fitSystematicErrorModel(
+  logRr,
+  seLogRr,
+  trueLogRr,
+  estimateCovarianceMatrix = FALSE,
+  legacy = FALSE
+)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}

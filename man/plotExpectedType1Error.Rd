@@ -4,9 +4,18 @@
 \alias{plotExpectedType1Error}
 \title{Plot the expected type 1 error as a function of standard error}
 \usage{
-plotExpectedType1Error(logRrNegatives, seLogRrNegatives, seLogRrPositives,
-  alpha = 0.05, null = NULL, xLabel = "Relative risk", title,
-  showCis = FALSE, showEffectSizes = FALSE, fileName = NULL)
+plotExpectedType1Error(
+  logRrNegatives,
+  seLogRrNegatives,
+  seLogRrPositives,
+  alpha = 0.05,
+  null = NULL,
+  xLabel = "Relative risk",
+  title,
+  showCis = FALSE,
+  showEffectSizes = FALSE,
+  fileName = NULL
+)
 }
 \arguments{
 \item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log

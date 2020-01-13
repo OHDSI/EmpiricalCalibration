@@ -4,10 +4,18 @@
 \alias{plotCalibrationEffect}
 \title{Plot the effect of the calibration}
 \usage{
-plotCalibrationEffect(logRrNegatives, seLogRrNegatives,
-  logRrPositives = NULL, seLogRrPositives = NULL, null = NULL,
-  alpha = 0.05, xLabel = "Relative risk", title, showCis = FALSE,
-  fileName = NULL)
+plotCalibrationEffect(
+  logRrNegatives,
+  seLogRrNegatives,
+  logRrPositives = NULL,
+  seLogRrPositives = NULL,
+  null = NULL,
+  alpha = 0.05,
+  xLabel = "Relative risk",
+  title,
+  showCis = FALSE,
+  fileName = NULL
+)
 }
 \arguments{
 \item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log

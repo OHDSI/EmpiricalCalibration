@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Empirical calibration of confidence intervals • EmpiricalCalibration</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Empirical calibration of confidence intervals">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
@@ -30,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
       </span>
     </div>
 
@@ -38,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -67,7 +68,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/OHDSI/EmpiricalCalibration">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -80,13 +81,14 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Empirical calibration of confidence intervals</h1>
                         <h4 class="author">Martijn J. Schuemie, Marc A. Suchard</h4>
             
-            <h4 class="date">2019-06-17</h4>
+            <h4 class="date">2020-01-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/master/vignettes/EmpiricalCiCalibrationVignette.Rmd"><code>vignettes/EmpiricalCiCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalCiCalibrationVignette.Rmd</code></div>
@@ -102,25 +104,25 @@
 <p>The first is for the researcher to specify an assumption, for example to specify that systematic error doesn’t change as a function of true effect size. Although this is likely to be correct in many instances, if an estimation method is for example biased towards the null the assumption will be violated, and the calibrated confidence intervals will have a lower than nominal coverage.</p>
 <p>The second approach is to us positive controls to empirically derive how systematic error changes with true effect size. Since real positive controls are problematic, we typically generate synthetic positive controls by injection additional (simulated) outcomes on top of negative controls.</p>
 <p>In this document we use an example study to illustrate how CIs can be calibrated using the <code>EmpiricalCalibration</code> R package. In the example, we have replicated a previously published new-user cohort study comparing dabigatran to warfarin for the risk of GI bleeding. The study does not apply any adjustment for confounding.</p>
-<p>The results from this study are available in the package, and can be loaded using the <code><a href="https://www.rdocumentation.org/packages/utils/topics/data">data()</a></code> command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(southworthReplication)</a></code></pre></div>
+<p>The results from this study are available in the package, and can be loaded using the <code><a href="https://rdrr.io/r/utils/data.html">data()</a></code> command:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(southworthReplication)</span></code></pre></div>
 <p>The estimate for the outcome of interest can in this dataset be identified because <code>trueLogRr</code> is NA:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">outcomeOfInterest &lt;-<span class="st"> </span>southworthReplication[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(southworthReplication<span class="op">$</span>trueLogRr), ]</a>
-<a class="sourceLine" id="cb2-2" title="2">outcomeOfInterest</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>outcomeOfInterest &lt;-<span class="st"> </span>southworthReplication[<span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(southworthReplication<span class="op">$</span>trueLogRr), ]</span>
+<span id="cb2-2"><a href="#cb2-2"></a>outcomeOfInterest</span></code></pre></div>
 <pre><code>##   outcomeName trueLogRr      logRr    seLogRr
 ## 1     GiBleed        NA -0.3575234 0.06668903</code></pre>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw"><a href="../reference/computeTraditionalCi.html">computeTraditionalCi</a></span>(outcomeOfInterest<span class="op">$</span>logRr, outcomeOfInterest<span class="op">$</span>seLogRr)</a></code></pre></div>
-<pre><code>##        rr        lb        ub 
-## 0.6994063 0.6137108 0.7970680</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw"><a href="../reference/computeTraditionalCi.html">computeTraditionalCi</a></span>(outcomeOfInterest<span class="op">$</span>logRr, outcomeOfInterest<span class="op">$</span>seLogRr)</span></code></pre></div>
+<pre><code>##          rr        lb       ub
+## 1 0.6994063 0.6137108 0.797068</code></pre>
 <p>Here we see that the effect estimate for GI bleed for dabigatran versus warfarin is 0.7, with a very tight CI.</p>
 </div>
 <div id="negative-controls" class="section level1">
 <h1 class="hasAnchor">
 <a href="#negative-controls" class="anchor"></a>Negative controls</h1>
 <p>Negative controls are drug-outcome pairs where we believe the drug does not cause (or prevent) the outcome. In other words, we believe the true effect size to be a relative risk of 1. We would prefer our negative controls to have some resemblance with out hypothesis of interest (in our example dabigatran vs warfarin and GI bleed), and we therefore typically pick negative controls where the outcome is the same (exposure controls), or the exposure is the same (outcome controls). In this example, we have opted for outcome controls, and have identified a set of outcomes not believed to be caused by either dabigatran or warfarin. We have executed exactly the same analysis for these outcomes, resulting in a set of effect size estimates, one per negative control:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">negatives &lt;-<span class="st"> </span>southworthReplication[southworthReplication<span class="op">$</span>trueLogRr <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span></a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="st">                                     </span><span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(southworthReplication<span class="op">$</span>trueLogRr), ]</a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(negatives)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>negatives &lt;-<span class="st"> </span>southworthReplication[southworthReplication<span class="op">$</span>trueLogRr <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="st">                                     </span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(southworthReplication<span class="op">$</span>trueLogRr), ]</span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(negatives)</span></code></pre></div>
 <pre><code>##                         outcomeName trueLogRr       logRr    seLogRr
 ## 4                         Neck pain         0 -0.10015508 0.05005106
 ## 6                Curvature of spine         0  0.01854604 0.08024194
@@ -133,10 +135,10 @@
 <h1 class="hasAnchor">
 <a href="#positive-controls" class="anchor"></a>Positive controls</h1>
 <p>Positive controls are drug-outcome pairs where we believe the drug does cause (or prevent) the outcome. In this case we have generated synthetic positive controls with various true effect sizes. Similar to the negative controls we have executed exactly the same analysis for these outcomes, resulting in a set of effect size estimates, one per positive control:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(southworthReplication)</a>
-<a class="sourceLine" id="cb8-2" title="2">positives &lt;-<span class="st"> </span>southworthReplication[southworthReplication<span class="op">$</span>trueLogRr <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span></a>
-<a class="sourceLine" id="cb8-3" title="3"><span class="st">                                     </span><span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(southworthReplication<span class="op">$</span>trueLogRr), ]</a>
-<a class="sourceLine" id="cb8-4" title="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(positives)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(southworthReplication)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>positives &lt;-<span class="st"> </span>southworthReplication[southworthReplication<span class="op">$</span>trueLogRr <span class="op">!=</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="st">                                     </span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(southworthReplication<span class="op">$</span>trueLogRr), ]</span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(positives)</span></code></pre></div>
 <pre><code>##          outcomeName trueLogRr     logRr    seLogRr
 ## 2          Neck pain 1.3862944 1.1466961 0.03324708
 ## 3          Neck pain 0.6931472 0.5539283 0.03959980
@@ -148,13 +150,8 @@
 <h2 class="hasAnchor">
 <a href="#plot-control-effect-sizes" class="anchor"></a>Plot control effect sizes</h2>
 <p>We can start by creating a forest plot of our controls:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">controls &lt;-<span class="st"> </span>southworthReplication[<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(southworthReplication<span class="op">$</span>trueLogRr), ]</a>
-<a class="sourceLine" id="cb10-2" title="2"><span class="kw"><a href="../reference/plotTrueAndObserved.html">plotTrueAndObserved</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</a></code></pre></div>
-<pre><code>## Registered S3 methods overwritten by 'ggplot2':
-##   method         from 
-##   [.quosures     rlang
-##   c.quosures     rlang
-##   print.quosures rlang</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>controls &lt;-<span class="st"> </span>southworthReplication[<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(southworthReplication<span class="op">$</span>trueLogRr), ]</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="kw"><a href="../reference/plotTrueAndObserved.html">plotTrueAndObserved</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</span></code></pre></div>
 <p><img src="EmpiricalCiCalibrationVignette_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 <p>The thick black lines indicate the true effect size, and the blue and orange dots and lines represent the effect size estimate and 95% confidence intervals of the controls. We see that many controls have a confidence interval that does not include the true effect size (orange lines), certainly more than the expected 5%. This indicates the analysis has systematic error.</p>
 </div>
@@ -166,37 +163,37 @@
 <h2 class="hasAnchor">
 <a href="#fitting-the-empirical-null-and-specifying-an-assumption" class="anchor"></a>Fitting the empirical null, and specifying an assumption</h2>
 <p>If we only have negative controls and no positive controls, we might still want to calibrate CIs. This requires us to make an assumption how systematic error changes as a function of the true effect size. The most obvious (and therefore default) assumption is that the systematic error does not change as a function of true effect size. We can fit the empirical null distribution, and convert it to a systematic error model:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">null &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitNull.html">fitNull</a></span>(negatives<span class="op">$</span>logRr, negatives<span class="op">$</span>seLogRr)</a>
-<a class="sourceLine" id="cb12-2" title="2">model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/convertNullToErrorModel.html">convertNullToErrorModel</a></span>(null)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>null &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitNull.html">fitNull</a></span>(negatives<span class="op">$</span>logRr, negatives<span class="op">$</span>seLogRr)</span>
+<span id="cb11-2"><a href="#cb11-2"></a>model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/convertNullToErrorModel.html">convertNullToErrorModel</a></span>(null)</span></code></pre></div>
 <p>See <code><a href="../reference/convertNullToErrorModel.html">?convertNullToErrorModel</a></code> for how to use a different assumption.</p>
 </div>
 <div id="fitting-the-systematic-error-model-using-positive-controls" class="section level2">
 <h2 class="hasAnchor">
 <a href="#fitting-the-systematic-error-model-using-positive-controls" class="anchor"></a>Fitting the systematic error model using positive controls</h2>
 <p>If we do have positive controls, like in this example, we do not have to make an assumption, but instead can estimate the full systematic error model using the estimates for both negative and positive controls:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitSystematicErrorModel.html">fitSystematicErrorModel</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</a>
-<a class="sourceLine" id="cb13-2" title="2">model</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/fitSystematicErrorModel.html">fitSystematicErrorModel</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>model</span></code></pre></div>
 <pre><code>## meanIntercept     meanSlope   sdIntercept       sdSlope 
 ##  -0.066550795   0.933292141   0.187468405   0.002979502 
 ## attr(,"class")
 ## [1] "systematicErrorModel"</code></pre>
 <p>We see that the intercept of the mean (<code>meanIntercept</code>) is slightly lower than 0, indicating the analysis is negatively biased when the null is true. Also note that the slope for the mean (<code>meanSlope</code>) is slightly lower than 1, meaning that the method appears to be somewhat biased towards the null; the negative bias tends to become larger as the true effect size increases.</p>
 <p>We can also visualize the model:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw"><a href="../reference/plotErrorModel.html">plotErrorModel</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw"><a href="../reference/plotErrorModel.html">plotErrorModel</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</span></code></pre></div>
 <p><img src="EmpiricalCiCalibrationVignette_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>Here we see how systematic error changes as a function of the true effect size. As visible, the model assumes the mean and standard deviation (SD) of the error distribution are linearly related to the true effect size. For this plot, the mean and SD are also estimated at each true effect size independently, allowing us to evaluate whether the linearity assumption is far off.</p>
 <p>There is also another way to plot the error model, and its subsequent calibration:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="kw"><a href="../reference/plotCiCalibrationEffect.html">plotCiCalibrationEffect</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw"><a href="../reference/plotCiCalibrationEffect.html">plotCiCalibrationEffect</a></span>(controls<span class="op">$</span>logRr, controls<span class="op">$</span>seLogRr, controls<span class="op">$</span>trueLogRr)</span></code></pre></div>
 <p><img src="EmpiricalCiCalibrationVignette_files/figure-html/unnamed-chunk-10-1.png" width="100%"></p>
 </div>
 <div id="evaluating-the-calibration" class="section level2">
 <h2 class="hasAnchor">
 <a href="#evaluating-the-calibration" class="anchor"></a>Evaluating the calibration</h2>
 <p>To evaluate whether our estimation of the systematic error distribution is a good one, we can test whether the calibrated CI is truly calibrated, meaning the fraction of controls where truth is inside the calibrated CI is approximately the specified width of the CI. We also evaluate ‘centeredness’, whether truth outside of the CI is equally distributed above and below the CI:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw"><a href="../reference/plotCiCoverage.html">plotCiCoverage</a></span>(controls<span class="op">$</span>logRr,</a>
-<a class="sourceLine" id="cb17-2" title="2">               controls<span class="op">$</span>seLogRr,</a>
-<a class="sourceLine" id="cb17-3" title="3">               controls<span class="op">$</span>trueLogRr,</a>
-<a class="sourceLine" id="cb17-4" title="4">               <span class="dt">crossValidationGroup =</span> controls<span class="op">$</span>outcomeName)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw"><a href="../reference/plotCiCoverage.html">plotCiCoverage</a></span>(controls<span class="op">$</span>logRr,</span>
+<span id="cb16-2"><a href="#cb16-2"></a>               controls<span class="op">$</span>seLogRr,</span>
+<span id="cb16-3"><a href="#cb16-3"></a>               controls<span class="op">$</span>trueLogRr,</span>
+<span id="cb16-4"><a href="#cb16-4"></a>               <span class="dt">crossValidationGroup =</span> controls<span class="op">$</span>outcomeName)</span></code></pre></div>
 <pre><code>## Fitting error models within leave-one-out cross-validation</code></pre>
 <p><img src="EmpiricalCiCalibrationVignette_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <p>The data shown here is produced using a leave-one-out cross-validation. It is important to remember that for this dataset positive controls were generated based on negative controls and will therefore be correlated. To perform an unbiased evaluation the ‘one’ in the leave-one-out should therefore be the group of a negative control <em>and</em> its derived positive controls, and this is achieved by specifying the <code>crossValidationGroup</code> argument. Thus, in this evaluation for each negative control and the positive controls derived from that negative control, we fit systematic error models using all other controls, and compute calibrated CIs for the left-out controls across a wide range of widths.</p>
@@ -210,11 +207,11 @@
 <h2 class="hasAnchor">
 <a href="#calibrating-the-confidence-interval" class="anchor"></a>Calibrating the confidence interval</h2>
 <p>We can now use the estimated systematic error model to compute the calibrated CI for our outcome of interest:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">ci &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calibrateConfidenceInterval.html">calibrateConfidenceInterval</a></span>(outcomeOfInterest<span class="op">$</span>logRr, outcomeOfInterest<span class="op">$</span>seLogRr, model)</a>
-<a class="sourceLine" id="cb19-2" title="2">ci</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>ci &lt;-<span class="st"> </span><span class="kw"><a href="../reference/calibrateConfidenceInterval.html">calibrateConfidenceInterval</a></span>(outcomeOfInterest<span class="op">$</span>logRr, outcomeOfInterest<span class="op">$</span>seLogRr, model)</span>
+<span id="cb18-2"><a href="#cb18-2"></a>ci</span></code></pre></div>
 <pre><code>##        logRr logLb95Rr logUb95Rr   seLogRr
 ## 1 -0.3117702 -0.733957 0.1067054 0.2144587</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(ci[,<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(ci[,<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>])</span></code></pre></div>
 <pre><code>##       logRr logLb95Rr logUb95Rr
 ## 1 0.7321498 0.4800058  1.112606</code></pre>
 <p>In this case, even though the point estimate has not changed much, the calibrated CI is much wider than the uncalibrated one to take in to account the residual error due to lack of any adjustment for confounding.</p>
@@ -223,7 +220,7 @@
 <div id="references" class="section level1">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/citation">citation</a></span>(<span class="st">"EmpiricalCalibration"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw"><a href="https://rdrr.io/r/utils/citation.html">citation</a></span>(<span class="st">"EmpiricalCalibration"</span>)</span></code></pre></div>
 <pre><code>## 
 ## To cite EmpiricalCalibration in publications use:
 ## 
@@ -233,9 +230,9 @@
 ## 209-218. &lt;URL: http://dx.doi.org/10.1002/sim.5925&gt;.
 ## 
 ## Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA (2018).
-## "Empirical confidence interval calibration for population-level
-## effect estimation studies in observational healthcare data."
-## _Proc. Natl. Acad. Sci. U.S.A._, *115*(11), 2571-2577. &lt;URL:
+## "Empirical confidence interval calibration for population-level effect
+## estimation studies in observational healthcare data." _Proc. Natl.
+## Acad. Sci. U.S.A._, *115*(11), 2571-2577. &lt;URL:
 ## https://doi.org/10.1073/pnas.1708282114&gt;.
 ## 
 ## To see these entries in BibTeX format, use 'print(&lt;citation&gt;,
@@ -245,6 +242,7 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -276,17 +274,20 @@
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Martijn Schuemie, Marc Suchard.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

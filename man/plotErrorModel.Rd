@@ -4,8 +4,14 @@
 \alias{plotErrorModel}
 \title{Plot the systematic error model}
 \usage{
-plotErrorModel(logRr, seLogRr, trueLogRr, title, legacy = FALSE,
-  fileName = NULL)
+plotErrorModel(
+  logRr,
+  seLogRr,
+  trueLogRr,
+  title,
+  legacy = FALSE,
+  fileName = NULL
+)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}

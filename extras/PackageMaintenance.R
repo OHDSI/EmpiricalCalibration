@@ -1,6 +1,6 @@
 # @file PackageMaintenance
 #
-# Copyright 2019 Observational Health Data Sciences and Informatics
+# Copyright 2020 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
 # 
@@ -22,7 +22,7 @@ OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
 OhdsiRTools::updateCopyrightYearFolder()
 
 # Create manual and vignettes:
-shell("rm extras/EmpiricalCalibration.pdf")
+unlink("extras/EmpiricalCalibration.pdf")
 shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
 
 rmarkdown::render("vignettes/EmpiricalPCalibrationVignette.Rmd",

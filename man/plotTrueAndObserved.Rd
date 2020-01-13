@@ -4,8 +4,14 @@
 \alias{plotTrueAndObserved}
 \title{Plot true and observed values}
 \usage{
-plotTrueAndObserved(logRr, seLogRr, trueLogRr, xLabel = "Relative risk",
-  title, fileName = NULL)
+plotTrueAndObserved(
+  logRr,
+  seLogRr,
+  trueLogRr,
+  xLabel = "Relative risk",
+  title,
+  fileName = NULL
+)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}

@@ -27,4 +27,4 @@ Suggests:
 License: Apache License 2.0
 URL: https://ohdsi.github.io/EmpiricalCalibration, https://github.com/OHDSI/EmpiricalCalibration
 BugReports: https://github.com/OHDSI/EmpiricalCalibration/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

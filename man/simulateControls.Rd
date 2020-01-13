@@ -4,8 +4,13 @@
 \alias{simulateControls}
 \title{Simulate (negative) controls}
 \usage{
-simulateControls(n = 50, mean = 0, sd = 0.1, seLogRr = runif(n, min
-  = 0.01, max = 0.2), trueLogRr = 0)
+simulateControls(
+  n = 50,
+  mean = 0,
+  sd = 0.1,
+  seLogRr = runif(n, min = 0.01, max = 0.2),
+  trueLogRr = 0
+)
 }
 \arguments{
 \item{n}{Number of controls to simulate.}

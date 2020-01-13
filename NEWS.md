@@ -1,6 +1,10 @@
 EmpiricalCalibration 2.0.1
 ==========================
 
+NEW FEATURES
+
+* computeTraditionalCi now outputs data frame instead of vector.
+
 BIG FIXES
 
 * convertNullToErrorModel function now adheres to new systematic error model (SD no longer on log scale).

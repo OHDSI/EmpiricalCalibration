@@ -1,6 +1,6 @@
 # @file ConfidenceIntervalCalibration.R
 #
-# Copyright 2019 Observational Health Data Sciences and Informatics
+# Copyright 2020 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
 # 
@@ -341,9 +341,9 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
 #'
 #' @export
 computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
-  return(c(rr = exp(logRr), 
-           lb = exp(logRr + qnorm((1 - ciWidth)/2)*seLogRr), 
-           ub = exp(logRr - qnorm((1 - ciWidth)/2)*seLogRr)))
+  return(data.frame(rr = exp(logRr), 
+                    lb = exp(logRr + qnorm((1 - ciWidth)/2)*seLogRr), 
+                    ub = exp(logRr - qnorm((1 - ciWidth)/2)*seLogRr)))
 }
 
 #' Convert empirical null distribution to systematic error model

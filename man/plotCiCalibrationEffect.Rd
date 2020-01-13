@@ -4,8 +4,16 @@
 \alias{plotCiCalibrationEffect}
 \title{Plot true and observed values}
 \usage{
-plotCiCalibrationEffect(logRr, seLogRr, trueLogRr, legacy = FALSE,
-  model = NULL, xLabel = "Relative risk", title, fileName = NULL)
+plotCiCalibrationEffect(
+  logRr,
+  seLogRr,
+  trueLogRr,
+  legacy = FALSE,
+  model = NULL,
+  xLabel = "Relative risk",
+  title,
+  fileName = NULL
+)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}

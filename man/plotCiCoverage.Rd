@@ -4,9 +4,18 @@
 \alias{plotCiCoverage}
 \title{Create a confidence interval coverage plot}
 \usage{
-plotCiCoverage(logRr, seLogRr, trueLogRr, strata = as.factor(trueLogRr),
-  crossValidationGroup = 1:length(logRr), legacy = FALSE, evaluation,
-  legendPosition = "top", title, fileName = NULL)
+plotCiCoverage(
+  logRr,
+  seLogRr,
+  trueLogRr,
+  strata = as.factor(trueLogRr),
+  crossValidationGroup = 1:length(logRr),
+  legacy = FALSE,
+  evaluation,
+  legendPosition = "top",
+  title,
+  fileName = NULL
+)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}

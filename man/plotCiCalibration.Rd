@@ -4,10 +4,18 @@
 \alias{plotCiCalibration}
 \title{Create a confidence interval calibration plot}
 \usage{
-plotCiCalibration(logRr, seLogRr, trueLogRr,
+plotCiCalibration(
+  logRr,
+  seLogRr,
+  trueLogRr,
   strata = as.factor(trueLogRr),
-  crossValidationGroup = 1:length(logRr), legacy = FALSE, evaluation,
-  legendPosition = "top", title, fileName = NULL)
+  crossValidationGroup = 1:length(logRr),
+  legacy = FALSE,
+  evaluation,
+  legendPosition = "top",
+  title,
+  fileName = NULL
+)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
