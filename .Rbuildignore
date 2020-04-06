@@ -2,7 +2,6 @@
 extras
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\R\Temp*
 ^\.travis\.yml$
 ^deploy.sh$
 ^cran-comments.md$

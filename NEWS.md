@@ -5,6 +5,10 @@ Changes
 
 1. Center title on all plots.
 
+Bugfixes
+
+1. Fix build fail in R 4.0.0.
+
 
 EmpiricalCalibration 2.0.1
 ==========================
