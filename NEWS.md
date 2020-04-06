@@ -1,89 +1,102 @@
+EmpiricalCalibration 2.0.2
+==========================
+
+Changes
+
+1. Center title on all plots.
+
+
 EmpiricalCalibration 2.0.1
 ==========================
 
-NEW FEATURES
+Changes
 
-* computeTraditionalCi now outputs data frame instead of vector.
+1. computeTraditionalCi now outputs data frame instead of vector.
 
-BIG FIXES
+Bugfixes
 
-* convertNullToErrorModel function now adheres to new systematic error model (SD no longer on log scale).
+1. convertNullToErrorModel function now adheres to new systematic error model (SD no longer on log scale).
+
 
 EmpiricalCalibration 2.0.0
 ==========================
 
-NEW FEATURES
+Changes
 
-* Adding new method for fitting systematic error models that drops the assumption that SD is linear in the log scale, but rather just linear (in the logRr space). Setting that to default, but allowing users to use legacy model if they choose.
+1. Adding new method for fitting systematic error models that drops the assumption that SD is linear in the log scale, but rather just linear (in the logRr space). Setting that to default, but allowing users to use legacy model if they choose.
+
 
 EmpiricalCalibration 1.4.1
 ==========================
 
-NEW FEATURES
+Changes
 
-* Added convertNullToErrorModel function to allow confidence interval calibration using only negative controls (requiring the user to make some assumptions).
+1. Added convertNullToErrorModel function to allow confidence interval calibration using only negative controls (requiring the user to make some assumptions).
+
 
 EmpiricalCalibration 1.4.0
 ==========================
 
-NEW FEATURES
+Changes
 
-* Added plot showing effec of confidence interval calibration, similar to p-value plot.
+1. Added plot showing effec of confidence interval calibration, similar to p-value plot.
 
-BUG FIXES
+Bugfixes
 
-* Fixed 'unknown aesthetics' warning when calling plotTrueAndObserved.
+2. Fixed 'unknown aesthetics' warning when calling plotTrueAndObserved.
+
 
 EmpiricalCalibration 1.3.6
 ==========================
 
-NEW FEATURES
+Changes
 
-* Added plots showing expected type 1 error given an estimated empirical null distribution.
+1. Added plots showing expected type 1 error given an estimated empirical null distribution.
 
-* Closed form solution for RR vs SE plot for faster computation (especially when plotting credible intervals).
+2. Closed form solution for RR vs SE plot for faster computation (especially when plotting credible intervals).
 
-BUG FIXES
+Bugfixes
 
-* Several improvements of the robustness of fitting systematic error models.
+1. Several improvements of the robustness of fitting systematic error models.
+
 
 EmpiricalCalibration 1.3.1
 ===========================
 
-NEW FEATURES
+Changes
 
-* Confidence interval calibration model StdDev transformed to log scale to prevent negative StdDev.
+1. Confidence interval calibration model StdDev transformed to log scale to prevent negative StdDev.
 
-* Confidence interval calibration cross-validation now allows specification of leave-out groups.
+2. Confidence interval calibration cross-validation now allows specification of leave-out groups.
 
-* various new plots for evaluating confidence interval calibration.
+3. various new plots for evaluating confidence interval calibration.
 
-* Added confidence interval calibration vignette.
+4. Added confidence interval calibration vignette.
 
-* Added example data for confidence interval calibration
+5. Added example data for confidence interval calibration
 
-BUG FIXES
+Bugfixes
 
-* None
+1. None
 
 
 EmpiricalCalibration 1.2.0
 ==========================
 
-NEW FEATURES
+Changes
 
-* Ability to add credible intervals to calibration effect plot
+1. Ability to add credible intervals to calibration effect plot
 
-* Plot CI calibration (using leave-one-out cross-validation)
+2. Plot CI calibration (using leave-one-out cross-validation)
 
-BUG FIXES
+Bugfixes
 
-* Fixed vignette name in index
+1. Fixed vignette name in index
 
-* Removed coverage plot (moved to MethodEvaluation package)
+2. Removed coverage plot (moved to MethodEvaluation package)
 
 
 EmpiricalCalibration 1.1.0
 ==========================
 
-Changes: initial submission to CRAN
+Initial submission to CRAN

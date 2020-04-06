@@ -81,6 +81,7 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", title, f
                      axis.title.x = ggplot2::element_blank(), 
                      axis.text.y = themeRA, 
                      axis.text.x = theme, 
+                     plot.title = ggplot2::element_text(hjust = 0.5),
                      legend.key = ggplot2::element_blank(), 
                      strip.text.x = theme, 
                      strip.background = ggplot2::element_blank(), 
@@ -231,6 +232,7 @@ plotCalibrationEffect <- function(logRrNegatives,
                    axis.text.y = themeRA,
                    axis.text.x = theme,
                    legend.key = ggplot2::element_blank(),
+                   plot.title = ggplot2::element_text(hjust = 0.5),
                    strip.text.x = theme,
                    strip.background = ggplot2::element_blank(),
                    legend.position = "none")
@@ -366,6 +368,7 @@ plotCalibration <- function(logRr,
       ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
                      panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
                      panel.grid.major = ggplot2::element_blank(), 
+                     plot.title = ggplot2::element_text(hjust = 0.5),
                      axis.ticks = ggplot2::element_blank(), 
                      axis.text.y = themeRA, 
                      axis.text.x = theme, 
@@ -475,6 +478,7 @@ plotCiCalibration <- function(logRr,
                      axis.ticks = ggplot2::element_blank(), 
                      axis.text.y = themeRA, 
                      axis.text.x = theme, 
+                     plot.title = ggplot2::element_text(hjust = 0.5),
                      strip.text.x = theme, 
                      strip.background = ggplot2::element_blank(), 
                      legend.position = legendPosition)
@@ -561,6 +565,7 @@ plotTrueAndObserved <- function(logRr,
                      axis.title.y = ggplot2::element_blank(), 
                      axis.title.x = ggplot2::element_blank(), 
                      axis.text.y = ggplot2::element_blank(), 
+                     plot.title = ggplot2::element_text(hjust = 0.5),
                      axis.text.x = theme, legend.key = ggplot2::element_blank(), 
                      strip.text.y = ggplot2::element_blank(), 
                      strip.background = ggplot2::element_blank(), 
@@ -704,6 +709,7 @@ plotCiCoverage <- function(logRr,
                      axis.ticks = ggplot2::element_blank(),
                      axis.text.y = themeRA,
                      axis.text.x = theme,
+                     plot.title = ggplot2::element_text(hjust = 0.5),
                      strip.text.x = theme,
                      strip.text.y = theme,
                      strip.background = ggplot2::element_blank(),
@@ -804,6 +810,7 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, legacy = FALSE, fil
                      panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
                      panel.grid.major = ggplot2::element_blank(),
                      axis.ticks = ggplot2::element_blank(),
+                     plot.title = ggplot2::element_text(hjust = 0.5),
                      legend.position = "none")
   })
   if (!missing(title)) {
@@ -947,13 +954,13 @@ plotExpectedType1Error <- function(logRrNegatives,
   if (is(null, "null")) {
     mean <- null[1]
     sd <- sqrt(se^2 + null[2]^2) 
-    type1Error <- pnorm(qnorm(1-alpha/2, 0, se), mean, sd, lower.tail = FALSE) + 
+    type1Error <- pnorm(qnorm(1 - alpha/2, 0, se), mean, sd, lower.tail = FALSE) + 
       pnorm(qnorm(alpha/2, 0, se), mean, sd, lower.tail = TRUE)
   } else {
     computeExpected <- function(se, chain) {
       mean <- chain[, 1]
       sd <- sqrt(se^2 + (1/sqrt(chain[, 2]))^2) 
-      type1Error <- pnorm(qnorm(1-alpha/2, 0, se), mean, sd, lower.tail = FALSE) + 
+      type1Error <- pnorm(qnorm(1 - alpha/2, 0, se), mean, sd, lower.tail = FALSE) + 
         pnorm(qnorm(alpha/2, 0, se), mean, sd, lower.tail = TRUE)
       return(quantile(type1Error, c(0.025, 0.5, 0.975)))
     }
@@ -1011,6 +1018,7 @@ plotExpectedType1Error <- function(logRrNegatives,
                    axis.text.y = themeRA,
                    axis.text.x = theme,
                    legend.key = ggplot2::element_blank(),
+                   plot.title = ggplot2::element_text(hjust = 0.5),
                    strip.text.x = theme,
                    strip.background = ggplot2::element_blank(),
                    legend.position = "none")
@@ -1176,11 +1184,13 @@ plotCiCalibrationEffect <- function(logRr,
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
           panel.background = ggplot2::element_blank(),
           panel.grid.major = ggplot2::element_blank(),
+          plot.title = element_text(hjust = 0.5),
           axis.ticks = ggplot2::element_blank(),
           axis.text.y = themeRA,
           axis.text.x = theme,
           axis.title = theme,
           legend.key = ggplot2::element_blank(),
+          plot.title = ggplot2::element_text(hjust = 0.5),
           strip.text.x = theme,
           strip.text.y = theme,
           strip.background = ggplot2::element_blank(),

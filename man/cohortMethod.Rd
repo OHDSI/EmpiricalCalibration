@@ -4,10 +4,12 @@
 \name{cohortMethod}
 \alias{cohortMethod}
 \title{Relative risks from a new-user cohort design}
-\format{A data frame with 31 rows and 4 variables: \describe{ \item{drugName}{Name of the drug}
+\format{
+A data frame with 31 rows and 4 variables: \describe{ \item{drugName}{Name of the drug}
 \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control} \item{logRr}{The log
 of the incidence rate ratio} \item{seLogRr}{The standard error of the log of the incidence rate
-ratio} }}
+ratio} }
+}
 \usage{
 data(cohortMethod)
 }

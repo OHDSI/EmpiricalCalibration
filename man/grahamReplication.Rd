@@ -4,10 +4,12 @@
 \name{grahamReplication}
 \alias{grahamReplication}
 \title{Relative risks from an adjusted new-user cohort design}
-\format{A data frame with 126 rows and 4 variables: \describe{ \item{outcomeName}{Name of the outcome}
+\format{
+A data frame with 126 rows and 4 variables: \describe{ \item{outcomeName}{Name of the outcome}
 \item{trueLogRr}{The log of the true effect size. Only provided for negative and positive controls, 
 is NA for the outcome of interest (GI bleeding).} \item{logRr}{The log of the incidence rate ratio} \item{seLogRr}{
-The standard error of the log of the incidence rate ratio} }}
+The standard error of the log of the incidence rate ratio} }
+}
 \usage{
 data(grahamReplication)
 }
