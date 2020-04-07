@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -53,7 +57,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -67,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
       </span>
     </div>
 
@@ -103,7 +107,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/OHDSI/EmpiricalCalibration">
+  <a href="https://github.com/OHDSI/EmpiricalCalibration/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -121,122 +125,125 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
+      <h1 data-toc-skip>Changelog <small></small></h1>
       <small>Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="empiricalcalibration-201" class="section level1">
-<h1 class="page-header">
-<a href="#empiricalcalibration-201" class="anchor"></a>EmpiricalCalibration 2.0.1<small> Unreleased </small>
+    <div id="empiricalcalibration-202" class="section level1">
+<h1 class="page-header" data-toc-text="2.0.2">
+<a href="#empiricalcalibration-202" class="anchor"></a>EmpiricalCalibration 2.0.2<small> Unreleased </small>
 </h1>
-<p>NEW FEATURES</p>
-<ul>
+<p>Changes</p>
+<ol>
+<li>Center title on all plots.</li>
+</ol>
+<p>Bugfixes</p>
+<ol>
+<li>Fix build fail in R 4.0.0.</li>
+</ol>
+</div>
+    <div id="empiricalcalibration-201" class="section level1">
+<h1 class="page-header" data-toc-text="2.0.1">
+<a href="#empiricalcalibration-201" class="anchor"></a>EmpiricalCalibration 2.0.1<small> 2020-01-13 </small>
+</h1>
+<p>Changes</p>
+<ol>
 <li>computeTraditionalCi now outputs data frame instead of vector.</li>
-</ul>
-<p>BIG FIXES</p>
-<ul>
+</ol>
+<p>Bugfixes</p>
+<ol>
 <li>convertNullToErrorModel function now adheres to new systematic error model (SD no longer on log scale).</li>
-</ul>
+</ol>
 </div>
     <div id="empiricalcalibration-200" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.0.0">
 <a href="#empiricalcalibration-200" class="anchor"></a>EmpiricalCalibration 2.0.0<small> 2019-07-08 </small>
 </h1>
-<p>NEW FEATURES</p>
-<ul>
+<p>Changes</p>
+<ol>
 <li>Adding new method for fitting systematic error models that drops the assumption that SD is linear in the log scale, but rather just linear (in the logRr space). Setting that to default, but allowing users to use legacy model if they choose.</li>
-</ul>
+</ol>
 </div>
     <div id="empiricalcalibration-141" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.1">
 <a href="#empiricalcalibration-141" class="anchor"></a>EmpiricalCalibration 1.4.1<small> Unreleased </small>
 </h1>
-<p>NEW FEATURES</p>
-<ul>
+<p>Changes</p>
+<ol>
 <li>Added convertNullToErrorModel function to allow confidence interval calibration using only negative controls (requiring the user to make some assumptions).</li>
-</ul>
+</ol>
 </div>
     <div id="empiricalcalibration-140" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.0">
 <a href="#empiricalcalibration-140" class="anchor"></a>EmpiricalCalibration 1.4.0<small> 2018-11-24 </small>
 </h1>
-<p>NEW FEATURES</p>
-<ul>
+<p>Changes</p>
+<ol>
 <li>Added plot showing effec of confidence interval calibration, similar to p-value plot.</li>
-</ul>
-<p>BUG FIXES</p>
-<ul>
-<li>Fixed ‘unknown aesthetics’ warning when calling plotTrueAndObserved.</li>
-</ul>
+</ol>
+<p>Bugfixes</p>
+<ol>
+<li>Fixed âunknown aestheticsâ warning when calling plotTrueAndObserved.</li>
+</ol>
 </div>
     <div id="empiricalcalibration-136" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.3.6">
 <a href="#empiricalcalibration-136" class="anchor"></a>EmpiricalCalibration 1.3.6<small> 2017-11-07 </small>
 </h1>
-<p>NEW FEATURES</p>
-<ul>
+<p>Changes</p>
+<ol>
 <li><p>Added plots showing expected type 1 error given an estimated empirical null distribution.</p></li>
 <li><p>Closed form solution for RR vs SE plot for faster computation (especially when plotting credible intervals).</p></li>
-</ul>
-<p>BUG FIXES</p>
-<ul>
+</ol>
+<p>Bugfixes</p>
+<ol>
 <li>Several improvements of the robustness of fitting systematic error models.</li>
-</ul>
+</ol>
 </div>
     <div id="empiricalcalibration-131" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.3.1">
 <a href="#empiricalcalibration-131" class="anchor"></a>EmpiricalCalibration 1.3.1<small> 2017-05-16 </small>
 </h1>
-<p>NEW FEATURES</p>
-<ul>
+<p>Changes</p>
+<ol>
 <li><p>Confidence interval calibration model StdDev transformed to log scale to prevent negative StdDev.</p></li>
 <li><p>Confidence interval calibration cross-validation now allows specification of leave-out groups.</p></li>
 <li><p>various new plots for evaluating confidence interval calibration.</p></li>
 <li><p>Added confidence interval calibration vignette.</p></li>
 <li><p>Added example data for confidence interval calibration</p></li>
-</ul>
-<p>BUG FIXES</p>
-<ul>
+</ol>
+<p>Bugfixes</p>
+<ol>
 <li>None</li>
-</ul>
+</ol>
 </div>
     <div id="empiricalcalibration-120" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.2.0">
 <a href="#empiricalcalibration-120" class="anchor"></a>EmpiricalCalibration 1.2.0<small> 2016-08-16 </small>
 </h1>
-<p>NEW FEATURES</p>
-<ul>
+<p>Changes</p>
+<ol>
 <li><p>Ability to add credible intervals to calibration effect plot</p></li>
 <li><p>Plot CI calibration (using leave-one-out cross-validation)</p></li>
-</ul>
-<p>BUG FIXES</p>
-<ul>
+</ol>
+<p>Bugfixes</p>
+<ol>
 <li><p>Fixed vignette name in index</p></li>
 <li><p>Removed coverage plot (moved to MethodEvaluation package)</p></li>
-</ul>
+</ol>
 </div>
     <div id="empiricalcalibration-110" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.1.0">
 <a href="#empiricalcalibration-110" class="anchor"></a>EmpiricalCalibration 1.1.0<small> 2016-02-15 </small>
 </h1>
-<p>Changes: initial submission to CRAN</p>
+<p>Initial submission to CRAN</p>
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#empiricalcalibration-201">2.0.1</a></li>
-        <li><a href="#empiricalcalibration-200">2.0.0</a></li>
-        <li><a href="#empiricalcalibration-141">1.4.1</a></li>
-        <li><a href="#empiricalcalibration-140">1.4.0</a></li>
-        <li><a href="#empiricalcalibration-136">1.3.6</a></li>
-        <li><a href="#empiricalcalibration-131">1.3.1</a></li>
-        <li><a href="#empiricalcalibration-120">1.2.0</a></li>
-        <li><a href="#empiricalcalibration-110">1.1.0</a></li>
-      </ul>
-    </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -248,7 +255,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.0.9000.</p>
 </div>
 
       </footer>

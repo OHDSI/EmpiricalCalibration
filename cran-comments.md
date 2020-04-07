@@ -1,4 +1,4 @@
-This update provides one bugfix and one new feature (see NEWS)
+This update provides one bugfix and one change (see NEWS)
 
 ---
 

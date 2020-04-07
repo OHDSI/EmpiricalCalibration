@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot the systematic error model — plotErrorModel • EmpiricalCalibration</title>
+<title>EmpiricalCalibration: Routines for Performing Empirical Calibration of Observational Study Estimates — EmpiricalCalibration-package • EmpiricalCalibration</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,15 @@
 
 
 
-<meta property="og:title" content="Plot the systematic error model — plotErrorModel" />
-<meta property="og:description" content="plotErrorModel creates a plot showing the systematic error model." />
+<meta property="og:title" content="EmpiricalCalibration: Routines for Performing Empirical Calibration of Observational Study Estimates — EmpiricalCalibration-package" />
+<meta property="og:description" content="Routines for performing empirical calibration of observational
+  study estimates. By using a set of negative control hypotheses we can
+  estimate the empirical null distribution of a particular observational
+  study setup. This empirical null distribution can be used to compute a
+  calibrated p-value, which reflects the probability of observing an
+  estimated effect size when the null hypothesis is true taking both random
+  and systematic error into account. A similar approach can be used to
+  calibrate confidence intervals, using both negative and positive controls." />
 
 
 
@@ -126,71 +133,34 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot the systematic error model</h1>
-    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/Plots.R'><code>R/Plots.R</code></a></small>
-    <div class="hidden name"><code>plotErrorModel.Rd</code></div>
+    <h1>EmpiricalCalibration: Routines for Performing Empirical Calibration of Observational Study Estimates</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/EmpiricalCalibration.R'><code>R/EmpiricalCalibration.R</code></a></small>
+    <div class="hidden name"><code>EmpiricalCalibration-package.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>plotErrorModel</code> creates a plot showing the systematic error model.</p>
+    <p>Routines for performing empirical calibration of observational
+  study estimates. By using a set of negative control hypotheses we can
+  estimate the empirical null distribution of a particular observational
+  study setup. This empirical null distribution can be used to compute a
+  calibrated p-value, which reflects the probability of observing an
+  estimated effect size when the null hypothesis is true taking both random
+  and systematic error into account. A similar approach can be used to
+  calibrate confidence intervals, using both negative and positive controls.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotErrorModel</span>(
-  <span class='no'>logRr</span>,
-  <span class='no'>seLogRr</span>,
-  <span class='no'>trueLogRr</span>,
-  <span class='no'>title</span>,
-  <span class='kw'>legacy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>fileName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>logRr</th>
-      <td><p>A numeric vector of effect estimates on the log scale.</p></td>
-    </tr>
-    <tr>
-      <th>seLogRr</th>
-      <td><p>The standard error of the log of the effect estimates. Hint: often the
-standard error = (log(&lt;lower bound 95 percent confidence interval&gt;) -
-log(&lt;effect estimate&gt;))/qnorm(0.025).</p></td>
-    </tr>
-    <tr>
-      <th>trueLogRr</th>
-      <td><p>The true log relative risk.</p></td>
-    </tr>
-    <tr>
-      <th>title</th>
-      <td><p>Optional: the main title for the plot</p></td>
-    </tr>
-    <tr>
-      <th>legacy</th>
-      <td><p>If true, a legacy error model will be fitted, meaning standard 
-deviation is linear on the log scale. If false, standard deviation
-is assumed to be simply linear.</p></td>
-    </tr>
-    <tr>
-      <th>fileName</th>
-      <td><p>Name of the file where the plot should be saved, for example 'plot.png'.
-See the function <code>ggsave</code> in the ggplot2 package for supported file
-formats.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>A Ggplot object. Use the <code>ggsave</code> function to save to file.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <div class='dont-index'><p>Useful links:</p><ul>
+<li><p><a href='https://ohdsi.github.io/EmpiricalCalibration'>https://ohdsi.github.io/EmpiricalCalibration</a></p></li>
+<li><p><a href='https://github.com/OHDSI/EmpiricalCalibration'>https://github.com/OHDSI/EmpiricalCalibration</a></p></li>
+<li><p>Report bugs at <a href='https://github.com/OHDSI/EmpiricalCalibration/issues'>https://github.com/OHDSI/EmpiricalCalibration/issues</a></p></li>
+</ul>
 
-    <p>Creates a plot with the true effect size on the x-axis, and the mean plus and minus the standard 
-deviation shown on the y-axis. Also shown are simple error models fitted at each true relative 
-risk in the input.</p>
+</div>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulateControls.html'>simulateControls</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>50</span> * <span class='fl'>3</span>, <span class='kw'>mean</span> <span class='kw'>=</span> <span class='fl'>0.25</span>, <span class='kw'>sd</span> <span class='kw'>=</span> <span class='fl'>0.25</span>, <span class='kw'>trueLogRr</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>4</span>)))
-<span class='fu'>plotErrorModel</span>(<span class='no'>data</span>$<span class='no'>logRr</span>, <span class='no'>data</span>$<span class='no'>seLogRr</span>, <span class='no'>data</span>$<span class='no'>trueLogRr</span>)</div><div class='img'><img src='plotErrorModel-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

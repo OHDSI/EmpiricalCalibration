@@ -322,7 +322,7 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
 #'
 #' @description
 #' \code{computeTraditionalCi} computes the traditional confidence interval based on the log of the
-#' relative risk and the standerd error of the log of the relative risk.
+#' relative risk and the standard error of the log of the relative risk.
 #'
 #' @param logRr     A numeric vector of one or more effect estimates on the log scale
 #' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard

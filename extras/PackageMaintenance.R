@@ -20,6 +20,7 @@
 OhdsiRTools::formatRFolder()
 OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
 OhdsiRTools::updateCopyrightYearFolder()
+devtools::spell_check()
 
 # Create manual and vignettes:
 unlink("extras/EmpiricalCalibration.pdf")
@@ -30,12 +31,14 @@ rmarkdown::render("vignettes/EmpiricalPCalibrationVignette.Rmd",
                   rmarkdown::pdf_document(latex_engine = "pdflatex",
                                           toc = TRUE,
                                           number_sections = TRUE))
+unlink("inst/doc/EmpiricalPCalibrationVignette.tex")
 
 rmarkdown::render("vignettes/EmpiricalCICalibrationVignette.Rmd",
                   output_file = "../inst/doc/EmpiricalCiCalibrationVignette.pdf",
                   rmarkdown::pdf_document(latex_engine = "pdflatex",
                                           toc = TRUE,
                                           number_sections = TRUE))
+unlink("inst/doc/EmpiricalCiCalibrationVignette.tex")
 
 pkgdown::build_site()
 

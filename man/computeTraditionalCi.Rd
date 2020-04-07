@@ -21,7 +21,7 @@ The point estimate and confidence interval
 }
 \description{
 \code{computeTraditionalCi} computes the traditional confidence interval based on the log of the
-relative risk and the standerd error of the log of the relative risk.
+relative risk and the standard error of the log of the relative risk.
 }
 \examples{
 data(sccs)
