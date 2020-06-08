@@ -41,6 +41,7 @@ rmarkdown::render("vignettes/EmpiricalCICalibrationVignette.Rmd",
 unlink("inst/doc/EmpiricalCiCalibrationVignette.tex")
 
 pkgdown::build_site()
+OhdsiRTools::fixHadesLogo()
 
 # Release package:
 devtools::check_win_devel()

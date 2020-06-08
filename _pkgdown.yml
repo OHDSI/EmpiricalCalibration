@@ -45,3 +45,11 @@ reference:
       - southworthReplication 
       - grahamReplication       
       - simulateControls 
+      
+navbar:
+  structure:
+    right: [hades, github]
+  components:
+    hades:
+      text: hadesLogo
+      href: https://ohdsi.github.io/Hades

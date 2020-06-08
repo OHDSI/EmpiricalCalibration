@@ -46,6 +46,9 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Articles
@@ -61,11 +64,11 @@
     </li>
   </ul>
 </li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://ohdsi.github.io/Hades"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
+</li>
 <li>
   <a href="https://github.com/OHDSI/EmpiricalCalibration/">
     <span class="fab fa fab fa-github fa-lg"></span>
@@ -88,7 +91,7 @@
       <h1 data-toc-skip>Empirical calibration of p-values</h1>
                         <h4 class="author">Martijn J. Schuemie, Marc A. Suchard</h4>
             
-            <h4 class="date">2020-04-07</h4>
+            <h4 class="date">2020-06-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/master/vignettes/EmpiricalPCalibrationVignette.Rmd"><code>vignettes/EmpiricalPCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalPCalibrationVignette.Rmd</code></div>
@@ -205,10 +208,10 @@
 <pre><code>## Estimated null distribution (using MCMC)
 ## 
 ##           Estimate lower .95 upper .95
-## Mean       0.78896   0.67271    0.9037
-## Precision 12.58479   6.28362   22.9195
+## Mean       0.78907   0.67044    0.9057
+## Precision 12.76251   6.10713   23.5003
 ## 
-## Acceptance rate: 0.317468253174683</code></pre>
+## Acceptance rate: 0.328967103289671</code></pre>
 <p>We see that there is uncertainty around the estimates of the mean and precision (= 1/SD^2), as expressed in the 95% credible intervals. This uncertainty can be reduced by either increasing the number of negative controls, or by increasing the power for the existing controls (e.g. by waiting for more data to accumulate).</p>
 <p>The acceptance rate of the MCMC seems reasonable (ideal values are typically between 0.2 and 0.6), but we can investigate the trace just to be sure:</p>
 <div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="fu"><a href="../reference/plotMcmcTrace.html">plotMcmcTrace</a></span>(<span class="no">null</span>)</pre></body></html></div>
@@ -217,8 +220,8 @@
 <p>We can use the new null object to compute the calibrated p-value as well as the 95% credible interval:</p>
 <div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="no">p</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/calibrateP.html">calibrateP</a></span>(<span class="no">null</span>, <span class="no">drugOfInterest</span>$<span class="no">logRr</span>, <span class="no">drugOfInterest</span>$<span class="no">seLogRr</span>)
 <span class="no">p</span></pre></body></html></div>
-<pre><code>##           p    lb95ci    ub95ci
-## 1 0.8411214 0.5619164 0.9923784</code></pre>
+<pre><code>##           p   lb95ci    ub95ci
+## 1 0.8344727 0.554066 0.9923127</code></pre>
 <p>Note that there is uncertainty around the calibrated p-value as expressed in the 95% credible interval.</p>
 <p>We can also visualize the uncertainty in the p-value calibration by plotting the 95% credible interval of the boundary where calibrated p = 0.05, here indicated by the red band:</p>
 <div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="fu"><a href="../reference/plotCalibrationEffect.html">plotCalibrationEffect</a></span>(<span class="no">negatives</span>$<span class="no">logRr</span>,
@@ -268,7 +271,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
