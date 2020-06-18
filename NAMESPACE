@@ -2,10 +2,13 @@
 
 S3method(calibrateP,mcmcNull)
 S3method(calibrateP,null)
+S3method(computeExpectedSystematicError,mcmcNull)
+S3method(computeExpectedSystematicError,null)
 S3method(print,mcmcNull)
 S3method(print,null)
 export(calibrateConfidenceInterval)
 export(calibrateP)
+export(computeExpectedSystematicError)
 export(computeTraditionalCi)
 export(computeTraditionalP)
 export(convertNullToErrorModel)

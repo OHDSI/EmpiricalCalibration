@@ -151,6 +151,7 @@ plotCalibrationEffect <- function(logRrNegatives,
                                   xLabel = "Relative risk",
                                   title,
                                   showCis = FALSE,
+                                  showExpectedSystematicError = FALSE,
                                   fileName = NULL) {
   if (is.null(null)) {
     if (showCis) {
@@ -201,6 +202,21 @@ plotCalibrationEffect <- function(logRrNegatives,
                          colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
                          size = 1)
   }
+  if (showExpectedSystematicError) {
+    expectedSystematicError <- computeExpectedSystematicError(null)
+    if (is(null, "null")) {
+      label <- sprintf("E(|error|) = %0.2f", expectedSystematicError) 
+    } else {
+      label <- sprintf("E(|error|) = %0.2f (%0.2f - %0.2f)", 
+                       expectedSystematicError$expectedSystematicError,
+                       expectedSystematicError$lb95ci,
+                       expectedSystematicError$lb95ub) 
+    }
+    dummy <- data.frame(text = label)
+    plot <- plot + ggplot2::geom_label(x = log10(0.26), y = 1.49, hjust = "left", vjust = "top", alpha = 0.8, ggplot2::aes(label = text), data = dummy, size = 3.5)
+      
+  }
+  
   plot <- plot +
     ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
                        fill = rgb(0, 0, 0),

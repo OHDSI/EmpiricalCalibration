@@ -14,6 +14,7 @@ plotCalibrationEffect(
   xLabel = "Relative risk",
   title,
   showCis = FALSE,
+  showExpectedSystematicError = FALSE,
   fileName = NULL
 )
 }
