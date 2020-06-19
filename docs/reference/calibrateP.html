@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -199,7 +199,7 @@ empirical calibration is needed to correct p-values. Statistics in Medicine 33(2
 <span class='no'>negatives</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>0</span>, ]
 <span class='no'>null</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fitNull.html'>fitNull</a></span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>)
 <span class='no'>positive</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>1</span>, ]
-<span class='fu'>calibrateP</span>(<span class='no'>null</span>, <span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>)</div><div class='output co'>#&gt; [1] 0.8390598</div><div class='input'>
+<span class='fu'>calibrateP</span>(<span class='no'>null</span>, <span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>)</div><div class='output co'>#&gt; [1] 0.839405</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

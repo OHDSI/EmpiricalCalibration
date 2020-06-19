@@ -24,7 +24,6 @@ closedFormIntegeralAbsolute <- function(mu, sigma) {
   closedFormIntegral(Inf, mu = mu, sigma = sigma) - 2*closedFormIntegral(0, mu = mu, sigma = sigma) + closedFormIntegral(-Inf, mu = mu, sigma = sigma)
 }
 
-
 #' Compute the expected systematic error
 #'
 #' @description
@@ -53,6 +52,9 @@ computeExpectedSystematicError <- function(null) {
 
 #' @export
 computeExpectedSystematicError.null <- function(null) {
+  if (null[1] == 0 && null[2] == 0) {
+    return(0)
+  }
   result <- closedFormIntegeralAbsolute(null[1], null[2])
   names(result) <- NULL
   return(result)

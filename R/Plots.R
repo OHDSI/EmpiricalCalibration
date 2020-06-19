@@ -57,36 +57,33 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", title, f
                        seLogRr, logUb95Rr = logRr + qnorm(0.975) * seLogRr)
   data$significant <- data$logLb95Rr > 0 | data$logUb95Rr < 0
   data$DRUG_NAME <- factor(data$DRUG_NAME, levels = rev(levels(data$DRUG_NAME)))
-  plot <- with(data, {
-    ggplot2::ggplot(data,
-                    ggplot2::aes(x = DRUG_NAME,
-                                 y = exp(logRr),
-                                 ymin = exp(logLb95Rr),
-                                 ymax = exp(logUb95Rr),
-                                 colour = significant,
-                                 fill = significant),
-                    environment = environment()) + 
-      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
-      ggplot2::geom_hline(yintercept = 1, size = 0.5) + 
-      ggplot2::geom_pointrange(shape = 23) + 
-      ggplot2::scale_colour_manual(values = col) + 
-      ggplot2::scale_fill_manual(values = colFill) + 
-      ggplot2::coord_flip(ylim = c(0.25, 10)) +
-      ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
-                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
-                     panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), 
-                     axis.ticks = ggplot2::element_blank(), 
-                     axis.title.y = ggplot2::element_blank(), 
-                     axis.title.x = ggplot2::element_blank(), 
-                     axis.text.y = themeRA, 
-                     axis.text.x = theme, 
-                     plot.title = ggplot2::element_text(hjust = 0.5),
-                     legend.key = ggplot2::element_blank(), 
-                     strip.text.x = theme, 
-                     strip.background = ggplot2::element_blank(), 
-                     legend.position = "none")
-  })
+  plot <- ggplot2::ggplot(data,
+                          ggplot2::aes(x = .data$DRUG_NAME,
+                                       y = exp(.data$logRr),
+                                       ymin = exp(.data$logLb95Rr),
+                                       ymax = exp(.data$logUb95Rr),
+                                       colour = .data$significant,
+                                       fill = .data$significant)) + 
+    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
+    ggplot2::geom_hline(yintercept = 1, size = 0.5) + 
+    ggplot2::geom_pointrange(shape = 23) + 
+    ggplot2::scale_colour_manual(values = col) + 
+    ggplot2::scale_fill_manual(values = colFill) + 
+    ggplot2::coord_flip(ylim = c(0.25, 10)) +
+    ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
+                   panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
+                   panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), 
+                   axis.ticks = ggplot2::element_blank(), 
+                   axis.title.y = ggplot2::element_blank(), 
+                   axis.title.x = ggplot2::element_blank(), 
+                   axis.text.y = themeRA, 
+                   axis.text.x = theme, 
+                   plot.title = ggplot2::element_text(hjust = 0.5),
+                   legend.key = ggplot2::element_blank(), 
+                   strip.text.x = theme, 
+                   strip.background = ggplot2::element_blank(), 
+                   legend.position = "none")
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
@@ -128,6 +125,8 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' @param xLabel             The label on the x-axis: the name of the effect estimate.
 #' @param title              Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the calibrated p = alpha boundary.
+#' @param showExpectedSystematicError  Show the expected absolute systematic error. If \code{null} is of 
+#'                           type \code{mcmcNull} the 95 percent credible interval will also be shown.
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function \code{ggsave} in the ggplot2 package for supported file
 #'                           formats.
@@ -182,8 +181,7 @@ plotCalibrationEffect <- function(logRrNegatives,
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
   plot <- ggplot2::ggplot(data.frame(x, y, seTheoretical),
-                          ggplot2::aes(x = x, y = y),
-                          environment = environment()) +
+                          ggplot2::aes(x = .data$x, y = .data$y)) +
     ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
     ggplot2::geom_vline(xintercept = 1, size = 1) +
     ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
@@ -205,24 +203,24 @@ plotCalibrationEffect <- function(logRrNegatives,
   if (showExpectedSystematicError) {
     expectedSystematicError <- computeExpectedSystematicError(null)
     if (is(null, "null")) {
-      label <- sprintf("E(|error|) = %0.2f", expectedSystematicError) 
+      label <- sprintf("Expected absolute systematic error = %0.2f", expectedSystematicError) 
     } else {
-      label <- sprintf("E(|error|) = %0.2f (%0.2f - %0.2f)", 
+      label <- sprintf("Expected absolute systematic error = %0.2f (%0.2f - %0.2f)", 
                        expectedSystematicError$expectedSystematicError,
                        expectedSystematicError$lb95ci,
                        expectedSystematicError$lb95ub) 
     }
     dummy <- data.frame(text = label)
-    plot <- plot + ggplot2::geom_label(x = log10(0.26), y = 1.49, hjust = "left", vjust = "top", alpha = 0.8, ggplot2::aes(label = text), data = dummy, size = 3.5)
-      
+    plot <- plot + ggplot2::geom_label(x = log10(0.26), y = 1.49, hjust = "left", vjust = "top", alpha = 0.9, ggplot2::aes(label = .data$text), data = dummy, size = 3.5)
+    
   }
   
   plot <- plot +
-    ggplot2::geom_area(ggplot2::aes(y = seTheoretical),
+    ggplot2::geom_area(ggplot2::aes(y = .data$seTheoretical),
                        fill = rgb(0, 0, 0),
                        colour = rgb(0, 0, 0, alpha = 0.1),
                        alpha = 0.1) +
-    ggplot2::geom_line(ggplot2::aes(y = seTheoretical),
+    ggplot2::geom_line(ggplot2::aes(y = .data$seTheoretical),
                        colour = rgb(0, 0, 0),
                        linetype = "dashed",
                        size = 1,
@@ -254,7 +252,7 @@ plotCalibrationEffect <- function(logRrNegatives,
                    legend.position = "none")
   if (!missing(logRrPositives)) {
     plot <- plot + ggplot2::geom_point(shape = 23,
-                                       ggplot2::aes(x, y),
+                                       ggplot2::aes(x = .data$x, y = .data$y),
                                        data = data.frame(x = exp(logRrPositives),
                                                          y = seLogRrPositives),
                                        size = 4,
@@ -362,36 +360,33 @@ plotCalibration <- function(logRr,
   breaks <- c(0, 0.25, 0.5, 0.75, 1)
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
-  plot <- with(catData, {
-    ggplot2::ggplot(catData,
-                    ggplot2::aes(x = x,
-                                 y = y,
-                                 colour = `P-value calculation`,
-                                 linetype = `P-value calculation`),
-                    environment = environment()) + 
-      ggplot2::geom_vline(xintercept = breaks,
-                          colour = "#AAAAAA",
-                          lty = 1,
-                          size = 0.3) + 
-      ggplot2::geom_vline(xintercept = 0.05, colour = "#888888", linetype = "dashed", size = 1) + 
-      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) + 
-      ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, size = 0.3) + 
-      ggplot2::geom_step(direction = "hv", size = 1) + 
-      ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + 
-      ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + 
-      ggplot2::scale_x_continuous(expression(alpha), limits = c(0, 1), breaks = c(breaks, 0.05), labels = c("", ".25", ".50", ".75", "1", ".05")) + 
-      ggplot2::scale_y_continuous(expression(paste("Fraction with p < ", alpha)), limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + 
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
-                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
-                     panel.grid.major = ggplot2::element_blank(), 
-                     plot.title = ggplot2::element_text(hjust = 0.5),
-                     axis.ticks = ggplot2::element_blank(), 
-                     axis.text.y = themeRA, 
-                     axis.text.x = theme, 
-                     strip.text.x = theme, 
-                     strip.background = ggplot2::element_blank(), 
-                     legend.position = legendPosition)
-  })
+  plot <- ggplot2::ggplot(catData,
+                          ggplot2::aes(x = .data$x,
+                                       y = .data$y,
+                                       colour = .data$`P-value calculation`,
+                                       linetype = .data$`P-value calculation`)) + 
+    ggplot2::geom_vline(xintercept = breaks,
+                        colour = "#AAAAAA",
+                        lty = 1,
+                        size = 0.3) + 
+    ggplot2::geom_vline(xintercept = 0.05, colour = "#888888", linetype = "dashed", size = 1) + 
+    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) + 
+    ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, size = 0.3) + 
+    ggplot2::geom_step(direction = "hv", size = 1) + 
+    ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + 
+    ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + 
+    ggplot2::scale_x_continuous(expression(alpha), limits = c(0, 1), breaks = c(breaks, 0.05), labels = c("", ".25", ".50", ".75", "1", ".05")) + 
+    ggplot2::scale_y_continuous(expression(paste("Fraction with p < ", alpha)), limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + 
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
+                   panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
+                   panel.grid.major = ggplot2::element_blank(), 
+                   plot.title = ggplot2::element_text(hjust = 0.5),
+                   axis.ticks = ggplot2::element_blank(), 
+                   axis.text.y = themeRA, 
+                   axis.text.x = theme, 
+                   strip.text.x = theme, 
+                   strip.background = ggplot2::element_blank(), 
+                   legend.position = legendPosition)
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
@@ -468,37 +463,34 @@ plotCiCalibration <- function(logRr,
   breaks <- c(0, 0.25, 0.5, 0.75, 1)
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
-  plot <- with(vizData, {
-    ggplot2::ggplot(vizData,
-                    ggplot2::aes(x = ciWidth,
-                                 y = coverage,
-                                 colour = `Confidence interval calculation`,
-                                 linetype = `Confidence interval calculation`),
-                    environment = environment()) + 
-      ggplot2::geom_vline(xintercept = breaks,
-                          colour = "#AAAAAA",
-                          lty = 1,
-                          size = 0.3) + 
-      ggplot2::geom_vline(xintercept = 0.95, colour = "#888888", linetype = "dashed", size = 1) + 
-      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) + 
-      ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, size = 0.3) + 
-      ggplot2::geom_line(size = 1) + 
-      ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + 
-      ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + 
-      ggplot2::scale_x_continuous("Width of CI", limits = c(0, 1), breaks = c(breaks, 0.95), labels = c("0", ".25", ".50", ".75", "", ".95")) + 
-      ggplot2::scale_y_continuous("Coverage", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + 
-      ggplot2::facet_grid(. ~ trueRr) +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
-                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
-                     panel.grid.major = ggplot2::element_blank(), 
-                     axis.ticks = ggplot2::element_blank(), 
-                     axis.text.y = themeRA, 
-                     axis.text.x = theme, 
-                     plot.title = ggplot2::element_text(hjust = 0.5),
-                     strip.text.x = theme, 
-                     strip.background = ggplot2::element_blank(), 
-                     legend.position = legendPosition)
-  })
+  plot <- ggplot2::ggplot(vizData,
+                          ggplot2::aes(x = .data$ciWidth,
+                                       y = .data$coverage,
+                                       colour = .data$`Confidence interval calculation`,
+                                       linetype = .data$`Confidence interval calculation`)) + 
+    ggplot2::geom_vline(xintercept = breaks,
+                        colour = "#AAAAAA",
+                        lty = 1,
+                        size = 0.3) + 
+    ggplot2::geom_vline(xintercept = 0.95, colour = "#888888", linetype = "dashed", size = 1) + 
+    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) + 
+    ggplot2::geom_abline(colour = "#AAAAAA", lty = 1, size = 0.3) + 
+    ggplot2::geom_line(size = 1) + 
+    ggplot2::scale_colour_manual(values = c(rgb(0, 0, 0), rgb(0, 0, 0), rgb(0.5, 0.5, 0.5))) + 
+    ggplot2::scale_linetype_manual(values = c("solid", "twodash")) + 
+    ggplot2::scale_x_continuous("Width of CI", limits = c(0, 1), breaks = c(breaks, 0.95), labels = c("0", ".25", ".50", ".75", "", ".95")) + 
+    ggplot2::scale_y_continuous("Coverage", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) + 
+    ggplot2::facet_grid(. ~ trueRr) +
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
+                   panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
+                   panel.grid.major = ggplot2::element_blank(), 
+                   axis.ticks = ggplot2::element_blank(), 
+                   axis.text.y = themeRA, 
+                   axis.text.x = theme, 
+                   plot.title = ggplot2::element_text(hjust = 0.5),
+                   strip.text.x = theme, 
+                   strip.background = ggplot2::element_blank(), 
+                   legend.position = legendPosition)
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
@@ -556,37 +548,34 @@ plotTrueAndObserved <- function(logRr,
   data$order <- 1:nrow(data)
   coverage <- aggregate(!significant ~ trueRr, data = data, mean)
   names(coverage)[2] <- "coverage"
-  plot <- with(data, {
-    ggplot2::ggplot(data,
-                    ggplot2::aes(x = exp(logRr),
-                                 y = order,
-                                 xmin = exp(logLb95Rr),
-                                 xmax = exp(logUb95Rr),
-                                 colour = significant,
-                                 fill = significant),
-                    environment = environment()) + 
-      ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
-      ggplot2::geom_errorbarh(ggplot2::aes(xmax = trueRr, xmin = trueRr), height = 1, color = rgb(0, 0, 0), size = 1) +
-      ggplot2::geom_errorbarh(height = 0) + 
-      ggplot2::geom_point(shape = 21, size = 1.5) + 
-      ggplot2::scale_colour_manual(values = col) + 
-      ggplot2::scale_fill_manual(values = colFill) + 
-      ggplot2::coord_cartesian(xlim = c(0.25, 10)) + 
-      ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
-      ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + 
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
-                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
-                     panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), 
-                     axis.ticks = ggplot2::element_blank(), 
-                     axis.title.y = ggplot2::element_blank(), 
-                     axis.title.x = ggplot2::element_blank(), 
-                     axis.text.y = ggplot2::element_blank(), 
-                     plot.title = ggplot2::element_text(hjust = 0.5),
-                     axis.text.x = theme, legend.key = ggplot2::element_blank(), 
-                     strip.text.y = ggplot2::element_blank(), 
-                     strip.background = ggplot2::element_blank(), 
-                     legend.position = "none")
-  })
+  plot <- ggplot2::ggplot(data,
+                          ggplot2::aes(x = exp(.data$logRr),
+                                       y = .data$order,
+                                       xmin = exp(.data$logLb95Rr),
+                                       xmax = exp(.data$logUb95Rr),
+                                       colour = .data$significant,
+                                       fill = .data$significant)) + 
+    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) + 
+    ggplot2::geom_errorbarh(ggplot2::aes(xmax = .data$trueRr, xmin = .data$trueRr), height = 1, color = rgb(0, 0, 0), size = 1) +
+    ggplot2::geom_errorbarh(height = 0) + 
+    ggplot2::geom_point(shape = 21, size = 1.5) + 
+    ggplot2::scale_colour_manual(values = col) + 
+    ggplot2::scale_fill_manual(values = colFill) + 
+    ggplot2::coord_cartesian(xlim = c(0.25, 10)) + 
+    ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
+    ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + 
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
+                   panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA), 
+                   panel.grid.major = ggplot2::element_line(colour = "#EEEEEE"), 
+                   axis.ticks = ggplot2::element_blank(), 
+                   axis.title.y = ggplot2::element_blank(), 
+                   axis.title.x = ggplot2::element_blank(), 
+                   axis.text.y = ggplot2::element_blank(), 
+                   plot.title = ggplot2::element_text(hjust = 0.5),
+                   axis.text.x = theme, legend.key = ggplot2::element_blank(), 
+                   strip.text.y = ggplot2::element_blank(), 
+                   strip.background = ggplot2::element_blank(), 
+                   legend.position = "none")
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
@@ -620,10 +609,11 @@ plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
   dataPrecision <- data.frame(x = 1:nrow(mcmc$chain), trace = as.numeric(ts(mcmc$chain[,
                                                                                        2])), var = "Precision")
   data <- rbind(dataMean, dataPrecision)
-  plot <- with(data, {
-    ggplot2::ggplot(data, ggplot2::aes(x = x,
-                                       y = trace)) + ggplot2::geom_line(alpha = 0.7) + ggplot2::scale_x_continuous("Iterations") + ggplot2::facet_grid(var ~ ., scales = "free") + ggplot2::theme(axis.title.y = ggplot2::element_blank())
-  })
+  plot <- ggplot2::ggplot(data, ggplot2::aes(x = .data$x, y = .data$trace)) + 
+    ggplot2::geom_line(alpha = 0.7) + 
+    ggplot2::scale_x_continuous("Iterations") + 
+    ggplot2::facet_grid(var ~ ., scales = "free") +
+    ggplot2::theme(axis.title.y = ggplot2::element_blank())
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 5, height = 3.5, dpi = 400)
   return(plot)
@@ -699,40 +689,38 @@ plotCiCoverage <- function(logRr,
   breaks <- c(0, 0.25, 0.5, 0.75, 1)
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
-  plot <- with(evaluation, {ggplot2::ggplot(evaluation,
-                                            ggplot2::aes(x = ciWidth,
-                                                         y = coverage,
-                                                         colour = label,
-                                                         fill = label,
-                                                         group = label),
-                                            environment = environment()) +
-      ggplot2::geom_vline(xintercept = breaks,
-                          colour = "#AAAAAA",
-                          lty = 1,
-                          size = 0.3) +
-      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) +
-      ggplot2::geom_area(position = "stack", alpha = 0.6) +
-      ggplot2::geom_abline(colour = "#000000", size = 1, intercept = 0.5, slope = 0.5, linetype = "dashed") +
-      ggplot2::geom_abline(colour = "#000000", size = 1, intercept = 0.5, slope = -0.5, linetype = "dashed") +
-      ggplot2::scale_colour_manual(values = c(rgb(0.8, 0, 0), rgb(0, 0, 0), rgb(0, 0, 0.8))) +
-      ggplot2::scale_fill_manual(values = c(rgb(0.8, 0, 0), rgb(0.75, 0.75, 0.75), rgb(0, 0, 0.8))) +
-      ggplot2::scale_x_continuous("Width of the confidence interval", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
-      ggplot2::scale_y_continuous("Fraction", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
-      ggplot2::facet_grid(`Confidence interval calculation` ~ trueRr) +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                     panel.background = ggplot2::element_blank(),
-                     panel.grid.major = ggplot2::element_blank(),
-                     axis.ticks = ggplot2::element_blank(),
-                     axis.text.y = themeRA,
-                     axis.text.x = theme,
-                     plot.title = ggplot2::element_text(hjust = 0.5),
-                     strip.text.x = theme,
-                     strip.text.y = theme,
-                     strip.background = ggplot2::element_blank(),
-                     legend.position = legendPosition,
-                     legend.title = ggplot2::element_blank(),
-                     legend.text = theme)
-  })
+  plot <- ggplot2::ggplot(evaluation,
+                          ggplot2::aes(x = .data$ciWidth,
+                                       y = .data$coverage,
+                                       colour = .data$label,
+                                       fill = .data$label,
+                                       group = .data$label)) +
+    ggplot2::geom_vline(xintercept = breaks,
+                        colour = "#AAAAAA",
+                        lty = 1,
+                        size = 0.3) +
+    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.3) +
+    ggplot2::geom_area(position = "stack", alpha = 0.6) +
+    ggplot2::geom_abline(colour = "#000000", size = 1, intercept = 0.5, slope = 0.5, linetype = "dashed") +
+    ggplot2::geom_abline(colour = "#000000", size = 1, intercept = 0.5, slope = -0.5, linetype = "dashed") +
+    ggplot2::scale_colour_manual(values = c(rgb(0.8, 0, 0), rgb(0, 0, 0), rgb(0, 0, 0.8))) +
+    ggplot2::scale_fill_manual(values = c(rgb(0.8, 0, 0), rgb(0.75, 0.75, 0.75), rgb(0, 0, 0.8))) +
+    ggplot2::scale_x_continuous("Width of the confidence interval", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
+    ggplot2::scale_y_continuous("Fraction", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
+    ggplot2::facet_grid(`Confidence interval calculation` ~ trueRr) +
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   panel.grid.major = ggplot2::element_blank(),
+                   axis.ticks = ggplot2::element_blank(),
+                   axis.text.y = themeRA,
+                   axis.text.x = theme,
+                   plot.title = ggplot2::element_text(hjust = 0.5),
+                   strip.text.x = theme,
+                   strip.text.y = theme,
+                   strip.background = ggplot2::element_blank(),
+                   legend.position = legendPosition,
+                   legend.title = ggplot2::element_blank(),
+                   legend.text = theme)
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
@@ -800,35 +788,33 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, legacy = FALSE, fil
     ymax <- exp(log(y) + (model[3] + model[4] * abs(log(x))))
   }
   data <- data.frame(x = x, y = y, ymin = ymin, ymax = ymax)
-  plot <- with(data, {ggplot2::ggplot(data,
-                                      ggplot2::aes(x = x,
-                                                   y = y,
-                                                   ymin = ymin,
-                                                   ymax = ymax),
-                                      environment = environment()) + 
-      ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
-      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
-      ggplot2::geom_vline(xintercept = 1, size = 1) +
-      ggplot2::geom_hline(yintercept = 1, size = 1) +
-      ggplot2::geom_ribbon(fill = rgb(0, 0, 0.8), alpha = 0.3) +
-      ggplot2::geom_line(color = rgb(0, 0, 0.8)) +
-      ggplot2::geom_errorbar(ggplot2::aes(x = trueRr), width = 0.1, size = 1, color = rgb(0, 0, 0.8), data = simpleModels) +
-      ggplot2::scale_x_continuous("True effect size",
-                                  trans = "log10",
-                                  breaks = breaks,
-                                  labels = breaks) +
-      ggplot2::scale_y_continuous("Systematic error mean (plus and minus one SD)",
-                                  trans = "log10",
-                                  breaks = breaks,
-                                  labels = breaks) +
-      ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0.25, 10)) +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                     panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
-                     panel.grid.major = ggplot2::element_blank(),
-                     axis.ticks = ggplot2::element_blank(),
-                     plot.title = ggplot2::element_text(hjust = 0.5),
-                     legend.position = "none")
-  })
+  plot <- ggplot2::ggplot(data,
+                          ggplot2::aes(x = .data$x,
+                                       y = .data$y,
+                                       ymin = .data$ymin,
+                                       ymax = .data$ymax)) + 
+    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
+    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
+    ggplot2::geom_vline(xintercept = 1, size = 1) +
+    ggplot2::geom_hline(yintercept = 1, size = 1) +
+    ggplot2::geom_ribbon(fill = rgb(0, 0, 0.8), alpha = 0.3) +
+    ggplot2::geom_line(color = rgb(0, 0, 0.8)) +
+    ggplot2::geom_errorbar(ggplot2::aes(x = .data$trueRr), width = 0.1, size = 1, color = rgb(0, 0, 0.8), data = simpleModels) +
+    ggplot2::scale_x_continuous("True effect size",
+                                trans = "log10",
+                                breaks = breaks,
+                                labels = breaks) +
+    ggplot2::scale_y_continuous("Systematic error mean (plus and minus one SD)",
+                                trans = "log10",
+                                breaks = breaks,
+                                labels = breaks) +
+    ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0.25, 10)) +
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
+                   panel.grid.major = ggplot2::element_blank(),
+                   axis.ticks = ggplot2::element_blank(),
+                   plot.title = ggplot2::element_text(hjust = 0.5),
+                   legend.position = "none")
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
@@ -842,7 +828,7 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
     null <- c(null[1], 1/sqrt(null[2])) 
   }
   x <- exp(seq(log(0.25), log(10), by = 0.01))
-  y <- sapply(x, FUN = function(x) abs(log(x))/qnorm(1-alpha/2))
+  y <- sapply(x, FUN = function(x) abs(log(x))/qnorm(1 - alpha/2))
   thresholds <- c(0.05, 0.25, 0.5, 0.75)
   isoBars <- lapply(thresholds, function(threshold) data.frame(x = x, 
                                                                y = logRrtoSE(log(x), threshold, null[1], null[2]), 
@@ -852,8 +838,7 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
   plot <- ggplot2::ggplot(data.frame(x, y),
-                          ggplot2::aes(x = x, y = y),
-                          environment = environment()) +
+                          ggplot2::aes(x = .data$x, y = .data$y)) +
     ggplot2::geom_vline(xintercept = breaks, colour = rgb(0,0,0), lty = 1, size = 0.5, alpha = 0.2) +
     ggplot2::geom_hline(yintercept = 0:4/4, colour = rgb(0,0,0), lty = 1, size = 0.5, alpha = 0.2) +
     ggplot2::geom_vline(xintercept = 1, size = 1) +
@@ -884,19 +869,19 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
                                   isoBarRight$x[which.min(abs(isoBarRight$y - 0.625))]),
                             y = 0.625,
                             label = paste0(100*isoBar$threshold[1], "%"))
-    plot <- with(labelData, {plot + ggplot2::geom_ribbon(
-      ggplot2::aes(ymin = y, ymax = ymax),
-      fill = rgb(1, 0.5, 0, alpha=0.2),
-      data = isoBar[isoBar$y < isoBar$ymax, ]) +
-        ggplot2::geom_line(color = rgb(1, 0.5, 0),
-                           size = 1,
-                           alpha = 0.5,            
-                           data = isoBar) +
-        ggplot2::geom_label(ggplot2::aes(label = label),
-                            color = rgb(1, 0.5, 0),
-                            data = labelData) +
-        ggplot2::geom_text(ggplot2::aes(label = label),
-                           data = labelData)})
+    plot <- plot + ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$y, 
+                                                     ymax = .data$ymax),
+                                        fill = rgb(1, 0.5, 0, alpha = 0.2),
+                                        data = isoBar[isoBar$y < isoBar$ymax, ]) +
+      ggplot2::geom_line(color = rgb(1, 0.5, 0),
+                         size = 1,
+                         alpha = 0.5,            
+                         data = isoBar) +
+      ggplot2::geom_label(ggplot2::aes(label = .data$label),
+                          color = rgb(1, 0.5, 0),
+                          data = labelData) +
+      ggplot2::geom_text(ggplot2::aes(label = .data$label),
+                         data = labelData)
   }
   if (!missing(seLogRrPositives)) {
     plot <- plot + ggplot2::geom_hline(yintercept = seLogRrPositives)
@@ -990,8 +975,7 @@ plotExpectedType1Error <- function(logRrNegatives,
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
   plot <- ggplot2::ggplot(data.frame(se, type1Error),
-                          ggplot2::aes(x = se, y = type1Error),
-                          environment = environment()) +
+                          ggplot2::aes(x = .data$se, y = .data$type1Error)) +
     ggplot2::geom_vline(xintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
     ggplot2::geom_hline(yintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
     ggplot2::geom_hline(yintercept = alpha,
@@ -1014,11 +998,10 @@ plotExpectedType1Error <- function(logRrNegatives,
                          colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
                          size = 1)
   }
-  plot <- plot +
-    ggplot2::geom_label(label = paste("alpha ==", alpha), 
-                        data = data.frame(se = 0.875 + showEffectSizes * 0.125, 
-                                          type1Error = alpha + showEffectSizes * 0.04), 
-                        parse = TRUE) +  
+  plot <- plot + ggplot2::geom_label(label = paste("alpha ==", alpha), 
+                                     data = data.frame(se = 0.875 + showEffectSizes * 0.125, 
+                                                       type1Error = alpha + showEffectSizes * 0.04), 
+                                     parse = TRUE) +  
     ggplot2::scale_x_continuous("Standard error",
                                 limits = c(0, 1),
                                 breaks = breaks,
@@ -1042,15 +1025,14 @@ plotExpectedType1Error <- function(logRrNegatives,
     yPos <- sapply(seLogRrPositives, FUN = function(x) {type1Error[which.min(abs(x - se))]})
     posData <- data.frame(x = seLogRrPositives,
                           y = yPos)
-    plot <- with(posData, {plot + ggplot2::geom_vline(ggplot2::aes(xintercept = x), 
-                                                      data = posData) +
-        ggplot2::geom_point(shape = 23,
-                            ggplot2::aes(x, y),
-                            data = posData,
-                            size = 4,
-                            fill = rgb(1, 1, 0),
-                            alpha = 0.8)
-    })
+    plot <- plot + ggplot2::geom_vline(ggplot2::aes(xintercept = .data$x), 
+                                       data = posData) +
+      ggplot2::geom_point(shape = 23,
+                          ggplot2::aes(x = .data$x, y = .data$y),
+                          data = posData,
+                          size = 4,
+                          fill = rgb(1, 1, 0),
+                          alpha = 0.8)
   }
   if (showEffectSizes) {
     plot <- plot + ggplot2::coord_flip() 
@@ -1084,7 +1066,7 @@ plotExpectedType1Error <- function(logRrNegatives,
 }
 
 
-#' Plot true and observed values
+#' Plot the effect of the CI calibration
 #'
 #' @description
 #' Creates a plot with the effect estimate on the x-axis and the standard error on the y-axis. The plot
@@ -1178,38 +1160,38 @@ plotCiCalibrationEffect <- function(logRr,
                                   seLogRr = logRrtoSE(x, alpha, mu, sigma),
                                   Group = dd$Group[i]))
   }
-  plot <- with(d, ggplot2::ggplot(d, ggplot2::aes(x = logRr, y = seLogRr), environment = environment()) +
+  plot <- ggplot2::ggplot(d, ggplot2::aes(x = .data$logRr, y = .data$seLogRr)) +
     ggplot2::geom_vline(xintercept = log(breaks), colour = "#AAAAAA", lty = 1, size = 0.5) +
     ggplot2::geom_area(fill = rgb(1, 0.5, 0, alpha = 0.5),
                        color = rgb(1, 0.5, 0),
                        size = 1,
                        alpha = 0.5, data = calBounds) +
-    ggplot2::geom_abline(ggplot2::aes(intercept = (-log(trueRr))/qnorm(0.025), slope = 1/qnorm(0.025)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
-    ggplot2::geom_abline(ggplot2::aes(intercept = (-log(trueRr))/qnorm(0.975), slope = 1/qnorm(0.975)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
+    ggplot2::geom_abline(ggplot2::aes(intercept = (-log(.data$trueRr))/qnorm(0.025), slope = 1/qnorm(0.025)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
+    ggplot2::geom_abline(ggplot2::aes(intercept = (-log(.data$trueRr))/qnorm(0.975), slope = 1/qnorm(0.975)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
     ggplot2::geom_point(shape = 16,
                         size = 2,
                         alpha = 0.5,
                         color = rgb(0, 0, 0.8)) +
     ggplot2::geom_hline(yintercept = 0) +
-    ggplot2::geom_label(x = log(0.15), y = 0.95, alpha = 1, hjust = "left", ggplot2::aes(label = nLabel), size = 3.5, data = dd) +
-    ggplot2::geom_label(x = log(0.15), y = 0.8, alpha = 1, hjust = "left", ggplot2::aes(label = meanLabel), size = 3.5, data = dd) +
+    ggplot2::geom_label(x = log(0.15), y = 0.95, alpha = 1, hjust = "left", ggplot2::aes(label = .data$nLabel), size = 3.5, data = dd) +
+    ggplot2::geom_label(x = log(0.15), y = 0.8, alpha = 1, hjust = "left", ggplot2::aes(label = .data$meanLabel), size = 3.5, data = dd) +
     ggplot2::scale_x_continuous(xLabel, limits = log(c(0.1, 10)), breaks = log(breaks), labels = breaks) +
     ggplot2::scale_y_continuous("Standard Error") +
     ggplot2::coord_cartesian(ylim = c(0,1)) +
     ggplot2::facet_grid(. ~ Group) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-          panel.background = ggplot2::element_blank(),
-          panel.grid.major = ggplot2::element_blank(),
-          axis.ticks = ggplot2::element_blank(),
-          axis.text.y = themeRA,
-          axis.text.x = theme,
-          axis.title = theme,
-          legend.key = ggplot2::element_blank(),
-          plot.title = ggplot2::element_text(hjust = 0.5),
-          strip.text.x = theme,
-          strip.text.y = theme,
-          strip.background = ggplot2::element_blank(),
-          legend.position = "none"))
+                   panel.background = ggplot2::element_blank(),
+                   panel.grid.major = ggplot2::element_blank(),
+                   axis.ticks = ggplot2::element_blank(),
+                   axis.text.y = themeRA,
+                   axis.text.x = theme,
+                   axis.title = theme,
+                   legend.key = ggplot2::element_blank(),
+                   plot.title = ggplot2::element_text(hjust = 0.5),
+                   strip.text.x = theme,
+                   strip.text.y = theme,
+                   strip.background = ggplot2::element_blank(),
+                   legend.position = "none")
   if (!missing(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }

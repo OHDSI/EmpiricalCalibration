@@ -43,6 +43,9 @@ will be fitted before plotting.}
 
 \item{showCis}{Show 95 percent credible intervals for the calibrated p = alpha boundary.}
 
+\item{showExpectedSystematicError}{Show the expected absolute systematic error. If \code{null} is of 
+type \code{mcmcNull} the 95 percent credible interval will also be shown.}
+
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'.
 See the function \code{ggsave} in the ggplot2 package for supported file
 formats.}

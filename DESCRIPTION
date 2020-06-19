@@ -20,7 +20,8 @@ VignetteBuilder: knitr
 Imports:
   ggplot2 (>= 2.0.0),
   gridExtra,
-  methods
+  methods,
+  rlang
 Suggests:
   knitr,
   rmarkdown

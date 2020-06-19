@@ -22,6 +22,7 @@ proposalFunction <- function(param, scale) {
 
   # Precision cannot be negative:
   draw[2] <- abs(draw[2])
+  # draw[2] <- max(0, draw[2])
   return(draw)
 }
 
@@ -42,6 +43,7 @@ runMetropolisMcmc <- function(startValue, ll, iterations, scale, logRr, seLogRr)
       -1e+10
     })
 
+    # print(paste(paste(proposal, collapse = ","), newLogLik))
     prob <- exp(newLogLik - logLik[i])
     if (runif(1) < prob) {
       chain[i + 1, ] <- proposal
@@ -57,24 +59,6 @@ runMetropolisMcmc <- function(startValue, ll, iterations, scale, logRr, seLogRr)
   return(result)
 }
 
-gaussianProduct <- function(mu1, mu2, sd1, sd2) {
-  (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
-}
-
-# Note: This function uses precision instead of standard deviation:
-logLikelihood <- function(theta, estimate, se) {
-  result <- 0
-  for (i in 1:length(estimate)) {
-    result <- result + log(gaussianProduct(estimate[i], theta[1], se[i], 1/sqrt(theta[2])))
-  }
-  if (is.infinite(result)) {
-    result <- -99999
-  }
-  # Add weak prior for when precision becomes very large:
-  result <- result + dgamma(theta[2], shape = 1e-04, rate = 1e-04, log = TRUE)
-  return(-result)
-}
-
 binarySearchMu <- function(modeMu,
                            modeSigma,
                            alpha = 0.1,
@@ -84,10 +68,10 @@ binarySearchMu <- function(modeMu,
   q <- qchisq(1 - alpha, 1)/2
   L <- modeMu
   H <- 10
-  llMode <- -logLikelihood(c(modeMu, modeSigma), estimate = logRrNegatives, se = seLogRrNegatives)
+  llMode <- -logLikelihoodNullMcmc(c(modeMu, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
   while (H >= L) {
     M <- L + (H - L)/2
-    llM <- -logLikelihood(c(M, modeSigma), estimate = logRrNegatives, se = seLogRrNegatives)
+    llM <- -logLikelihoodNullMcmc(c(M, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
     metric <- llMode - llM - q
     # writeLines(paste('M =', M, 'Metric = ',metric))
     if (metric > precision) {
@@ -109,11 +93,11 @@ binarySearchSigma <- function(modeMu,
                               seLogRrNegatives = seLogRrNegatives,
                               precision = 1e-07) {
   q <- qchisq(1 - alpha, 1)/2
-  llMode <- -logLikelihood(c(modeMu, modeSigma), estimate = logRrNegatives, se = seLogRrNegatives)
+  llMode <- -logLikelihoodNullMcmc(c(modeMu, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
   L <- modeSigma
-  for (i in 1:100) {
+  for (i in 1:10) {
     H <- modeSigma + exp(i)
-    llM <- -logLikelihood(c(modeMu, H), estimate = logRrNegatives, se = seLogRrNegatives)
+    llM <- -logLikelihoodNullMcmc(c(modeMu, H), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
     metric <- llMode - llM - q
     if (metric > 0) {
       break
@@ -121,7 +105,7 @@ binarySearchSigma <- function(modeMu,
   }
   while (H >= L) {
     M <- L + (H - L)/2
-    llM <- -logLikelihood(c(modeMu, M), estimate = logRrNegatives, se = seLogRrNegatives)
+    llM <- -logLikelihoodNullMcmc(c(modeMu, M), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
     metric <- llMode - llM - q
     # writeLines(paste('M =', M, 'Metric = ',metric))
     if (metric > precision) {
@@ -188,7 +172,7 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 10000) {
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
   }
-  fit <- optim(c(0, 0.1), logLikelihood, estimate = logRr, se = seLogRr)
+  fit <- optim(c(0, 100), logLikelihoodNullMcmc, logRr = logRr, seLogRr = seLogRr)
 
   # Profile likelihood for roughly correct scale:
   scale <- binarySearchMu(fit$par[1],
@@ -201,7 +185,7 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 10000) {
                                       seLogRrNegatives = seLogRr))
 
   # writeLines(paste('Scale:', paste(scale,collapse=',')))
-  mcmc <- runMetropolisMcmc(fit$par, logLikelihood, iterations = iter, scale, logRr, seLogRr)
+  mcmc <- runMetropolisMcmc(fit$par, logLikelihoodNullMcmc, iterations = iter, scale, logRr, seLogRr)
   result <- c(mean(mcmc$chain[, 1]), mean(mcmc$chain[, 2]))
   attr(result, "mcmc") <- mcmc
   class(result) <- "mcmcNull"

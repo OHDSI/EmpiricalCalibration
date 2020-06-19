@@ -80,7 +80,7 @@ calibrated confidence intervals to have lower than nominal coverage." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -187,8 +187,8 @@ relative risk.</p></td>
 <span class='no'>null</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fitNull.html'>fitNull</a></span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>)
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>convertNullToErrorModel</span>(<span class='no'>null</span>)
 <span class='no'>positive</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>1</span>, ]
-<span class='fu'><a href='calibrateConfidenceInterval.html'>calibrateConfidenceInterval</a></span>(<span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>, <span class='no'>model</span>)</div><div class='output co'>#&gt;         logRr  logLb95Rr logUb95Rr   seLogRr
-#&gt; 1 -0.05947242 -0.6334062 0.5144614 0.2928287</div><div class='input'>
+<span class='fu'><a href='calibrateConfidenceInterval.html'>calibrateConfidenceInterval</a></span>(<span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>, <span class='no'>model</span>)</div><div class='output co'>#&gt;         logRr  logLb95Rr logUb95Rr seLogRr
+#&gt; 1 -0.05936159 -0.6334743 0.5147511 0.29292</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

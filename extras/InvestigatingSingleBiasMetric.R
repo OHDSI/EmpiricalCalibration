@@ -29,6 +29,52 @@ system.time(
     closedFormIntegeralAbsolute(mu, sigma)
 )
 
+# Coverage --------------------------------------------
+
+grid <- expand.grid(mean = seq(0,0.5, 0.1), sd = seq(0,0.5, 0.1))
+
+
+
+evaluateGridPoint <- function(row) {
+  singleEvaluation <- function(i, row) {
+    data <- simulateControls(n = 50, mean = row$mean, sd = row$sd, runif(50, min = 0.1, max = 1)) 
+    null <- fitMcmcNull(data$logRr, data$seLogRr)
+    return(computeExpectedSystematicError(null))
+  }
+  
+  eval <- lapply(1:100, singleEvaluation, row = row)
+  eval <- dplyr::bind_rows(eval)
+  eval$mean <- row$mean
+  eval$sd <- row$sd
+  null <- c(mean = row$mean, sd = row$sd)
+  class(null) <- "null"
+  eval$trueEsr <- computeExpectedSystematicError(null)
+  return(eval)
+}
+
+cluster <- ParallelLogger::makeCluster(3)
+ParallelLogger::clusterRequire(cluster, "EmpiricalCalibration")
+eval <- ParallelLogger::clusterApply(cluster, split(grid, 1:nrow(grid)), evaluateGridPoint)
+ParallelLogger::stopCluster(cluster)
+
+eval <- dplyr::bind_rows(eval)
+saveRDS(eval, "c:/temp/esrEval.rds")
+eval$coverage <- eval$trueEsr >= eval$lb95ci & eval$trueEsr < eval$lb95ub
+agg <- aggregate(coverage ~ mean + sd + trueEsr, data = eval, mean)
+
+row <- data.frame(mean = 0.05, sd = 0.05)
+pointEval <- evaluateGridPoint(row)
+pointEval$coverage <- pointEval$trueEsr >= pointEval$lb95ci & pointEval$trueEsr < pointEval$lb95ub
+mean(pointEval$coverage)
+
+data <- simulateControls(n = 50, mean = row$mean, sd = row$sd, runif(50, min = 0.1, max = 0.5)) 
+plotCalibrationEffect(data$logRr, data$seLogRr, null = null, showCis = TRUE)
+null <- fitMcmcNull(data$logRr, data$seLogRr)
+null
+
+null <- fitNull(data$logRr, data$seLogRr)
+null
+
 # Constructing a null for absolute systematic error ---------------------
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]

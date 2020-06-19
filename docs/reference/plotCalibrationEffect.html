@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -148,6 +148,7 @@
   <span class='kw'>xLabel</span> <span class='kw'>=</span> <span class='st'>"Relative risk"</span>,
   <span class='no'>title</span>,
   <span class='kw'>showCis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>showExpectedSystematicError</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>fileName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
@@ -195,6 +196,11 @@ will be fitted before plotting.</p></td>
     <tr>
       <th>showCis</th>
       <td><p>Show 95 percent credible intervals for the calibrated p = alpha boundary.</p></td>
+    </tr>
+    <tr>
+      <th>showExpectedSystematicError</th>
+      <td><p>Show the expected absolute systematic error. If <code>null</code> is of 
+type <code>mcmcNull</code> the 95 percent credible interval will also be shown.</p></td>
     </tr>
     <tr>
       <th>fileName</th>

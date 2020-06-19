@@ -16,34 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ll <- function(theta, logRr, seLogRr, trueLogRr) {
-  estimateLl <- function(i) {
-    mean <- theta[1] + theta[2] * trueLogRr[i]
-    sd <- theta[3] + theta[4] * abs(trueLogRr[i])
-    if (sd < 0) {
-      return(Inf)
-    } else {
-      return(-log(gaussianProduct(logRr[i], mean, seLogRr[i], sd)))
-    }
-  }
-  result <- sum(sapply(1:length(logRr), estimateLl))
-  if (is.infinite(result) || is.na(result))
-    result <- 99999
-  result
-}
-
-llLegacy <- function(theta, logRr, seLogRr, trueLogRr) {
-  result <- 0
-  for (i in 1:length(logRr)) {
-    mean <- theta[1] + theta[2] * trueLogRr[i]
-    sd <- exp(theta[3] + theta[4] * trueLogRr[i])
-    result <- result - log(gaussianProduct(logRr[i], mean, seLogRr[i], sd))
-  }
-  if (is.infinite(result) || is.na(result))
-    result <- 99999
-  result
-}
-
 #' Fit a systematic error model
 #'
 #' @details
@@ -104,11 +76,11 @@ fitSystematicErrorModel <- function(logRr,
   
   if (legacy) {
     theta <- c(0, 1, -2, 0)
-    logLikelihood <- llLegacy
+    logLikelihood <- minLogLikelihoodErrorModelLegacy
     parscale <- c(1, 1, 10, 10)
   } else {
     theta <- c(0, 1, 0.1, 0)
-    logLikelihood <- ll
+    logLikelihood <- minLogLikelihoodErrorModel
     parscale <- c(1, 1, 1, 1)
   }
   

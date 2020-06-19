@@ -67,23 +67,10 @@ fitNull <- function(logRr, seLogRr) {
     logRr <- logRr[!is.na(logRr)]
   }
 
-  gaussianProduct <- function(mu1, mu2, sd1, sd2) {
-    (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
-  }
-
-  LL <- function(theta, estimate, se) {
-    result <- 0
-    for (i in 1:length(estimate)) {
-      result <- result - log(gaussianProduct(estimate[i], theta[1], se[i], exp(theta[2])))
-    }
-    if (length(result) == 0 || is.infinite(result))
-      result <- 99999
-    result
-  }
-  theta <- c(0, 0)
-  fit <- optim(theta, LL, estimate = logRr, se = seLogRr)
+  theta <- c(0, 100)
+  fit <- optim(theta, logLikelihoodNull, logRr = logRr, seLogRr = seLogRr)
   null <- fit$par
-  null[2] <- exp(null[2])
+  null[2] <- 1/sqrt(null[2])
   names(null) <- c("mean", "sd")
   class(null) <- "null"
   return(null)
@@ -96,7 +83,6 @@ print.null <- function(x, ...) {
   colnames(output) <- c("Estimate")
   rownames(output) <- c("Mean", "SD")
   printCoefmat(output)
-
 }
 
 #' Calibrate the p-value
@@ -140,9 +126,9 @@ calibrateP <- function(null, logRr, seLogRr, ...) {
 #' @export
 calibrateP.null <- function(null, logRr, seLogRr, ...) {
 
-  oneAdjustedP <- function(logRR, se, null) {
-    P_upper_bound <- pnorm((null[1] - logRR)/sqrt(null[2]^2 + se^2))
-    P_lower_bound <- pnorm((logRR - null[1])/sqrt(null[2]^2 + se^2))
+  oneAdjustedP <- function(logRR, seLogRr, null) {
+    P_upper_bound <- pnorm((null[1] - logRR)/sqrt(null[2]^2 + seLogRr^2))
+    P_lower_bound <- pnorm((logRR - null[1])/sqrt(null[2]^2 + seLogRr^2))
     2 * min(P_upper_bound, P_lower_bound)
   }
 

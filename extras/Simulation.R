@@ -1,6 +1,20 @@
-negControls <- simulateControls()
+set.seed(123)
+negControls <- simulateControls(n = 50, mean = 0.01, sd = 0, seLogRr = runif(50, 0.05, 0.5))
+
+# plotCalibration(negControls$logRr, negControls$seLogRr, useMcmc = FALSE)
 null <- fitNull(negControls$logRr, negControls$seLogRr)
-plotCalibrationEffect(negControls$logRr, negControls$seLogRr, null = null)
+null
+
+plotCalibrationEffect(negControls$logRr, negControls$seLogRr, null = null, showCis = FALSE, showExpectedSystematicError = TRUE, fileName = "c:/temp/plot1.png")
+calibrateP(null, negControls$logRr[1], negControls$seLogRr[1])
+
+# plotCalibration(negControls$logRr, negControls$seLogRr, useMcmc = TRUE)
+null <- fitMcmcNull(negControls$logRr, negControls$seLogRr)
+null
+plotCalibrationEffect(negControls$logRr, negControls$seLogRr, null = null, showCis = TRUE, showExpectedSystematicError = TRUE)
+
+calibrateP(null, negControls$logRr[1], negControls$seLogRr[1])
+
 
 data <- simulateControls(n = 50 * 3, trueLogRr = log(c(1, 2, 4)))
 
@@ -16,8 +30,8 @@ plotTrueAndObserved(cal$logRr, cal$seLogRr, data$trueLogRr)
 
 eval <- evaluateCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
 plotCiCalibration(evaluation = eval)
-plotCiCoverage(evaluation = eval, fileName = "s:/temp/plot.png")
-plotErrorModel(data$logRr, data$seLogRr, data$trueLogRr, fileName = "s:/temp/plot.png")
+plotCiCoverage(evaluation = eval, fileName = "c:/temp/plot.png")
+plotErrorModel(data$logRr, data$seLogRr, data$trueLogRr, fileName = "c:/temp/plot.png")
 
 logRr <- data$logRr
 seLogRr <- data$seLogRr

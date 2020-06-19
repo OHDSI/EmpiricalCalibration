@@ -2,7 +2,7 @@
 % Please edit documentation in R/Plots.R
 \name{plotCiCalibrationEffect}
 \alias{plotCiCalibrationEffect}
-\title{Plot true and observed values}
+\title{Plot the effect of the CI calibration}
 \usage{
 plotCiCalibrationEffect(
   logRr,
