@@ -1,3 +1,5 @@
+library(EmpiricalCalibration)
+
 mu <- 0.1
 sigma <- 0.2
 
@@ -62,7 +64,7 @@ saveRDS(eval, "c:/temp/esrEval.rds")
 eval$coverage <- eval$trueEsr >= eval$lb95ci & eval$trueEsr < eval$lb95ub
 agg <- aggregate(coverage ~ mean + sd + trueEsr, data = eval, mean)
 
-row <- data.frame(mean = 0.05, sd = 0.05)
+row <- data.frame(mean = 0.1, sd = 0.1)
 pointEval <- evaluateGridPoint(row)
 pointEval$coverage <- pointEval$trueEsr >= pointEval$lb95ci & pointEval$trueEsr < pointEval$lb95ub
 mean(pointEval$coverage)
@@ -74,6 +76,34 @@ null
 
 null <- fitNull(data$logRr, data$seLogRr)
 null
+
+# Likelihood curves -----------------------------------------
+library(ggplot2)
+closedFormIntegeralAbsolute <- EmpiricalCalibration:::closedFormIntegeralAbsolute
+truth <- c(0.0, 0.1)
+data <- simulateControls(n = 50, mean = truth[1], sd = truth[2], runif(50, min = 0.1, max = 1)) 
+null <- fitMcmcNull(data$logRr, data$seLogRr, iter = 1000000)
+chain <- attr(null, "mcmc")$chain
+dist <- apply(chain, 1, function(x) closedFormIntegeralAbsolute(x[1], 1 / sqrt(x[2])))
+# hist(dist, breaks = 100)
+
+trueEsr <- closedFormIntegeralAbsolute(truth[1], truth[2])
+
+plot <- ggplot(data.frame(dist = log(dist)), aes(x = dist)) +
+  geom_histogram(bins = 100, alpha = 0.7) +
+  geom_vline(xintercept = trueEsr) +
+  scale_x_continuous("Absolute systematic error")
+ggsave(filename = sprintf("c:/temp/Esr_%s.png", trueEsr), plot = plot)
+
+
+null <- fitNull(data$logRr, data$seLogRr)
+closedFormIntegeralAbsolute(null[1], null[2])
+
+
+dist2 <- abs(rnorm(length(dist), trueEsr, 0.07))
+ggplot(data.frame(dist = dist2), aes(x = dist)) +
+  geom_histogram(bins = 100, alpha = 0.7) +
+  geom_vline(xintercept = trueEsr)
 
 # Constructing a null for absolute systematic error ---------------------
 data(sccs)
@@ -167,3 +197,256 @@ meta <- meta::metagen(negatives$logRr, negatives$seLogRr, studlab = 1:nrow(negat
 summary(meta)
 meta$tau
 meta$TE.random
+
+# Computing test for correlated esr -------------------------
+method1Ncs <- simulateControls(n = 50, mean = 0.1, sd = 0.1, seLogRr = runif(50, 0.1, 1))
+ # second method slightly more biased:
+method2Ncs <- method1Ncs
+method2Ncs$logRr <- method2Ncs$logRr + rnorm(nrow(method2Ncs), mean = 0.05, sd = 0.05)
+
+null1 <- fitMcmcNull(method1Ncs$logRr, method1Ncs$seLogRr)
+null2 <- fitMcmcNull(method2Ncs$logRr, method2Ncs$seLogRr)
+
+computeExpectedSystematicError(null1)
+computeExpectedSystematicError(null2)
+
+deltaLogRr <- method2Ncs$logRr - method1Ncs$logRr
+mean(deltaLogRr)
+sd(deltaLogRr)
+
+# Direct estimation (no mu or sigma) --------------------------------------
+mu <- 0.3
+sigma <- 0.2
+ncs <- simulateControls(n = 10, mean = mu, sd = sigma, seLogRr = runif(10, 0.1, 0.1))
+closedFormIntegeralAbsolute(mu, sigma)
+
+# null <- fitMcmcNull(ncs$logRr, ncs$seLogRr)
+# computeExpectedSystematicError(null)
+
+computeCi(ncs)
+
+# x <- seq(0, 1, length.out = 100)
+# plot(x, -fun(x, ncs = ncs))
+
+computeCi <- function(ncs, alpha = 0.05) {
+  fun <- function(x, ncs) {
+    
+    p <- sapply(1:nrow(ncs), function(i) log(dnorm(x, ncs$logRr[i], ncs$seLogRr[i]) + dnorm(-x, ncs$logRr[i], ncs$seLogRr[i])))
+    if (is.null(dim(p))) {
+      p <- sum(p)
+    } else {
+      p <- apply(p, 1, sum)
+    }
+    # print(paste(x, x + p))
+    return(-x - p)
+  }
+  
+  fit <- nlm(fun, 0.6, ncs = ncs)
+  ese <- abs(fit$estimate)
+  threshold <- -fit$minimum - qchisq(1 - alpha, df = 1)/2
+  
+  precision <- 1e-07
+  
+  # Binary search for upper bound
+  L <- ese
+  H <- 2
+  ub <- Inf
+  while (H >= L) {
+    M <- L + (H - L)/2
+    llM <- -fun(M, ncs = ncs)
+    metric <- threshold - llM
+    if (metric > precision) {
+      H <- M
+    } else if (-metric > precision) {
+      L <- M
+    } else {
+      ub <- M
+      break
+    }
+    if (M == ese) {
+      warning("Error finding upper bound")
+      break
+    } else if (M == 10) {
+      warning("Confidence interval upper bound out of range")
+      break
+    }
+  }
+  
+  # Binary search for lower bound
+  if (threshold < -fun(0, ncs = ncs)) {
+    lb <- 0
+  } else {
+    L <- 0
+    H <- ese
+    lb <- -Inf
+    while (H >= L) {
+      M <- L + (H - L)/2
+      llM <- -fun(M, ncs = ncs)
+      metric <- threshold - llM
+      if (metric > precision) {
+        L <- M
+      } else if (-metric > precision) {
+        H <- M
+      } else {
+        lb <- M
+        break
+      }
+      if (M == ese) {
+        warning("Error finding lower bound")
+        break
+      } else if (M == 0) {
+        warning("Confidence interval lower bound out of range")
+        break
+      }
+    }
+  }
+  result <- data.frame(ese = ese,
+                       lb = lb,
+                       ub = ub)
+  return(result)
+}
+
+
+
+# Coverage of direct approach --------------------------------------------
+
+grid <- expand.grid(mean = seq(0,0.5, 0.1), sd = seq(0,0.5, 0.1))
+
+
+
+evaluateGridPoint <- function(row) {
+  fun <- function(x, ncs) {
+    
+    p <- sapply(1:nrow(ncs), function(i) log(dnorm(x, ncs$logRr[i], ncs$seLogRr[i]) + dnorm(-x, ncs$logRr[i], ncs$seLogRr[i])))
+    if (is.null(dim(p))) {
+      p <- sum(p)
+    } else {
+      p <- apply(p, 1, sum)
+    }
+    # print(paste(x, x + p))
+    return(-x - p)
+  }
+  
+  computeCi <- function(ncs, alpha = 0.05) {
+    fit <- nlm(fun, 0.6, ncs = ncs)
+    ese <- abs(fit$estimate)
+    threshold <- -fit$minimum - qchisq(1 - alpha, df = 1)/2
+    
+    precision <- 1e-07
+    
+    # Binary search for upper bound
+    L <- ese
+    H <- 2
+    ub <- Inf
+    while (H >= L) {
+      M <- L + (H - L)/2
+      llM <- -fun(M, ncs = ncs)
+      metric <- threshold - llM
+      if (metric > precision) {
+        H <- M
+      } else if (-metric > precision) {
+        L <- M
+      } else {
+        ub <- M
+        break
+      }
+      if (M == ese) {
+        warning("Error finding upper bound")
+        break
+      } else if (M == 10) {
+        warning("Confidence interval upper bound out of range")
+        break
+      }
+    }
+    
+    # Binary search for lower bound
+    if (threshold < -fun(0, ncs = ncs)) {
+      lb <- 0
+    } else {
+      L <- 0
+      H <- ese
+      lb <- -Inf
+      while (H >= L) {
+        M <- L + (H - L)/2
+        llM <- -fun(M, ncs = ncs)
+        metric <- threshold - llM
+        if (metric > precision) {
+          L <- M
+        } else if (-metric > precision) {
+          H <- M
+        } else {
+          lb <- M
+          break
+        }
+        if (M == ese) {
+          warning("Error finding lower bound")
+          break
+        } else if (M == 0) {
+          warning("Confidence interval lower bound out of range")
+          break
+        }
+      }
+    }
+    result <- data.frame(ese = ese,
+                         lb = lb,
+                         ub = ub)
+    return(result)
+  }
+  
+  singleEvaluation <- function(i, row) {
+    data <- simulateControls(n = 50, mean = row$mean, sd = row$sd, runif(50, min = 0.1, max = 1)) 
+    return(computeCi(data))
+  }
+  
+  eval <- lapply(1:100, singleEvaluation, row = row)
+  eval <- dplyr::bind_rows(eval)
+  eval$mean <- row$mean
+  eval$sd <- row$sd
+  null <- c(mean = row$mean, sd = row$sd)
+  class(null) <- "null"
+  eval$trueEsr <- computeExpectedSystematicError(null)
+  return(eval)
+}
+
+cluster <- ParallelLogger::makeCluster(3)
+ParallelLogger::clusterRequire(cluster, "EmpiricalCalibration")
+eval <- ParallelLogger::clusterApply(cluster, split(grid, 1:nrow(grid)), evaluateGridPoint)
+ParallelLogger::stopCluster(cluster)
+
+eval <- dplyr::bind_rows(eval)
+saveRDS(eval, "c:/temp/esrDirectEval.rds")
+eval$coverage <- eval$trueEsr >= eval$lb & eval$trueEsr < eval$ub
+agg <- aggregate(coverage ~ mean + sd + trueEsr, data = eval, mean)
+
+
+
+# Mean Squared Systematic Error -----------------------------------------------
+# This is not a good idea, as the score will go up when sample size goes down.
+mu <- 0.3
+sigma <- 0.3
+# Numeric solution 
+fun2 <- function(x, mu, sigma) {
+  return(x^2 * dnorm(x, mu, sigma)) 
+}
+
+integrate(fun2, lower = -Inf, upper = Inf, mu = mu, sigma = sigma)
+
+# Direct estimation
+ncs <- simulateControls(n = 50, mean = mu, sd = sigma, seLogRr = runif(50, 0.05, 0.05))
+
+fun <- function(x, ncs) {
+  
+  p <- sapply(1:nrow(ncs), function(i) log(dnorm(x, ncs$logRr[i], ncs$seLogRr[i]) + dnorm(-x, ncs$logRr[i], ncs$seLogRr[i])))
+  if (is.null(dim(p))) {
+    p <- sum(p)
+  } else {
+    p <- apply(p, 1, sum)
+  }
+  # print(paste(x, x + p))
+  return(-x^2 - p)
+}
+
+
+x <- seq(0, 1, length.out = 100)
+plot(x, -fun(x, ncs = ncs))
+nlm(fun, 0.6, ncs = ncs)$estimate
