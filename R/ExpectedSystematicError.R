@@ -68,7 +68,7 @@ computeExpectedSystematicError.mcmcNull <- function(null) {
   result <- quantile(dist, c(0.5, 0.025, 0.975))
   result <- data.frame(expectedSystematicError = result[1],
                        lb95ci = result[2],
-                       lb95ub = result[3])
+                       ub95ci = result[3])
   row.names(result) <- NULL
   return(result)
 }
