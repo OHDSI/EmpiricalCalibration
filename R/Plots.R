@@ -125,7 +125,7 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' @param xLabel             The label on the x-axis: the name of the effect estimate.
 #' @param title              Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the calibrated p = alpha boundary.
-#' @param showExpectedSystematicError  Show the expected absolute systematic error. If \code{null} is of 
+#' @param showExpectedAbsoluteSystematicError  Show the expected absolute systematic error. If \code{null} is of 
 #'                           type \code{mcmcNull} the 95 percent credible interval will also be shown.
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function \code{ggsave} in the ggplot2 package for supported file
@@ -150,7 +150,7 @@ plotCalibrationEffect <- function(logRrNegatives,
                                   xLabel = "Relative risk",
                                   title,
                                   showCis = FALSE,
-                                  showExpectedSystematicError = FALSE,
+                                  showExpectedAbsoluteSystematicError = FALSE,
                                   fileName = NULL) {
   if (is.null(null)) {
     if (showCis) {
@@ -200,15 +200,15 @@ plotCalibrationEffect <- function(logRrNegatives,
                          colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
                          size = 1)
   }
-  if (showExpectedSystematicError) {
-    expectedSystematicError <- computeExpectedSystematicError(null)
+  if (showExpectedAbsoluteSystematicError) {
+    ease <- showExpectedAbsoluteSystematicError(null)
     if (is(null, "null")) {
-      label <- sprintf("Expected absolute systematic error = %0.2f", expectedSystematicError) 
+      label <- sprintf("Expected absolute systematic error = %0.2f", ease) 
     } else {
       label <- sprintf("Expected absolute systematic error = %0.2f (%0.2f - %0.2f)", 
-                       expectedSystematicError$expectedSystematicError,
-                       expectedSystematicError$lb95ci,
-                       expectedSystematicError$lb95ub) 
+                       ease$ease,
+                       ease$ciLb,
+                       ease$ciUb) 
     }
     dummy <- data.frame(text = label)
     plot <- plot + ggplot2::geom_label(x = log10(0.26), y = 1.49, hjust = "left", vjust = "top", alpha = 0.9, ggplot2::aes(label = .data$text), data = dummy, size = 3.5)

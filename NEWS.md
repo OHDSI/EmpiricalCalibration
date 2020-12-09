@@ -3,7 +3,7 @@ EmpiricalCalibration 2.1.0
 
 Changes
 
-1. Adding computation of expected systematic error. Can be shown in plots.
+1. Adding computation of expected absolute systematic error. Can be shown in plots.
 
 
 

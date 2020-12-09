@@ -24,20 +24,23 @@ closedFormIntegeralAbsolute <- function(mu, sigma) {
   closedFormIntegral(Inf, mu = mu, sigma = sigma) - 2*closedFormIntegral(0, mu = mu, sigma = sigma) + closedFormIntegral(-Inf, mu = mu, sigma = sigma)
 }
 
-#' Compute the expected systematic error
+#' Compute the expected absolute systematic error
 #'
 #' @description
-#' \code{calibrateP} computes calibrated p-values using the fitted null distribution
-#'
-#' @details
-#' This function computes a calibrated two-sided p-value as described in Schuemie et al (2014).
-#'
+#' For a random study estimate, what is the expected value of the absolute systematic error?
+#' Provides a single summary value for a null distribution. The expected systematic error of a null 
+#' distribution is equal to its mean (mu), and is insensitive to the spread of the null distribution (sigma). 
+#' 
+#' Taking the absolute value of the expected systematic error we can express both mean and spread of the 
+#' estimated null distribution.
+#' 
 #' @param null      An object of class \code{null} created using the \code{fitNull} function or an
 #'                  object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.
-#' @param ...       Any additional parameters (currently none).
+#' @param alpha     The expected type I error for computing the credible interval.
 #'
 #' @return
-#' The two-sided calibrated p-value.
+#' The expected absolute systematic error. If the provided \code{null} argument is of type \code{mcmcNull},
+#' the credible interval (defined by \code{alpha}) is also returned.
 #'
 #' @examples
 #' data(sccs)
@@ -46,12 +49,12 @@ closedFormIntegeralAbsolute <- function(mu, sigma) {
 #' computeExpectedSystematicError(null)
 #'
 #' @export
-computeExpectedSystematicError <- function(null) {
-  UseMethod("computeExpectedSystematicError") 
+computeExpectedAbsoluteSystematicError <- function(null, alpha = 0.05) {
+  UseMethod("computeExpectedAbsoluteSystematicError") 
 }
 
 #' @export
-computeExpectedSystematicError.null <- function(null) {
+computeExpectedAbsoluteSystematicError.null <- function(null, alpha = 0.05) {
   if (null[1] == 0 && null[2] == 0) {
     return(0)
   }
@@ -61,14 +64,13 @@ computeExpectedSystematicError.null <- function(null) {
 }
 
 #' @export
-computeExpectedSystematicError.mcmcNull <- function(null) {
+computeExpectedAbsoluteSystematicError.mcmcNull <- function(null, alpha = 0.05) {
   chain <- attr(null, "mcmc")$chain
   dist <- apply(chain, 1, function(x) closedFormIntegeralAbsolute(x[1], 1 / sqrt(x[2])))
-  # dist <- apply(chain, 1, function(x) closedFormIntegeralAbsolute(x[1], x[2]))
-  result <- quantile(dist, c(0.5, 0.025, 0.975))
-  result <- data.frame(expectedSystematicError = result[1],
-                       lb95ci = result[2],
-                       ub95ci = result[3])
+  result <- quantile(dist, c(0.5, alpha / 2, 1 - (alpha / 2)))
+  result <- data.frame(ease = result[1],
+                       ciLb = result[2],
+                       ciUb = result[3])
   row.names(result) <- NULL
   return(result)
 }
