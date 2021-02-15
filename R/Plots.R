@@ -201,7 +201,7 @@ plotCalibrationEffect <- function(logRrNegatives,
                          size = 1)
   }
   if (showExpectedAbsoluteSystematicError) {
-    ease <- showExpectedAbsoluteSystematicError(null)
+    ease <- computeExpectedAbsoluteSystematicError(null)
     if (is(null, "null")) {
       label <- sprintf("Expected absolute systematic error = %0.2f", ease) 
     } else {

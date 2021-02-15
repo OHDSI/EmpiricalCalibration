@@ -1,7 +1,7 @@
 EmpiricalCalibration
 ====================
 
-[![Build Status](https://travis-ci.org/OHDSI/EmpiricalCalibration.svg?branch=master)](https://travis-ci.org/OHDSI/EmpiricalCalibration)
+[![Build Status](https://github.com/OHDSI/EmpiricalCalibration/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/EmpiricalCalibration/actions?query=workflow%3AR-CMD-check)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 [![CRAN_Status_Badge](http://cranlogs.r-pkg.org/badges/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 
