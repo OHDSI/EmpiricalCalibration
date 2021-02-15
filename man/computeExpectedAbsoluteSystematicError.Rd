@@ -28,6 +28,6 @@ estimated null distribution.
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
 null <- fitNull(negatives$logRr, negatives$seLogRr)
-computeExpectedSystematicError(null)
+computeExpectedAbsoluteSystematicError(null)
 
 }

@@ -2,9 +2,9 @@
 extras
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.travis\.yml$
 ^deploy.sh$
 ^cran-comments.md$
 compare_versions
+.github
 _pkgdown.yml
 docs
