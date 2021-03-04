@@ -1,10 +1,12 @@
-This update provides one bugfix and one change (see NEWS)
+This update provides one change (see NEWS)
 
 ---
 
 ## Test environments
-* Ubuntu 14.04.5 LTS (Travis), R 3.6.2
-* Windows 7, R 3.6.1
+* Ubuntu 20.03, R 4.0.3
+* Microsoft Windows Server 2019, R 4.0.3
+* MacOS, R 4.0.3
+* Windows 10, R 4.0.3
 
 ## R CMD check results
 

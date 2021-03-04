@@ -21,6 +21,7 @@ reference:
       - plotCalibration 
       - plotCalibrationEffect 
       - plotExpectedType1Error 
+      - computeExpectedAbsoluteSystematicError
   - title: "Confidence interval calibration"
     desc: >
       Functions for calibrating confidence intervals based on a systematic error model fitted using negative and positive controls.

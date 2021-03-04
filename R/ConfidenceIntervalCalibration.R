@@ -1,6 +1,6 @@
 # @file ConfidenceIntervalCalibration.R
 #
-# Copyright 2020 Observational Health Data Sciences and Informatics
+# Copyright 2021 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
 # 
@@ -332,7 +332,7 @@ computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
 #' however, if an estimation method is biased towards the null this assumption will be violated, causing the
 #' calibrated confidence intervals to have lower than nominal coverage.
 #'
-#' @param null         The empirical null distribution fitted using eith the \code{\link{fitNull}}
+#' @param null         The empirical null distribution fitted using either the \code{\link{fitNull}}
 #'                     or the \code{\link{fitMcmcNull}} function.
 #' @param meanSlope    The slope for the mean of the error distribution. A slope of 1 means the error
 #'                     is the same for different values of the true relative risk.

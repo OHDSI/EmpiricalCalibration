@@ -52,7 +52,7 @@ EmpiricalCalibration 1.4.0
 
 Changes
 
-1. Added plot showing effec of confidence interval calibration, similar to p-value plot.
+1. Added plot showing effect of confidence interval calibration, similar to p-value plot.
 
 Bugfixes
 

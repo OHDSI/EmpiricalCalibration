@@ -13,7 +13,9 @@ Routines for performing empirical calibration of observational
   calibrated p-value, which reflects the probability of observing an
   estimated effect size when the null hypothesis is true taking both random
   and systematic error into account. A similar approach can be used to
-  calibrate confidence intervals, using both negative and positive controls.
+  calibrate confidence intervals, using both negative and positive controls. 
+  For more details, see Schuemie, et al. (2013) <doi:10.1002/sim.5925> and
+  Schuemie, et al. (2018) <doi:10.1073/pnas.1708282114>.
 }
 \seealso{
 Useful links:
@@ -25,11 +27,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Martijn Schuemie \email{schuemie@ohdsi.org}
+\strong{Maintainer}: Martijn Schuemie \email{schuemie@ohdsi.org} (\href{https://orcid.org/0000-0002-0817-5361}{ORCID})
 
 Authors:
 \itemize{
-  \item Marc Suchard
+  \item Marc Suchard (\href{https://orcid.org/0000-0001-9818-479X}{ORCID})
 }
 
 }

@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -112,7 +112,7 @@
 </li>
 <li>
   <a href="https://github.com/OHDSI/EmpiricalCalibration/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -138,7 +138,7 @@
     <p>Plot the MCMC trace</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotMcmcTrace</span>(<span class='no'>mcmcNull</span>, <span class='kw'>fileName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>plotMcmcTrace</span><span class='op'>(</span><span class='va'>mcmcNull</span>, fileName <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,12 +160,13 @@ function <code>ggsave</code> in the ggplot2 package for supported file formats.<
     <p>Plot the trace of the MCMC for diagnostics purposes.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>sccs</span>)
-<span class='no'>negatives</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>0</span>, ]
-<span class='no'>null</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fitMcmcNull.html'>fitMcmcNull</a></span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>)
-<span class='fu'>plotMcmcTrace</span>(<span class='no'>null</span>)
-}</div></pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sccs</span><span class='op'>)</span>
+<span class='va'>negatives</span> <span class='op'>&lt;-</span> <span class='va'>sccs</span><span class='op'>[</span><span class='va'>sccs</span><span class='op'>$</span><span class='va'>groundTruth</span> <span class='op'>==</span> <span class='fl'>0</span>, <span class='op'>]</span>
+<span class='va'>null</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fitMcmcNull.html'>fitMcmcNull</a></span><span class='op'>(</span><span class='va'>negatives</span><span class='op'>$</span><span class='va'>logRr</span>, <span class='va'>negatives</span><span class='op'>$</span><span class='va'>seLogRr</span><span class='op'>)</span>
+<span class='fu'>plotMcmcTrace</span><span class='op'>(</span><span class='va'>null</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -181,7 +182,7 @@ function <code>ggsave</code> in the ggplot2 package for supported file formats.<
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

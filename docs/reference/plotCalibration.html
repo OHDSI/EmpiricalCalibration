@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -112,7 +112,7 @@
 </li>
 <li>
   <a href="https://github.com/OHDSI/EmpiricalCalibration/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -138,14 +138,14 @@
     <p><code>plotCalibration</code> creates a plot showing the calibration of our calibration procedure</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotCalibration</span>(
-  <span class='no'>logRr</span>,
-  <span class='no'>seLogRr</span>,
-  <span class='kw'>useMcmc</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>legendPosition</span> <span class='kw'>=</span> <span class='st'>"right"</span>,
-  <span class='no'>title</span>,
-  <span class='kw'>fileName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>plotCalibration</span><span class='op'>(</span>
+  <span class='va'>logRr</span>,
+  <span class='va'>seLogRr</span>,
+  useMcmc <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  legendPosition <span class='op'>=</span> <span class='st'>"right"</span>,
+  <span class='va'>title</span>,
+  fileName <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -193,9 +193,10 @@ approximate the diagonal. The plot shows both theoretical (traditional) and empi
 p-values.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>sccs</span>)
-<span class='no'>negatives</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>0</span>, ]
-<span class='fu'>plotCalibration</span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>)</div><div class='img'><img src='plotCalibration-1.png' alt='' width='700' height='433' /></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sccs</span><span class='op'>)</span>
+<span class='va'>negatives</span> <span class='op'>&lt;-</span> <span class='va'>sccs</span><span class='op'>[</span><span class='va'>sccs</span><span class='op'>$</span><span class='va'>groundTruth</span> <span class='op'>==</span> <span class='fl'>0</span>, <span class='op'>]</span>
+<span class='fu'>plotCalibration</span><span class='op'>(</span><span class='va'>negatives</span><span class='op'>$</span><span class='va'>logRr</span>, <span class='va'>negatives</span><span class='op'>$</span><span class='va'>seLogRr</span><span class='op'>)</span>
+</div><div class='img'><img src='plotCalibration-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -212,7 +213,7 @@ p-values.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

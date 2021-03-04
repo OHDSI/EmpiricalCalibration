@@ -7,7 +7,7 @@
 convertNullToErrorModel(null, meanSlope = 1, sdSlope = 0)
 }
 \arguments{
-\item{null}{The empirical null distribution fitted using eith the \code{\link{fitNull}}
+\item{null}{The empirical null distribution fitted using either the \code{\link{fitNull}}
 or the \code{\link{fitMcmcNull}} function.}
 
 \item{meanSlope}{The slope for the mean of the error distribution. A slope of 1 means the error

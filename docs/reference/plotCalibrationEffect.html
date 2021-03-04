@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -112,7 +112,7 @@
 </li>
 <li>
   <a href="https://github.com/OHDSI/EmpiricalCalibration/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -138,19 +138,19 @@
     <p><code>plotCalibrationEffect</code> creates a plot showing the effect of the calibration.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotCalibrationEffect</span>(
-  <span class='no'>logRrNegatives</span>,
-  <span class='no'>seLogRrNegatives</span>,
-  <span class='kw'>logRrPositives</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seLogRrPositives</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>null</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>xLabel</span> <span class='kw'>=</span> <span class='st'>"Relative risk"</span>,
-  <span class='no'>title</span>,
-  <span class='kw'>showCis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>showExpectedSystematicError</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>fileName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>plotCalibrationEffect</span><span class='op'>(</span>
+  <span class='va'>logRrNegatives</span>,
+  <span class='va'>seLogRrNegatives</span>,
+  logRrPositives <span class='op'>=</span> <span class='cn'>NULL</span>,
+  seLogRrPositives <span class='op'>=</span> <span class='cn'>NULL</span>,
+  null <span class='op'>=</span> <span class='cn'>NULL</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.05</span>,
+  xLabel <span class='op'>=</span> <span class='st'>"Relative risk"</span>,
+  <span class='va'>title</span>,
+  showCis <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  showExpectedAbsoluteSystematicError <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  fileName <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -198,7 +198,7 @@ will be fitted before plotting.</p></td>
       <td><p>Show 95 percent credible intervals for the calibrated p = alpha boundary.</p></td>
     </tr>
     <tr>
-      <th>showExpectedSystematicError</th>
+      <th>showExpectedAbsoluteSystematicError</th>
       <td><p>Show the expected absolute systematic error. If <code>null</code> is of 
 type <code>mcmcNull</code> the 95 percent credible interval will also be shown.</p></td>
     </tr>
@@ -221,10 +221,11 @@ dashed line indicated estimates with p &lt; 0.05. The orange area indicates esti
 p &lt; 0.05.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>sccs</span>)
-<span class='no'>negatives</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>0</span>, ]
-<span class='no'>positive</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>1</span>, ]
-<span class='fu'>plotCalibrationEffect</span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>, <span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>)</div><div class='img'><img src='plotCalibrationEffect-1.png' alt='' width='700' height='433' /></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sccs</span><span class='op'>)</span>
+<span class='va'>negatives</span> <span class='op'>&lt;-</span> <span class='va'>sccs</span><span class='op'>[</span><span class='va'>sccs</span><span class='op'>$</span><span class='va'>groundTruth</span> <span class='op'>==</span> <span class='fl'>0</span>, <span class='op'>]</span>
+<span class='va'>positive</span> <span class='op'>&lt;-</span> <span class='va'>sccs</span><span class='op'>[</span><span class='va'>sccs</span><span class='op'>$</span><span class='va'>groundTruth</span> <span class='op'>==</span> <span class='fl'>1</span>, <span class='op'>]</span>
+<span class='fu'>plotCalibrationEffect</span><span class='op'>(</span><span class='va'>negatives</span><span class='op'>$</span><span class='va'>logRr</span>, <span class='va'>negatives</span><span class='op'>$</span><span class='va'>seLogRr</span>, <span class='va'>positive</span><span class='op'>$</span><span class='va'>logRr</span>, <span class='va'>positive</span><span class='op'>$</span><span class='va'>seLogRr</span><span class='op'>)</span>
+</div><div class='img'><img src='plotCalibrationEffect-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -241,7 +242,7 @@ p &lt; 0.05.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

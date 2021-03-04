@@ -88,7 +88,7 @@ calibrated confidence intervals to have lower than nominal coverage." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -120,7 +120,7 @@ calibrated confidence intervals to have lower than nominal coverage." />
 </li>
 <li>
   <a href="https://github.com/OHDSI/EmpiricalCalibration/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -154,14 +154,14 @@ however, if an estimation method is biased towards the null this assumption will
 calibrated confidence intervals to have lower than nominal coverage.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>convertNullToErrorModel</span>(<span class='no'>null</span>, <span class='kw'>meanSlope</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>sdSlope</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+    <pre class="usage"><span class='fu'>convertNullToErrorModel</span><span class='op'>(</span><span class='va'>null</span>, meanSlope <span class='op'>=</span> <span class='fl'>1</span>, sdSlope <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>null</th>
-      <td><p>The empirical null distribution fitted using eith the <code><a href='fitNull.html'>fitNull</a></code>
+      <td><p>The empirical null distribution fitted using either the <code><a href='fitNull.html'>fitNull</a></code>
 or the <code><a href='fitMcmcNull.html'>fitMcmcNull</a></code> function.</p></td>
     </tr>
     <tr>
@@ -182,12 +182,13 @@ relative risk.</p></td>
     <p>An object of type <code>systematicErrorModel</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>sccs</span>)
-<span class='no'>negatives</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>0</span>, ]
-<span class='no'>null</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='fitNull.html'>fitNull</a></span>(<span class='no'>negatives</span>$<span class='no'>logRr</span>, <span class='no'>negatives</span>$<span class='no'>seLogRr</span>)
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>convertNullToErrorModel</span>(<span class='no'>null</span>)
-<span class='no'>positive</span> <span class='kw'>&lt;-</span> <span class='no'>sccs</span>[<span class='no'>sccs</span>$<span class='no'>groundTruth</span> <span class='kw'>==</span> <span class='fl'>1</span>, ]
-<span class='fu'><a href='calibrateConfidenceInterval.html'>calibrateConfidenceInterval</a></span>(<span class='no'>positive</span>$<span class='no'>logRr</span>, <span class='no'>positive</span>$<span class='no'>seLogRr</span>, <span class='no'>model</span>)</div><div class='output co'>#&gt;         logRr  logLb95Rr logUb95Rr seLogRr
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sccs</span><span class='op'>)</span>
+<span class='va'>negatives</span> <span class='op'>&lt;-</span> <span class='va'>sccs</span><span class='op'>[</span><span class='va'>sccs</span><span class='op'>$</span><span class='va'>groundTruth</span> <span class='op'>==</span> <span class='fl'>0</span>, <span class='op'>]</span>
+<span class='va'>null</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fitNull.html'>fitNull</a></span><span class='op'>(</span><span class='va'>negatives</span><span class='op'>$</span><span class='va'>logRr</span>, <span class='va'>negatives</span><span class='op'>$</span><span class='va'>seLogRr</span><span class='op'>)</span>
+<span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'>convertNullToErrorModel</span><span class='op'>(</span><span class='va'>null</span><span class='op'>)</span>
+<span class='va'>positive</span> <span class='op'>&lt;-</span> <span class='va'>sccs</span><span class='op'>[</span><span class='va'>sccs</span><span class='op'>$</span><span class='va'>groundTruth</span> <span class='op'>==</span> <span class='fl'>1</span>, <span class='op'>]</span>
+<span class='fu'><a href='calibrateConfidenceInterval.html'>calibrateConfidenceInterval</a></span><span class='op'>(</span><span class='va'>positive</span><span class='op'>$</span><span class='va'>logRr</span>, <span class='va'>positive</span><span class='op'>$</span><span class='va'>seLogRr</span>, <span class='va'>model</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;         logRr  logLb95Rr logUb95Rr seLogRr
 #&gt; 1 -0.05936159 -0.6334743 0.5147511 0.29292</div><div class='input'>
 </div></pre>
   </div>
@@ -205,7 +206,7 @@ relative risk.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

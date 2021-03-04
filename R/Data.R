@@ -1,6 +1,6 @@
 # @file Data.R
 #
-# Copyright 2020 Observational Health Data Sciences and Informatics
+# Copyright 2021 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
 # 
@@ -158,7 +158,7 @@ NULL
 #' @details
 #' A dataset containing the incidence rate ratios (and standard errors) produced using a new-user 
 #' cohort design that compares new-users of dabigatran to new-users of warfarin for the outcome of 
-#' GI hemorrhage. The dataset includes estimates both for the outcome ofinterest as well as negative 
+#' GI hemorrhage. The dataset includes estimates both for the outcome of interest as well as negative 
 #' and positive control outcomes. Subject are required to have 183 days of continuous observation 
 #' prior to initiating treatment, be at least 65 years old at index date, and are required to have 
 #' no prior exposure to warfarin or dabigatran (or any other novel anticoagulant). Furthermore, 

@@ -5,7 +5,7 @@ sigma <- 0.2
 
 # Numeric solution ---------------------------------------
 fun <- function(x, mu, sigma) {
-   return(abs(x) * dnorm(x, mu, sigma)) 
+  return(abs(x) * dnorm(x, mu, sigma)) 
 }
 
 integrate(fun, lower = -Inf, upper = Inf, mu = mu, sigma = sigma)
@@ -131,7 +131,7 @@ computeOne <- function(i) {
   return(computeExpectedSystematicError(null))
 }
 system.time(
-dist <- sapply(1:1000, computeOne)
+  dist <- sapply(1:1000, computeOne)
 )
 
 # user  system elapsed 
@@ -174,7 +174,7 @@ negatives <- simulateControls(n = 25, mean = 00, sd = 0, seLogRr = runif(25, 0.1
 llAbsError <- function(theta, estimate, se) {
   absError <- rep(1/sqrt(theta), length(estimate))
   result <- -sum(log(dnorm(absError, estimate, se) +
-    dnorm(-absError, estimate, se)))
+                       dnorm(-absError, estimate, se)))
   print(paste(theta, result))
   if (length(result) == 0 || is.infinite(result))
     result <- 99999
@@ -200,7 +200,7 @@ meta$TE.random
 
 # Computing test for correlated esr -------------------------
 method1Ncs <- simulateControls(n = 50, mean = 0.1, sd = 0.1, seLogRr = runif(50, 0.1, 1))
- # second method slightly more biased:
+# second method slightly more biased:
 method2Ncs <- method1Ncs
 method2Ncs$logRr <- method2Ncs$logRr + rnorm(nrow(method2Ncs), mean = 0.05, sd = 0.05)
 
@@ -215,13 +215,13 @@ mean(deltaLogRr)
 sd(deltaLogRr)
 
 # Direct estimation (no mu or sigma) --------------------------------------
-mu <- 0.3
-sigma <- 0.2
-ncs <- simulateControls(n = 10, mean = mu, sd = sigma, seLogRr = runif(10, 0.1, 0.1))
+mu <- 0.5
+sigma <- 0.5
+ncs <- simulateControls(n = 60, mean = mu, sd = sigma, seLogRr = runif(20, 0.1, 0.1))
 closedFormIntegeralAbsolute(mu, sigma)
 
-# null <- fitMcmcNull(ncs$logRr, ncs$seLogRr)
-# computeExpectedSystematicError(null)
+null <- fitMcmcNull(ncs$logRr, ncs$seLogRr)
+computeExpectedSystematicError(null)
 
 computeCi(ncs)
 
@@ -230,7 +230,6 @@ computeCi(ncs)
 
 computeCi <- function(ncs, alpha = 0.05) {
   fun <- function(x, ncs) {
-    
     p <- sapply(1:nrow(ncs), function(i) log(dnorm(x, ncs$logRr[i], ncs$seLogRr[i]) + dnorm(-x, ncs$logRr[i], ncs$seLogRr[i])))
     if (is.null(dim(p))) {
       p <- sum(p)
@@ -238,72 +237,87 @@ computeCi <- function(ncs, alpha = 0.05) {
       p <- apply(p, 1, sum)
     }
     # print(paste(x, x + p))
-    return(-x - p)
+    return(-p)
   }
   
   fit <- nlm(fun, 0.6, ncs = ncs)
   ese <- abs(fit$estimate)
-  threshold <- -fit$minimum - qchisq(1 - alpha, df = 1)/2
   
-  precision <- 1e-07
+  x <- seq(0,4, length.out = 1000)
+  y <- exp(-fun(x, ncs = ncs))
+  # plot(x,y)
+  d <- list(x = x, y = y)
+  class(d) <- "density"
   
-  # Binary search for upper bound
-  L <- ese
-  H <- 2
-  ub <- Inf
-  while (H >= L) {
-    M <- L + (H - L)/2
-    llM <- -fun(M, ncs = ncs)
-    metric <- threshold - llM
-    if (metric > precision) {
-      H <- M
-    } else if (-metric > precision) {
-      L <- M
-    } else {
-      ub <- M
-      break
-    }
-    if (M == ese) {
-      warning("Error finding upper bound")
-      break
-    } else if (M == 10) {
-      warning("Confidence interval upper bound out of range")
-      break
-    }
-  }
+  ci <- HDInterval::hdi(d, credMass = 1 - alpha)
   
-  # Binary search for lower bound
-  if (threshold < -fun(0, ncs = ncs)) {
-    lb <- 0
-  } else {
-    L <- 0
-    H <- ese
-    lb <- -Inf
-    while (H >= L) {
-      M <- L + (H - L)/2
-      llM <- -fun(M, ncs = ncs)
-      metric <- threshold - llM
-      if (metric > precision) {
-        L <- M
-      } else if (-metric > precision) {
-        H <- M
-      } else {
-        lb <- M
-        break
-      }
-      if (M == ese) {
-        warning("Error finding lower bound")
-        break
-      } else if (M == 0) {
-        warning("Confidence interval lower bound out of range")
-        break
-      }
-    }
-  }
   result <- data.frame(ese = ese,
-                       lb = lb,
-                       ub = ub)
+                       lb = ci[1],
+                       ub = ci[2])
   return(result)
+  # 
+  # 
+  # threshold <- -fit$minimum - qchisq(1 - alpha, df = 1)/2
+  # 
+  # precision <- 1e-07
+  # 
+  # # Binary search for upper bound
+  # L <- ese
+  # H <- 2
+  # ub <- Inf
+  # while (H >= L) {
+  #   M <- L + (H - L)/2
+  #   llM <- -fun(M, ncs = ncs)
+  #   metric <- threshold - llM
+  #   if (metric > precision) {
+  #     H <- M
+  #   } else if (-metric > precision) {
+  #     L <- M
+  #   } else {
+  #     ub <- M
+  #     break
+  #   }
+  #   if (M == ese) {
+  #     warning("Error finding upper bound")
+  #     break
+  #   } else if (M == 10) {
+  #     warning("Confidence interval upper bound out of range")
+  #     break
+  #   }
+  # }
+  # 
+  # # Binary search for lower bound
+  # if (threshold < -fun(0, ncs = ncs)) {
+  #   lb <- 0
+  # } else {
+  #   L <- 0
+  #   H <- ese
+  #   lb <- -Inf
+  #   while (H >= L) {
+  #     M <- L + (H - L)/2
+  #     llM <- -fun(M, ncs = ncs)
+  #     metric <- threshold - llM
+  #     if (metric > precision) {
+  #       L <- M
+  #     } else if (-metric > precision) {
+  #       H <- M
+  #     } else {
+  #       lb <- M
+  #       break
+  #     }
+  #     if (M == ese) {
+  #       warning("Error finding lower bound")
+  #       break
+  #     } else if (M == 0) {
+  #       warning("Confidence interval lower bound out of range")
+  #       break
+  #     }
+  #   }
+  # }
+  # result <- data.frame(ese = ese,
+  #                      lb = lb,
+  #                      ub = ub)
+  # return(result)
 }
 
 
@@ -324,72 +338,22 @@ evaluateGridPoint <- function(row) {
       p <- apply(p, 1, sum)
     }
     # print(paste(x, x + p))
-    return(-x - p)
+    return(-p)
   }
   
   computeCi <- function(ncs, alpha = 0.05) {
     fit <- nlm(fun, 0.6, ncs = ncs)
     ese <- abs(fit$estimate)
-    threshold <- -fit$minimum - qchisq(1 - alpha, df = 1)/2
+    x <- seq(0,4, length.out = 1000)
+    y <- exp(-fun(x, ncs = ncs))
+    d <- list(x = x, y = y)
+    class(d) <- "density"
     
-    precision <- 1e-07
+    ci <- HDInterval::hdi(d, credMass = 1 - alpha)
     
-    # Binary search for upper bound
-    L <- ese
-    H <- 2
-    ub <- Inf
-    while (H >= L) {
-      M <- L + (H - L)/2
-      llM <- -fun(M, ncs = ncs)
-      metric <- threshold - llM
-      if (metric > precision) {
-        H <- M
-      } else if (-metric > precision) {
-        L <- M
-      } else {
-        ub <- M
-        break
-      }
-      if (M == ese) {
-        warning("Error finding upper bound")
-        break
-      } else if (M == 10) {
-        warning("Confidence interval upper bound out of range")
-        break
-      }
-    }
-    
-    # Binary search for lower bound
-    if (threshold < -fun(0, ncs = ncs)) {
-      lb <- 0
-    } else {
-      L <- 0
-      H <- ese
-      lb <- -Inf
-      while (H >= L) {
-        M <- L + (H - L)/2
-        llM <- -fun(M, ncs = ncs)
-        metric <- threshold - llM
-        if (metric > precision) {
-          L <- M
-        } else if (-metric > precision) {
-          H <- M
-        } else {
-          lb <- M
-          break
-        }
-        if (M == ese) {
-          warning("Error finding lower bound")
-          break
-        } else if (M == 0) {
-          warning("Confidence interval lower bound out of range")
-          break
-        }
-      }
-    }
     result <- data.frame(ese = ese,
-                         lb = lb,
-                         ub = ub)
+                         lb = ci[1],
+                         ub = ci[2])
     return(result)
   }
   

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • EmpiricalCalibration</title>
+<title>Compute the expected absolute systematic error — computeExpectedAbsoluteSystematicError • EmpiricalCalibration</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,12 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Compute the expected absolute systematic error — computeExpectedAbsoluteSystematicError" />
+<meta property="og:description" content="For a random study estimate, what is the expected value of the absolute systematic error?
+Provides a single summary value for a null distribution. The expected systematic error of a null 
+distribution is equal to its mean (mu), and is insensitive to the spread of the null distribution (sigma).
+Taking the absolute value of the expected systematic error we can express both mean and spread of the 
+estimated null distribution." />
 
 
 
@@ -58,7 +63,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -128,136 +133,53 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Compute the expected absolute systematic error</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/ExpectedSystematicError.R'><code>R/ExpectedSystematicError.R</code></a></small>
+    <div class="hidden name"><code>computeExpectedAbsoluteSystematicError.Rd</code></div>
     </div>
 
-    <div id="empiricalcalibration-210" class="section level1">
-<h1 class="page-header" data-toc-text="2.1.0">
-<a href="#empiricalcalibration-210" class="anchor"></a>EmpiricalCalibration 2.1.0<small> Unreleased </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li>Adding computation of expected absolute systematic error. Can be shown in plots.</li>
-</ol>
-</div>
-    <div id="empiricalcalibration-202" class="section level1">
-<h1 class="page-header" data-toc-text="2.0.2">
-<a href="#empiricalcalibration-202" class="anchor"></a>EmpiricalCalibration 2.0.2<small> 2020-04-07 </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li>Center title on all plots.</li>
-</ol>
-<p>Bugfixes</p>
-<ol>
-<li>Fix build fail in R 4.0.0.</li>
-</ol>
-</div>
-    <div id="empiricalcalibration-201" class="section level1">
-<h1 class="page-header" data-toc-text="2.0.1">
-<a href="#empiricalcalibration-201" class="anchor"></a>EmpiricalCalibration 2.0.1<small> 2020-01-13 </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li>computeTraditionalCi now outputs data frame instead of vector.</li>
-</ol>
-<p>Bugfixes</p>
-<ol>
-<li>convertNullToErrorModel function now adheres to new systematic error model (SD no longer on log scale).</li>
-</ol>
-</div>
-    <div id="empiricalcalibration-200" class="section level1">
-<h1 class="page-header" data-toc-text="2.0.0">
-<a href="#empiricalcalibration-200" class="anchor"></a>EmpiricalCalibration 2.0.0<small> 2019-07-08 </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li>Adding new method for fitting systematic error models that drops the assumption that SD is linear in the log scale, but rather just linear (in the logRr space). Setting that to default, but allowing users to use legacy model if they choose.</li>
-</ol>
-</div>
-    <div id="empiricalcalibration-141" class="section level1">
-<h1 class="page-header" data-toc-text="1.4.1">
-<a href="#empiricalcalibration-141" class="anchor"></a>EmpiricalCalibration 1.4.1<small> Unreleased </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li>Added convertNullToErrorModel function to allow confidence interval calibration using only negative controls (requiring the user to make some assumptions).</li>
-</ol>
-</div>
-    <div id="empiricalcalibration-140" class="section level1">
-<h1 class="page-header" data-toc-text="1.4.0">
-<a href="#empiricalcalibration-140" class="anchor"></a>EmpiricalCalibration 1.4.0<small> 2018-11-24 </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li>Added plot showing effect of confidence interval calibration, similar to p-value plot.</li>
-</ol>
-<p>Bugfixes</p>
-<ol>
-<li>Fixed ‘unknown aesthetics’ warning when calling plotTrueAndObserved.</li>
-</ol>
-</div>
-    <div id="empiricalcalibration-136" class="section level1">
-<h1 class="page-header" data-toc-text="1.3.6">
-<a href="#empiricalcalibration-136" class="anchor"></a>EmpiricalCalibration 1.3.6<small> 2017-11-07 </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li><p>Added plots showing expected type 1 error given an estimated empirical null distribution.</p></li>
-<li><p>Closed form solution for RR vs SE plot for faster computation (especially when plotting credible intervals).</p></li>
-</ol>
-<p>Bugfixes</p>
-<ol>
-<li>Several improvements of the robustness of fitting systematic error models.</li>
-</ol>
-</div>
-    <div id="empiricalcalibration-131" class="section level1">
-<h1 class="page-header" data-toc-text="1.3.1">
-<a href="#empiricalcalibration-131" class="anchor"></a>EmpiricalCalibration 1.3.1<small> 2017-05-16 </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li><p>Confidence interval calibration model StdDev transformed to log scale to prevent negative StdDev.</p></li>
-<li><p>Confidence interval calibration cross-validation now allows specification of leave-out groups.</p></li>
-<li><p>various new plots for evaluating confidence interval calibration.</p></li>
-<li><p>Added confidence interval calibration vignette.</p></li>
-<li><p>Added example data for confidence interval calibration</p></li>
-</ol>
-<p>Bugfixes</p>
-<ol>
-<li>None</li>
-</ol>
-</div>
-    <div id="empiricalcalibration-120" class="section level1">
-<h1 class="page-header" data-toc-text="1.2.0">
-<a href="#empiricalcalibration-120" class="anchor"></a>EmpiricalCalibration 1.2.0<small> 2016-08-16 </small>
-</h1>
-<p>Changes</p>
-<ol>
-<li><p>Ability to add credible intervals to calibration effect plot</p></li>
-<li><p>Plot CI calibration (using leave-one-out cross-validation)</p></li>
-</ol>
-<p>Bugfixes</p>
-<ol>
-<li><p>Fixed vignette name in index</p></li>
-<li><p>Removed coverage plot (moved to MethodEvaluation package)</p></li>
-</ol>
-</div>
-    <div id="empiricalcalibration-110" class="section level1">
-<h1 class="page-header" data-toc-text="1.1.0">
-<a href="#empiricalcalibration-110" class="anchor"></a>EmpiricalCalibration 1.1.0<small> 2016-02-15 </small>
-</h1>
-<p>Initial submission to CRAN</p>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>For a random study estimate, what is the expected value of the absolute systematic error?
+Provides a single summary value for a null distribution. The expected systematic error of a null 
+distribution is equal to its mean (mu), and is insensitive to the spread of the null distribution (sigma).</p>
+<p>Taking the absolute value of the expected systematic error we can express both mean and spread of the 
+estimated null distribution.</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>computeExpectedAbsoluteSystematicError</span><span class='op'>(</span><span class='va'>null</span>, alpha <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>null</th>
+      <td><p>An object of class <code>null</code> created using the <code>fitNull</code> function or an
+object of class <code>mcmcNull</code> created using the <code>fitMcmcNull</code> function.</p></td>
+    </tr>
+    <tr>
+      <th>alpha</th>
+      <td><p>The expected type I error for computing the credible interval.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>The expected absolute systematic error. If the provided <code>null</code> argument is of type <code>mcmcNull</code>,
+the credible interval (defined by <code>alpha</code>) is also returned.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sccs</span><span class='op'>)</span>
+<span class='va'>negatives</span> <span class='op'>&lt;-</span> <span class='va'>sccs</span><span class='op'>[</span><span class='va'>sccs</span><span class='op'>$</span><span class='va'>groundTruth</span> <span class='op'>==</span> <span class='fl'>0</span>, <span class='op'>]</span>
+<span class='va'>null</span> <span class='op'>&lt;-</span> <span class='fu'><a href='fitNull.html'>fitNull</a></span><span class='op'>(</span><span class='va'>negatives</span><span class='op'>$</span><span class='va'>logRr</span>, <span class='va'>negatives</span><span class='op'>$</span><span class='va'>seLogRr</span><span class='op'>)</span>
+<span class='fu'>computeExpectedAbsoluteSystematicError</span><span class='op'>(</span><span class='va'>null</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0.7924259</div><div class='input'>
+</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 
