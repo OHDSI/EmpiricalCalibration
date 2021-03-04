@@ -16,8 +16,8 @@ Description: Routines for performing empirical calibration of observational
   estimated effect size when the null hypothesis is true taking both random
   and systematic error into account. A similar approach can be used to
   calibrate confidence intervals, using both negative and positive controls. 
-  For more details, see Schuemie, et al. (2013) <doi:10.1002/sim.5925> and
-  Schuemie, et al. (2018) <doi:10.1073/pnas.1708282114>.
+  For more details, see Schuemie et al. (2013) <doi:10.1002/sim.5925> and
+  Schuemie et al. (2018) <doi:10.1073/pnas.1708282114>.
 VignetteBuilder: knitr
 Imports:
   ggplot2 (>= 2.0.0),
@@ -28,7 +28,7 @@ Suggests:
   knitr,
   rmarkdown
 License: Apache License 2.0
-URL: https://ohdsi.github.io/EmpiricalCalibration, https://github.com/OHDSI/EmpiricalCalibration
+URL: https://ohdsi.github.io/EmpiricalCalibration/, https://github.com/OHDSI/EmpiricalCalibration
 BugReports: https://github.com/OHDSI/EmpiricalCalibration/issues
 RoxygenNote: 7.1.1
 Encoding: UTF-8
