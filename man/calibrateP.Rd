@@ -7,11 +7,19 @@
 \alias{calibrateP.mcmcNull}
 \title{Calibrate the p-value}
 \usage{
-calibrateP(null, logRr, seLogRr, ...)
+calibrateP(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...)
 
-\method{calibrateP}{null}(null, logRr, seLogRr, ...)
+\method{calibrateP}{null}(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...)
 
-\method{calibrateP}{mcmcNull}(null, logRr, seLogRr, pValueOnly, ...)
+\method{calibrateP}{mcmcNull}(
+  null,
+  logRr,
+  seLogRr,
+  twoSided = TRUE,
+  upper = TRUE,
+  pValueOnly,
+  ...
+)
 }
 \arguments{
 \item{null}{An object of class \code{null} created using the \code{fitNull} function or an
@@ -23,13 +31,17 @@ object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.}
 error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 estimate>))/qnorm(0.025)}
 
+\item{twoSided}{Compute two-sided (TRUE) or one-sided (FALSE) p-value?}
+
+\item{upper}{If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?}
+
 \item{...}{Any additional parameters (currently none).}
 
 \item{pValueOnly}{If true, will return only the calibrated P-value itself, not the credible
 interval.}
 }
 \value{
-The two-sided calibrated p-value.
+The calibrated p-value.
 }
 \description{
 \code{calibrateP} computes calibrated p-values using the fitted null distribution

@@ -4,7 +4,7 @@
 \alias{computeTraditionalP}
 \title{Compute the (traditional) p-value}
 \usage{
-computeTraditionalP(logRr, seLogRr)
+computeTraditionalP(logRr, seLogRr, twoSided = TRUE, upper = TRUE)
 }
 \arguments{
 \item{logRr}{A numeric vector of one or more effect estimates on the log scale}
@@ -12,9 +12,13 @@ computeTraditionalP(logRr, seLogRr)
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
 error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 estimate>))/qnorm(0.025)}
+
+\item{twoSided}{Compute two-sided (TRUE) or one-sided (FALSE) p-value?}
+
+\item{upper}{If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?}
 }
 \value{
-The two-sided (traditional) p-value.
+The (traditional) p-value.
 }
 \description{
 \code{computeTraditionalP} computes the traditional two-sided p-value based on the log of the

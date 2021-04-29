@@ -217,7 +217,7 @@ print.mcmcNull <- function(x, ...) {
 #'                     interval.
 #'
 #' @export
-calibrateP.mcmcNull <- function(null, logRr, seLogRr, pValueOnly, ...) {
+calibrateP.mcmcNull <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, pValueOnly, ...) {
   mcmc <- attr(null, "mcmc")
   adjustedP <- data.frame(p = rep(1, length(logRr)), lb95ci = 0, ub95ci = 0)
   for (i in 1:length(logRr)) {
@@ -226,13 +226,17 @@ calibrateP.mcmcNull <- function(null, logRr, seLogRr, pValueOnly, ...) {
       adjustedP$lb95ci[i] <- NA
       adjustedP$ub95ci[i] <- NA
     } else {
-      P_upper_bound <- pnorm((mcmc$chain[,
-                              1] - logRr[i])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-      P_lower_bound <- pnorm((logRr[i] - mcmc$chain[,
-                              1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-      p <- P_upper_bound
-      p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
-      p <- p * 2
+      pUpperBound <- pnorm((mcmc$chain[, 1] - logRr[i])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+      pLowerBound <- pnorm((logRr[i] - mcmc$chain[, 1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+      if (twoSided) {
+        p <- pUpperBound
+        p[pLowerBound < p] <- pLowerBound[pLowerBound < p]
+        p <- p * 2
+      } else if (upper) {
+        p <- pUpperBound
+      } else {
+        p <- pLowerBound
+      }
       adjustedP$p[i] <- quantile(p, 0.5)
       adjustedP$lb95ci[i] <- quantile(p, 0.025)
       adjustedP$ub95ci[i] <- quantile(p, 0.975)
