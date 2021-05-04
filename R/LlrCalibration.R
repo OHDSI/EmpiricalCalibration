@@ -74,7 +74,10 @@ calibrateLlr.null <- function(null, likelihoodApproximation, twoSided = FALSE, u
     }
   } else {
     message("Detected data following grid distribution")
-    # TODO: implement efficient grid likelihood function
+    logLikelihood <- gridLikelihood
+    if (!is.data.frame(likelihoodApproximation)) {
+      likelihoodApproximation <- as.data.frame(t(likelihoodApproximation))
+    }
   }
   calibrateOneLlr <- function(i) {
     optimum <-  suppressWarnings(optim(0, function(x) -logLikelihood(x, row = likelihoodApproximation[i, ])))
@@ -106,14 +109,29 @@ calibrateLlr.null <- function(null, likelihoodApproximation, twoSided = FALSE, u
   return(calibratedLlr)
 }
 
-# gridLikelihood <- function(x, row) {
-#   gridX <- as.numeric(colnames(row))
-#   if (any(is.na(gridX))) {
-#     stop("Expecting grid data, but not all column names are numeric")
-#   }
-#   lowIdx <- 
-#   
-# }
+
+gridOneLikelihood <- function(x, gridX, gridY) {
+  highIdx <- min(which(gridX > x))
+  if (highIdx == 1) {
+    return(gridY[highIdx])
+  } else if (is.infinite(highIdx)) {
+    return(gridY[length(gridY)])
+  } else {
+    lowIdx <- highIdx - 1
+    deltaY <- gridY[highIdx] - gridY[lowIdx]
+    deltaX <- gridX[highIdx] - gridX[lowIdx]
+    coefficient <- deltaY / deltaX
+    return(gridY[lowIdx] + (x - gridX[lowIdx]) * coefficient)
+  }
+}
+
+gridLikelihood <- function(x, row) {
+  gridX <- as.numeric(colnames(row))
+  if (any(is.na(gridX))) {
+    stop("Expecting grid data, but not all column names are numeric")
+  }
+  return(sapply(x, gridOneLikelihood, gridX = gridX, gridY = as.numeric(row)))
+}
 
 computePFromLlr <- function(llr, mle, nullLogRr = 0) {
   ifelse(mle < nullLogRr, 1 - (1 - pchisq(2 * llr, df = 1))/2, (1 - pchisq(2 * llr, df = 1))/2)

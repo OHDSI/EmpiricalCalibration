@@ -32,13 +32,27 @@ simulate <- function(seed, parameters, useCalibration = TRUE, looks = 10) {
                         unexposedTime = sum(data$time[!data$exposure])))
     } else {
       if (useCalibration) {
-        llAproximation <- EvidenceSynthesis::approximateLikelihood(cyclopsFit = fit,
+        llApproximation <- EvidenceSynthesis::approximateLikelihood(cyclopsFit = fit,
                                                                    parameter = "exposureTRUE",
-                                                                   approximation = "custom")
+                                                                   approximation = "grid")
+        # EvidenceSynthesis::plotLikelihoodFit(llApproximation, fit, parameter = "exposureTRUE")
         null <- c(parameters$nullMu, parameters$nullSigma)
         names(null) <- c("mean", "sd")
         class(null) <- "null"
-        llr <- EmpiricalCalibration::calibrateLlr(null, llAproximation, twoSided = FALSE, upper = TRUE)
+        llr <- EmpiricalCalibration::calibrateLlr(null = null, 
+                                                  likelihoodApproximation = llApproximation, 
+                                                  twoSided = FALSE, 
+                                                  upper = TRUE)
+      #   
+      #   EvidenceSynthesis::customFunction(x = coef(fit)["exposureTRUE"],
+      #                                     mu = llAproximation$mu,
+      #                                     sigma = llAproximation$sigma,
+      #                                     gamma = llAproximation$gamma) -
+      #     EvidenceSynthesis::customFunction(x = 0,
+      #                                       mu = llAproximation$mu,
+      #                                       sigma = llAproximation$sigma,
+      #                                       gamma = llAproximation$gamma)
+      #   fit$log_likelihood - llNull
       } else {
         if (coef(fit)["exposureTRUE"] > 0) {
           llNull <- Cyclops::getCyclopsProfileLogLikelihood(object = fit,
@@ -85,7 +99,7 @@ simulate <- function(seed, parameters, useCalibration = TRUE, looks = 10) {
 }
 
 # Compute type I error (probability of a signal when the null is true). Should be 0.05:
-cluster <- ParallelLogger::makeCluster(10)
+cluster <- ParallelLogger::makeCluster(20)
 ParallelLogger::clusterRequire(cluster, "survival")
 
 
@@ -123,6 +137,27 @@ mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters =
 
 mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = FALSE, looks = 10)), na.rm = TRUE)
 # [1] 0.258
+
+
+# Scenario 5: no systematic error, 1 look, imbalanced exposure cohorts
+parameters$nullMu <- 0
+parameters$nullSigma <- 0
+parameters$pExposure <- 0.1
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = TRUE, looks = 1)), na.rm = TRUE)
+# [1] 0.04
+
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = FALSE, looks = 1)), na.rm = TRUE)
+# [1] 0.041
+
+# Scenario 6: systematic error, 10 sequential looks, imbalanced exposure cohorts
+parameters$nullMu <- 0.2
+parameters$nullSigma <- 0.2
+parameters$pExposure <- 0.1
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = TRUE, looks = 10)), na.rm = TRUE)
+# [1] 0.043
+
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = FALSE, looks = 10)), na.rm = TRUE)
+# [1] 0.146
 
 ParallelLogger::stopCluster(cluster)
 
