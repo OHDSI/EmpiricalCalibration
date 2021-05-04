@@ -147,6 +147,7 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
   }
 
   calibratedP <- sapply(1:length(logRr), calibrateOneP)
+  names(calibratedP) <- NULL
   return(calibratedP)
 }
 
