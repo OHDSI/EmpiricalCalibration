@@ -23,7 +23,7 @@
 #' This function computes a calibrated two-sided p-value as described in Schuemie et al (2014).
 #'
 #' @param likelihoodApproximation    A data frame containing either normal, skew-normal, custom parametric, or grid
-#'                likelihood data. One row per database.
+#'                  likelihood data. 
 #' @param null      An object of class \code{null} created using the \code{fitNull} function or an
 #'                  object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.
 #' @param twoSided  Compute two-sided (TRUE) or one-sided (FALSE) p-value?
@@ -72,23 +72,32 @@ calibrateLlr.null <- function(null, likelihoodApproximation, twoSided = FALSE, u
       }
       return(log(2) + dnorm(x, row$mu, row$sigma, log = TRUE) + pnorm(row$alpha * (x - row$mu), 0, row$sigma, log.p = TRUE))
     }
-  } else if (is.list(data) && !is.data.frame(data)) {
-    message("Detected (pooled) patient-level data")
-    
+  } else {
+    message("Detected data following grid distribution")
+    # TODO: implement efficient grid likelihood function
   }
   calibrateOneLlr <- function(i) {
     optimum <-  suppressWarnings(optim(0, function(x) -logLikelihood(x, row = likelihoodApproximation[i, ])))
     mle <- optimum$par
     ml <- -optimum$value
-    calibratedP <- integrate(f = computePAtNull, 
-                             logLikelihood = logLikelihood, 
-                             row = likelihoodApproximation[i, ],
-                             mle = mle,
-                             ml = ml,
-                             null = null,
-                             lower = null[1] - 10 * null[2], 
-                             upper = null[1] + 10 * null[2])$value
-    calibratedLlr <- computeLlrFromP(calibratedP)
+    if (null[2] < 0.001) {
+      if (mle < null[1]) {
+        calibratedLlr <- 0
+      } else {
+        calibratedLlr <- ml - logLikelihood(null[1], likelihoodApproximation[i, ])
+      }
+    } else {
+      calibratedP <- integrate(f = computePAtNull, 
+                               logLikelihood = logLikelihood, 
+                               row = likelihoodApproximation[i, ],
+                               mle = mle,
+                               ml = ml,
+                               null = null,
+                               lower = null[1] - 10 * null[2], 
+                               upper = null[1] + 10 * null[2])$value
+      calibratedLlr <- computeLlrFromP(calibratedP)
+    }
+    
     return(calibratedLlr)
   }
   
@@ -106,8 +115,8 @@ calibrateLlr.null <- function(null, likelihoodApproximation, twoSided = FALSE, u
 #   
 # }
 
-computePFromLlr <- function(llr, mle, nullRr = 0) {
-  ifelse(mle < nullRr, 1 - (1 - pchisq(2 * llr, df = 1))/2, (1 - pchisq(2 * llr, df = 1))/2)
+computePFromLlr <- function(llr, mle, nullLogRr = 0) {
+  ifelse(mle < nullLogRr, 1 - (1 - pchisq(2 * llr, df = 1))/2, (1 - pchisq(2 * llr, df = 1))/2)
 }
 
 computeLlrFromP <- function(p) {
@@ -120,6 +129,6 @@ computeLlrFromP <- function(p) {
 
 computePAtNull <- function(x, logLikelihood, row, mle, ml, null) {
   llr <- ml - logLikelihood(x, row)
-  p <- computePFromLlr(llr, mle = mle, nullRr = x)
+  p <- computePFromLlr(llr, mle = mle, nullLogRr = x)
   p * dnorm(x, null[1], null[2])
 }
