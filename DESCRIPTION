@@ -23,11 +23,14 @@ Imports:
   ggplot2 (>= 2.0.0),
   gridExtra,
   methods,
-  rlang
+  rlang,
+  Rcpp
 Suggests:
   knitr,
   rmarkdown
 License: Apache License 2.0
+LinkingTo: Rcpp
+NeedsCompilation: yes
 URL: https://ohdsi.github.io/EmpiricalCalibration/, https://github.com/OHDSI/EmpiricalCalibration
 BugReports: https://github.com/OHDSI/EmpiricalCalibration/issues
 RoxygenNote: 7.1.1

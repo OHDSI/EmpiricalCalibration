@@ -35,24 +35,14 @@ simulate <- function(seed, parameters, useCalibration = TRUE, looks = 10) {
         llApproximation <- EvidenceSynthesis::approximateLikelihood(cyclopsFit = fit,
                                                                    parameter = "exposureTRUE",
                                                                    approximation = "grid")
-        # EvidenceSynthesis::plotLikelihoodFit(llApproximation, fit, parameter = "exposureTRUE")
         null <- c(parameters$nullMu, parameters$nullSigma)
         names(null) <- c("mean", "sd")
         class(null) <- "null"
+      
         llr <- EmpiricalCalibration::calibrateLlr(null = null, 
                                                   likelihoodApproximation = llApproximation, 
                                                   twoSided = FALSE, 
                                                   upper = TRUE)
-      #   
-      #   EvidenceSynthesis::customFunction(x = coef(fit)["exposureTRUE"],
-      #                                     mu = llAproximation$mu,
-      #                                     sigma = llAproximation$sigma,
-      #                                     gamma = llAproximation$gamma) -
-      #     EvidenceSynthesis::customFunction(x = 0,
-      #                                       mu = llAproximation$mu,
-      #                                       sigma = llAproximation$sigma,
-      #                                       gamma = llAproximation$gamma)
-      #   fit$log_likelihood - llNull
       } else {
         if (coef(fit)["exposureTRUE"] > 0) {
           llNull <- Cyclops::getCyclopsProfileLogLikelihood(object = fit,
@@ -125,7 +115,7 @@ mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters =
 parameters$nullMu <- 0.2
 parameters$nullSigma <- 0.2
 mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = TRUE, looks = 1)), na.rm = TRUE)
-# [1] 0.047
+# [1] 0.045
 
 mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = FALSE, looks = 1)), na.rm = TRUE)
 # [1] 0.324

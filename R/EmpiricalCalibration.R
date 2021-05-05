@@ -19,9 +19,11 @@
 #' @keywords internal
 "_PACKAGE"
 
+#' @importFrom Rcpp evalCpp
 #' @import stats
 #' @importFrom grDevices rgb
 #' @importFrom utils read.csv
 #' @importFrom methods is
 #' @importFrom rlang .data
+#' @useDynLib EmpiricalCalibration
 NULL

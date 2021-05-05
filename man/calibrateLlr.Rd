@@ -2,12 +2,9 @@
 % Please edit documentation in R/LlrCalibration.R
 \name{calibrateLlr}
 \alias{calibrateLlr}
-\alias{calibrateLlr.null}
 \title{Calibrate the log likelihood ratio}
 \usage{
 calibrateLlr(null, likelihoodApproximation, twoSided = FALSE, upper = TRUE)
-
-\method{calibrateLlr}{null}(null, likelihoodApproximation, twoSided = FALSE, upper = TRUE)
 }
 \arguments{
 \item{null}{An object of class \code{null} created using the \code{fitNull} function or an
@@ -21,19 +18,11 @@ likelihood data.}
 \item{upper}{If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?}
 }
 \value{
-The calibrated og likelihood ratio.
+The calibrated log likelihood ratio.
 }
 \description{
-\code{calibrateP} computes calibrated p-values using the fitted null distribution
+\code{calibrateLlr} computes calibrated log likelihood ratio using the fitted null distribution
 }
-\details{
-This function computes a calibrated two-sided p-value as described in Schuemie et al (2014).
-}
-\section{Methods (by class)}{
-\itemize{
-\item \code{null}: Computes the calibrated log likelihood ratio using asymptotic assumptions.
-}}
-
 \examples{
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
