@@ -152,3 +152,53 @@ mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters =
 ParallelLogger::stopCluster(cluster)
 
 
+
+# Abstract Poisson (historic comparator method) -------------------------------------------------------------
+parameters <- data.frame(n = 1000000, # Subjects
+                         rate = 0.0001,
+                         nullMu = 0.2, # Null distribution mean (at log IRR scale)
+                         nullSigma = 0.2) # Null distribution SD (at log IRR scale))
+
+simulate <- function(seed, parameters, useCalibration = TRUE, cv) {
+  set.seed(seed)
+  
+  llr <- function(observed, expected) {
+    if (observed <= expected) {
+      return(0)
+    } else {
+      if (useCalibration) {
+        bounds = c(log(0.1), log(10))
+        x <- seq(bounds[1], bounds[2], length.out = 1000)
+        ll <- dpois(observed, expected * exp(x), log = TRUE)
+        names(ll) <- x
+        null <- c(parameters$nullMu, parameters$nullSigma)
+        names(null) <- c("mean", "sd")
+        class(null) <- "null"
+        return(EmpiricalCalibration::calibrateLlr(null = null, likelihoodApproximation = ll))
+      } else {
+        return(dpois(observed, observed, log = TRUE) - dpois(observed, expected, log = TRUE))
+      }
+    }
+  }
+  systematicError <- rnorm(n = 1, mean = parameters$nullMu, sd = parameters$nullSigma)
+  observed <- sum(rpois(parameters$n, parameters$rate * exp(systematicError)))
+  expected <- parameters$n * parameters$rate
+  llr <- llr(observed = observed, expected = expected)
+  return(llr > cv)
+}
+
+# Compute type I error (probability of a signal when the null is true). Should be 0.05:
+expected <- parameters$n * parameters$rate
+cv <- Sequential::CV.Poisson(SampleSize = expected,
+                             alpha = 0.05,
+                             M = 1,
+                             GroupSizes = c(expected))
+
+cluster <- ParallelLogger::makeCluster(10)
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:10000, simulate, parameters = parameters, cv = cv, useCalibration = TRUE)), na.rm = TRUE)
+# [1] 0.0471
+
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:10000, simulate, parameters = parameters, cv = cv, useCalibration = FALSE)), na.rm = TRUE)
+# [1] 0.5726
+
+ParallelLogger::stopCluster(cluster)
