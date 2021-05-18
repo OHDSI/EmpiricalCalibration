@@ -3,7 +3,9 @@ EmpiricalCalibration 2.2.0
 
 Changes
 
-1. Adding option to make p-values one-sided
+1. Adding option to make p-values one-sided.
+
+2. Adding empirical calibration of the log likelihood ratio.
 
 
 EmpiricalCalibration 2.1.0
