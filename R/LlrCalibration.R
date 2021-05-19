@@ -82,9 +82,10 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
   calibrateOneLlr <- function(i) {
     row <- likelihoodApproximation[i, ]
     if (type == "grid") {
+      row <- as.numeric(row)
       idx <- which(row == max(row))[1]
-      mle <- as.numeric(colnames(row)[idx])
-      ml <- row[, idx]
+      mle <- gridX[idx]
+      ml <- row[idx]
     } else if (type == "normal") {
       mle <- row$logRr
       ml <- logLikelihood(row$logRr, row = row, gridX = gridX)
@@ -108,12 +109,12 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
       return(result)
     } else {
       result <- calibrateOneLlrOneNull(nullMu = null[1],
-                             nullSigma = null[2],
-                             logLikelihood = logLikelihood,
-                             row = row,
-                             gridX = gridX,
-                             mle = mle,
-                             ml = ml)
+                                       nullSigma = null[2],
+                                       logLikelihood = logLikelihood,
+                                       row = row,
+                                       gridX = gridX,
+                                       mle = mle,
+                                       ml = ml)
       return(result    )
     }
   }
@@ -128,16 +129,12 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
   return(calibratedLlr)
 }
 
-gridLikelihood <- function(x, row, gridX) {
-  return(sapply(x, EmpiricalCalibration:::gridOneLikelihood, gridX = gridX, gridY = as.numeric(row)))
-}
-
 computePFromLlr <- function(llr, mle, nullLogRr = 0) {
   ifelse(mle < nullLogRr, 1 - (1 - pchisq(2 * llr, df = 1))/2, (1 - pchisq(2 * llr, df = 1))/2)
 }
 
 computeLlrFromP <- function(p) {
-  if (p > 0.5) {
+  if (p >= 0.5) {
     return(0)
   } else {
     return(qchisq(1 - 2 * p, df = 1) / 2)

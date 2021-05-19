@@ -26,23 +26,27 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-double gridOneLikelihood(double x, const NumericVector& gridX, const NumericVector& gridY) {
+NumericVector gridLikelihood(NumericVector& x, const NumericVector& row, const NumericVector& gridX) {
   int n = gridX.size();
-  if (x < gridX[0]) {
-    double slope = std::max(0.0, (gridY[1] - gridY[0]) / (gridX[1] - gridX[0]));
-    return (x - gridX[0]) * slope + gridY[0];
-  } 
-  if (x >= gridX[n - 1]) {
-    double slope = std::min(0.0, (gridY[n - 1] - gridY[n - 2]) / (gridX[n - 1] - gridX[n - 2]));
-    return (x - gridX[n - 1]) * slope + gridY[n - 1];
-  } 
-  for(int i = 0; i < n; ++i) {
-    if (gridX[i] >= x) {
-      double slope = (gridY[i] - gridY[i - 1]) / (gridX[i] - gridX[i - 1]);
-      return (x - gridX[i - 1]) * slope + gridY[i - 1];
+  NumericVector result(x.size());
+  for (int i = 0; i < x.size(); ++i) {
+    if (x[i] < gridX[0]) {
+      double slope = std::max(0.0, (row[1] - row[0]) / (gridX[1] - gridX[0]));
+      result[i] = (x[i] - gridX[0]) * slope + row[0];
+    } else if (x[i] >= gridX[n - 1]) {
+      double slope = std::min(0.0, (row[n - 1] - row[n - 2]) / (gridX[n - 1] - gridX[n - 2]));
+      result[i] = (x[i] - gridX[n - 1]) * slope + row[n - 1];
+    } else {
+      for (int j = 0; j < n; ++j) {
+        if (gridX[j] >= x[i]) {
+          double slope = (row[j] - row[j - 1]) / (gridX[j] - gridX[j - 1]);
+          result[i] = (x[i] - gridX[j - 1]) * slope + row[j - 1];
+          break;
+        }
+      }
     }
   }
-  return 0;
+  return result;
 }
 
 #endif // __RcppWrapper_cpp__

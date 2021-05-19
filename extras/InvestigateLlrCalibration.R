@@ -124,3 +124,30 @@ calibratedLlr <- computeLlrFromP(calibratedP)
 
 computePFromLlr(calibratedLlr)
 # 0.2274269 
+
+# Simulate example using grid likelihood approximation with MCMC ----------------------------
+library(Cyclops)
+library(EmpiricalCalibration)
+set.seed(1)
+n <- 400
+background <- 0.05
+rr <- 2
+treatment <- runif(n) < 0.05
+pOutcome <- ifelse(treatment, background * rr, background)
+outcome <- runif(n) < pOutcome
+sum(outcome)
+cyclopsData <- createCyclopsData(outcome ~ treatment, modelType = "lr")
+fit <- fitCyclopsModel(cyclopsData)
+likelihoodApproximation <- EvidenceSynthesis::approximateLikelihood(fit, approximation = "grid")
+
+data <- simulateControls(n = 50, mean = 0, sd = 0, trueLogRr = 0)
+null <- fitMcmcNull(data$logRr, data$seLogRr)
+
+system.time(
+  calibrateLlr(null, likelihoodApproximation) 
+)
+# user  system elapsed 
+# 10.25    0.00   10.25
+
+# user  system elapsed 
+# 5.83    0.00    5.85 
