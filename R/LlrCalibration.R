@@ -163,7 +163,8 @@ calibrateOneLlrOneNull <- function(nullMu, nullSigma, logLikelihood, row, gridX,
                              gridX = gridX,
                              null = c(nullMu, nullSigma),
                              lower = nullMu - 10 * nullSigma, 
-                             upper = nullMu + 10 * nullSigma)$value
+                             upper = nullMu + 10 * nullSigma,
+                             stop.on.error = FALSE)$value
     calibratedLlr <- computeLlrFromP(calibratedP)
   }
   return(calibratedLlr)
