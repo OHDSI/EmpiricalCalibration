@@ -137,7 +137,18 @@ computeLlrFromP <- function(p) {
   if (p >= 0.5) {
     return(0)
   } else {
-    return(qchisq(1 - 2 * p, df = 1) / 2)
+    if (p < 1e-16) {
+      # For very small p values qchisq returns Inf. 
+      # Behaves roughly log linear in that region, so using linear extrapolation.
+      # p <- exp(-10:-25)
+      # llr <- qchisq(1 - 2 * p, df = 1) / 2
+      # plot(log(p), llr)
+      # fit <- lm(llr ~ log(p))
+      # coef(fit)
+      return(-2.0604312 - 0.9677458 * log(p))
+    } else {
+      return(qchisq(1 - 2 * p, df = 1) / 2)
+    }
   }
 }
 
