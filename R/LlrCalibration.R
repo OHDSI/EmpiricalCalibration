@@ -136,9 +136,11 @@ computePFromLlr <- function(llr, mle, nullLogRr = 0) {
   # p <- (1 - pchisq(2 * llr, df = 1))/2
   # plot(llr, log(p))
   # fit <- lm(log(p) ~ llr)
-  # coef(fit)
+  # # Recompute intercept at cut point for smooth integration:
+  # formatC(log(p[length(p)]) - llr[length(llr)] * coef(fit)[2], digits = 20)
+  # formatC(coef(fit)[2], digits = 20)
   p <- ifelse(llr > 33,
-              exp(-2.405603 - 1.019384 * llr),
+              exp(-2.4039960592000753081 - 1.0193835554520327413 * llr),
               (1 - pchisq(2 * llr, df = 1))/2)
   ifelse(mle < nullLogRr, 1 - p, p)
 }
