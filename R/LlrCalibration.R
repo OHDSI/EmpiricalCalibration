@@ -130,7 +130,17 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
 }
 
 computePFromLlr <- function(llr, mle, nullLogRr = 0) {
-  ifelse(mle < nullLogRr, 1 - (1 - pchisq(2 * llr, df = 1))/2, (1 - pchisq(2 * llr, df = 1))/2)
+  # For very large llr values pchisq returns 0. 
+  # Behaves roughly log linear in that region, so using linear extrapolation.
+  # llr <- 20:33
+  # p <- (1 - pchisq(2 * llr, df = 1))/2
+  # plot(llr, log(p))
+  # fit <- lm(log(p) ~ llr)
+  # coef(fit)
+  p <- ifelse(llr > 33,
+              exp(-2.405603 - 1.019384 * llr),
+              (1 - pchisq(2 * llr, df = 1))/2)
+  ifelse(mle < nullLogRr, 1 - p, p)
 }
 
 computeLlrFromP <- function(p) {
