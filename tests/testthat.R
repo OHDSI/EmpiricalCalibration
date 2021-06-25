@@ -1,2 +1,2 @@
 library(testthat)
-test_check("SqlRender")
+test_check("EmpiricalCalibration")
