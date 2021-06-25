@@ -7,6 +7,8 @@ Changes
 
 2. Adding empirical calibration of the log likelihood ratio.
 
+3. Adding ability to fit null distribution using non-normal approximations of the per-negative control likelihood functions.
+
 
 EmpiricalCalibration 2.1.0
 ==========================

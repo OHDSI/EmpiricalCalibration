@@ -5,22 +5,21 @@
 
 using namespace Rcpp;
 
-// gridLikelihood
-NumericVector gridLikelihood(NumericVector& x, const NumericVector& row, const NumericVector& gridX);
-RcppExport SEXP _EmpiricalCalibration_gridLikelihood(SEXP xSEXP, SEXP rowSEXP, SEXP gridXSEXP) {
+// gridLlApproximation
+NumericVector gridLlApproximation(NumericVector& x, const DataFrame& parameters);
+RcppExport SEXP _EmpiricalCalibration_gridLlApproximation(SEXP xSEXP, SEXP parametersSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type row(rowSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type gridX(gridXSEXP);
-    rcpp_result_gen = Rcpp::wrap(gridLikelihood(x, row, gridX));
+    Rcpp::traits::input_parameter< const DataFrame& >::type parameters(parametersSEXP);
+    rcpp_result_gen = Rcpp::wrap(gridLlApproximation(x, parameters));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_EmpiricalCalibration_gridLikelihood", (DL_FUNC) &_EmpiricalCalibration_gridLikelihood, 3},
+    {"_EmpiricalCalibration_gridLlApproximation", (DL_FUNC) &_EmpiricalCalibration_gridLlApproximation, 2},
     {NULL, NULL, 0}
 };
 

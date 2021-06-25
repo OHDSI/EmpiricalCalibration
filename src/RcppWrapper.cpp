@@ -26,21 +26,23 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericVector gridLikelihood(NumericVector& x, const NumericVector& row, const NumericVector& gridX) {
-  int n = gridX.size();
+NumericVector gridLlApproximation(NumericVector& x, const DataFrame& parameters) {
+  NumericVector point = parameters["point"];
+  NumericVector value = parameters["value"];
+  int n = point.size();
   NumericVector result(x.size());
   for (int i = 0; i < x.size(); ++i) {
-    if (x[i] < gridX[0]) {
-      double slope = std::max(0.0, (row[1] - row[0]) / (gridX[1] - gridX[0]));
-      result[i] = (x[i] - gridX[0]) * slope + row[0];
-    } else if (x[i] >= gridX[n - 1]) {
-      double slope = std::min(0.0, (row[n - 1] - row[n - 2]) / (gridX[n - 1] - gridX[n - 2]));
-      result[i] = (x[i] - gridX[n - 1]) * slope + row[n - 1];
+    if (x[i] < point[0]) {
+      double slope = std::max(0.0, (value[1] - value[0]) / (point[1] - point[0]));
+      result[i] = (x[i] - point[0]) * slope + value[0];
+    } else if (x[i] >= point[n - 1]) {
+      double slope = std::min(0.0, (value[n - 1] - value[n - 2]) / (point[n - 1] - point[n - 2]));
+      result[i] = (x[i] - point[n - 1]) * slope + value[n - 1];
     } else {
       for (int j = 0; j < n; ++j) {
-        if (gridX[j] >= x[i]) {
-          double slope = (row[j] - row[j - 1]) / (gridX[j] - gridX[j - 1]);
-          result[i] = (x[i] - gridX[j - 1]) * slope + row[j - 1];
+        if (point[j] >= x[i]) {
+          double slope = (value[j] - value[j - 1]) / (point[j] - point[j - 1]);
+          result[i] = (x[i] - point[j - 1]) * slope + value[j - 1];
           break;
         }
       }

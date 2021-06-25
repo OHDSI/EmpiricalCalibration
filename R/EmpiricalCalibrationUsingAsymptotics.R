@@ -66,7 +66,7 @@ fitNull <- function(logRr, seLogRr) {
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
   }
-
+  
   theta <- c(0, 100)
   fit <- optim(theta, logLikelihoodNull, logRr = logRr, seLogRr = seLogRr)
   null <- fit$par
@@ -130,12 +130,12 @@ calibrateP <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...)
 calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...) {
   if (length(logRr) != length(seLogRr)) 
     stop("The logRr and seLogRr arguments must be of equal length")
-
+  
   calibrateOneP <- function(i) {
     if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
       return(NA)
     } else
-    pUpperBound <- pnorm((null[1] - logRr[i])/sqrt(null[2]^2 + seLogRr[i]^2))
+      pUpperBound <- pnorm((null[1] - logRr[i])/sqrt(null[2]^2 + seLogRr[i]^2))
     pLowerBound <- pnorm((logRr[i] - null[1])/sqrt(null[2]^2 + seLogRr[i]^2))
     if (twoSided) {
       return(2 * min(pUpperBound, pLowerBound))
@@ -145,7 +145,7 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
       return(pLowerBound)
     }
   }
-
+  
   calibratedP <- sapply(1:length(logRr), calibrateOneP)
   names(calibratedP) <- NULL
   return(calibratedP)
@@ -184,4 +184,84 @@ computeTraditionalP <- function(logRr, seLogRr, twoSided = TRUE, upper = TRUE) {
   } else {
     return(pLowerBound)
   }
+}
+
+
+#' Fit the null distribution using non-normal log-likelihood approximations
+#'
+#' @description
+#' \code{fitNullNonNormalLl} fits the null distribution to a set of negative controls
+#'
+#' @details
+#' This function fits a Gaussian function to the negative control estimates, using non-normal
+#' approximations of the per-negative control log likelihood.
+#'
+#'
+#' @param likelihoodApproximations Either a data frame containing normal, skew-normal, or custom parametric likelihood
+#'                                 approximations, or a list of (adaptive) grid likelihood profiles.
+#'
+#' @return
+#' An object containing the parameters of the null distribution.
+#'
+#' @examples
+#' data(sccs)
+#' negatives <- sccs[sccs$groundTruth == 0, ]
+#' null <- fitNullNonNormalLl(negatives)
+#' null
+#'
+#' @export
+fitNullNonNormalLl <- function(likelihoodApproximations) {
+  if (is.data.frame(likelihoodApproximations)) {
+    if ("logRr" %in% colnames(likelihoodApproximations)) {
+      message("Detected data following normal distribution")
+      return(fitNull(logRr = likelihoodApproximations$logRr, seLogRr = likelihoodApproximations$seLogRr))
+    } else if ("gamma" %in% colnames(likelihoodApproximations)) {
+      message("Detected data following custom parameric distribution")
+      type <- "custom"
+      llApproximationFunction <- customLlApproximation
+      idx <- is.na(likelihoodApproximations$mu) | is.na(likelihoodApproximations$sigma) | is.na(likelihoodApproximations$gamma)
+      if (any(idx)) {
+        warning("Approximations with NA parameters detected. Removing before fitting null distribution")
+        likelihoodApproximations <- likelihoodApproximations[!idx, ]
+      }
+      likelihoodApproximations <- split(likelihoodApproximations, 1:nrow(likelihoodApproximations))
+    } else if ("alpha" %in% colnames(likelihoodApproximations)) {
+      message("Detected data following skew normal distribution")
+      type <- "skewNormal"
+      llApproximationFunction <- skewNormalLlApproximation
+      idx <- is.na(likelihoodApproximations$mu) | is.na(likelihoodApproximations$sigma) | is.na(likelihoodApproximations$alpha)
+      if (any(idx)) {
+        warning("Approximations with NA parameters detected. Removing before fitting null distribution")
+        likelihoodApproximations <- likelihoodApproximations[!idx, ]
+      }
+      likelihoodApproximations <- split(likelihoodApproximations, 1:nrow(likelihoodApproximations))
+    } else {
+      message("Detected data following grid distribution")
+      type <- "grid"
+      llApproximationFunction <- gridLlApproximation
+      point <- as.numeric(colnames(likelihoodApproximation))
+      if (any(is.na(point))) {
+        stop("Expecting grid data, but not all column names are numeric")
+      }
+      convertToDataFrame <- function(i) {
+        data.frame(value = as.numeric(likelihoodApproximations[i, ]),
+                   point = point)
+      }
+      likelihoodApproximations <- lapply(1:nrow(likelihoodApproximations), convertToDataFrame) 
+    }
+  } else {
+    message("Detected data following grid distribution")
+    type <- "grid"
+    llApproximationFunction <- gridLlApproximation
+  }
+  theta <- c(0, 100)
+  fit <- optim(par = theta, 
+               fn = logLikelihoodNullNonNormalLl, 
+               likelihoodApproximations = likelihoodApproximations, 
+               llApproximationFunction = llApproximationFunction)
+  null <- fit$par
+  null[2] <- 1/sqrt(null[2])
+  names(null) <- c("mean", "sd")
+  class(null) <- "null"
+  return(null)
 }

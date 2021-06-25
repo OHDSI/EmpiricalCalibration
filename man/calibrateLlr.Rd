@@ -10,8 +10,8 @@ calibrateLlr(null, likelihoodApproximation, twoSided = FALSE, upper = TRUE)
 \item{null}{An object of class \code{null} created using the \code{fitNull} function or an
 object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.}
 
-\item{likelihoodApproximation}{A data frame containing either normal, skew-normal, custom parametric, or grid
-likelihood data.}
+\item{likelihoodApproximation}{Either a data frame containing normal, skew-normal, or custom parametric likelihood
+approximations, or a list of (adaptive) grid likelihood profiles.}
 
 \item{twoSided}{Compute two-sided (TRUE) or one-sided (FALSE) p-value?}
 

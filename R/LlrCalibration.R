@@ -19,8 +19,8 @@
 #' @description
 #' \code{calibrateLlr} computes calibrated log likelihood ratio using the fitted null distribution
 #'
-#' @param likelihoodApproximation    A data frame containing either normal, skew-normal, custom parametric, or grid
-#'                  likelihood data. 
+#' @param likelihoodApproximation Either a data frame containing normal, skew-normal, or custom parametric likelihood
+#'                                approximations, or a list of (adaptive) grid likelihood profiles.
 #' @param null      An object of class \code{null} created using the \code{fitNull} function or an
 #'                  object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.
 #' @param twoSided  Compute two-sided (TRUE) or one-sided (FALSE) p-value?
@@ -41,56 +41,68 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
   if (twoSided || !upper)
     stop("Currently only one-sided upper LLRs are supported")
   
-  if ("logRr" %in% colnames(likelihoodApproximation)) {
-    message("Detected data following normal distribution")
-    type <- "normal"
-    logLikelihood <- function(x, row, ...) {
-      dnorm(x, mean = row$logRr, sd = row$seLogRr, log = TRUE)
-    }
-    gridX <- NULL
-  } else if ("gamma" %in% colnames(likelihoodApproximation)) {
-    message("Detected data following custom parameric distribution")
-    type <- "custom"
-    logLikelihood <- function(x, row, ...) {
-      ((exp(row$gamma * (x - row$mu)))) * ((-(x - row$mu)^2)/(2 * row$sigma^2))
-    }
-    gridX <- NULL
-  } else if ("alpha" %in% colnames(likelihoodApproximation)) {
-    message("Detected data following skew normal distribution")
-    type <- "skewNormal"
-    logLikelihood <- function(x, row, ...) {
-      if (is.infinite(row$sigma)) {
-        return(rep(0, length(x)))
+  if (is.data.frame(likelihoodApproximation) || is.numeric(likelihoodApproximation)) {
+    if ("logRr" %in% colnames(likelihoodApproximation)) {
+      message("Detected data following normal distribution")
+      type <- "normal"
+      logLikelihood <- normalLlApproximaton
+      likelihoodApproximation <- split(likelihoodApproximation, 1:nrow(likelihoodApproximation))
+    } else if ("gamma" %in% colnames(likelihoodApproximation)) {
+      message("Detected data following custom parameric distribution")
+      type <- "custom"
+      logLikelihood <- customLlApproximation
+      likelihoodApproximation <- split(likelihoodApproximation, 1:nrow(likelihoodApproximation))
+    } else if ("alpha" %in% colnames(likelihoodApproximation)) {
+      message("Detected data following skew normal distribution")
+      type <- "skewNormal"
+      logLikelihood <- skewNormalLlApproximation
+      likelihoodApproximation <- split(likelihoodApproximation, 1:nrow(likelihoodApproximation))
+    } else if ("point" %in% colnames(likelihoodApproximation)) {
+      message("Detected data following grid distribution")
+      type <- "grid"
+      logLikelihood <- gridLlApproximation
+      likelihoodApproximation <- list(likelihoodApproximation)
+    } else {
+      message("Detected data following grid distribution")
+      type <- "grid"
+      logLikelihood <- gridLlApproximation
+      if (is.numeric(likelihoodApproximation)) {
+        likelihoodApproximation <- as.data.frame(t(likelihoodApproximation))
       }
-      return(log(2) + dnorm(x, row$mu, row$sigma, log = TRUE) + pnorm(row$alpha * (x - row$mu), 0, row$sigma, log.p = TRUE))
+      point <- as.numeric(colnames(likelihoodApproximation))
+      if (any(is.na(point))) {
+        stop("Expecting grid data, but not all column names are numeric")
+      }
+      convertToDataFrame <- function(i) {
+        data.frame(value = as.numeric(likelihoodApproximation[i, ]),
+                   point = point)
+      }
+      likelihoodApproximation <- lapply(1:nrow(likelihoodApproximation), convertToDataFrame) 
     }
-    gridX <- NULL
   } else {
     message("Detected data following grid distribution")
     type <- "grid"
-    logLikelihood <- gridLikelihood
-    if (!is.data.frame(likelihoodApproximation)) {
-      likelihoodApproximation <- as.data.frame(t(likelihoodApproximation))
-    }
-    gridX <- as.numeric(colnames(likelihoodApproximation))
-    if (any(is.na(gridX))) {
-      stop("Expecting grid data, but not all column names are numeric")
-    }
+    logLikelihood <- gridLlApproximation
   }
   useMcmc <- is(null, "mcmcNull")
   
   calibrateOneLlr <- function(i) {
-    row <- likelihoodApproximation[i, ]
+    parameters <- likelihoodApproximation[[i]]
     if (type == "grid") {
-      row <- as.numeric(row)
-      idx <- which(row == max(row))[1]
-      mle <- gridX[idx]
-      ml <- row[idx]
+      idx <- which(parameters$value == max(parameters$value))[1]
+      mle <- parameters$point[idx]
+      ml <- parameters$value[idx]
     } else if (type == "normal") {
-      mle <- row$logRr
-      ml <- logLikelihood(row$logRr, row = row, gridX = gridX)
+      if (is.na(parameters$logRr) || 
+          is.na(parameters$seLogRr) ||
+          is.infinite(parameters$logRr) || 
+          is.infinite(parameters$seLogRr)) {
+        return(NA)
+      }
+      mle <- parameters$logRr
+      ml <- logLikelihood(mle, parameters = parameters)
     } else {
-      optimum <-  suppressWarnings(optim(0, function(x) -logLikelihood(x = x, row = row, gridX = gridX)))
+      optimum <-  suppressWarnings(optim(0, function(x) -logLikelihood(x = x, parameters = parameters)))
       mle <- optimum$par
       ml <- -optimum$value
     }
@@ -101,8 +113,7 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
                               nullSigma = 1/sqrt(chain[, 2]),
                               MoreArgs = list(
                                 logLikelihood = logLikelihood,
-                                row = row,
-                                gridX = gridX,
+                                parameters = parameters,
                                 mle = mle,
                                 ml = ml))
       result <- quantile(calibratedLlr, c(0.5, 0.025, 0.975))
@@ -111,15 +122,14 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
       result <- calibrateOneLlrOneNull(nullMu = null[1],
                                        nullSigma = null[2],
                                        logLikelihood = logLikelihood,
-                                       row = row,
-                                       gridX = gridX,
+                                       parameters = parameters,
                                        mle = mle,
                                        ml = ml)
       return(result    )
     }
   }
   
-  calibratedLlr <- sapply(1:nrow(likelihoodApproximation), calibrateOneLlr)
+  calibratedLlr <- sapply(1:length(likelihoodApproximation), calibrateOneLlr)
   if (useMcmc) {
     calibratedLlr <- as.data.frame(t(calibratedLlr))
     colnames(calibratedLlr) <- c("llr", "ci95Lb", "ci95Ub")
@@ -164,26 +174,25 @@ computeLlrFromP <- function(p) {
   }
 }
 
-computePAtNull <- function(x, logLikelihood, row, mle, ml, null, gridX) {
-  llr <- ml - logLikelihood(x = x, row = row, gridX = gridX)
+computePAtNull <- function(x, logLikelihood, parameters, mle, ml, null) {
+  llr <- ml - logLikelihood(x = x, parameters = parameters)
   p <- computePFromLlr(llr, mle = mle, nullLogRr = x)
   p * dnorm(x, null[1], null[2])
 }
 
-calibrateOneLlrOneNull <- function(nullMu, nullSigma, logLikelihood, row, gridX, mle, ml) {
+calibrateOneLlrOneNull <- function(nullMu, nullSigma, logLikelihood, parameters, mle, ml) {
   if (nullSigma < 0.001) {
     if (mle < nullMu) {
       calibratedLlr <- 0
     } else {
-      calibratedLlr <- ml - logLikelihood(x = nullMu, row = row, gridX = gridX)
+      calibratedLlr <- ml - logLikelihood(x = nullMu, parameters = parameters)
     }
   } else {
     calibratedP <- integrate(f = computePAtNull, 
                              logLikelihood = logLikelihood, 
-                             row = row,
+                             parameters = parameters,
                              mle = mle,
                              ml = ml,
-                             gridX = gridX,
                              null = c(nullMu, nullSigma),
                              lower = nullMu - 10 * nullSigma, 
                              upper = nullMu + 10 * nullSigma,
