@@ -7,7 +7,9 @@ Changes
 
 2. Adding empirical calibration of the log likelihood ratio.
 
-3. Adding ability to fit null distribution using non-normal approximations of the per-negative control likelihood functions.
+3. Adding functions for computing critical values for the log likelihood ratio when performing sequential testing (MaxSPRT).
+
+4. Adding ability to fit null distribution using non-normal approximations of the per-negative control likelihood functions.
 
 
 EmpiricalCalibration 2.1.0

@@ -27,7 +27,9 @@ Imports:
   Rcpp
 Suggests:
   knitr,
-  rmarkdown
+  rmarkdown,
+  testthat,
+  Sequential
 License: Apache License 2.0
 LinkingTo: Rcpp
 NeedsCompilation: yes
