@@ -17,9 +17,38 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// samplePoissonMaxLrr
+NumericVector samplePoissonMaxLrr(NumericVector groupSizes, int minimumEvents, int sampleSize);
+RcppExport SEXP _EmpiricalCalibration_samplePoissonMaxLrr(SEXP groupSizesSEXP, SEXP minimumEventsSEXP, SEXP sampleSizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type groupSizes(groupSizesSEXP);
+    Rcpp::traits::input_parameter< int >::type minimumEvents(minimumEventsSEXP);
+    Rcpp::traits::input_parameter< int >::type sampleSize(sampleSizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(samplePoissonMaxLrr(groupSizes, minimumEvents, sampleSize));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sampleBinomialMaxLrr
+NumericVector sampleBinomialMaxLrr(NumericVector groupSizes, double p, int minimumEvents, int sampleSize);
+RcppExport SEXP _EmpiricalCalibration_sampleBinomialMaxLrr(SEXP groupSizesSEXP, SEXP pSEXP, SEXP minimumEventsSEXP, SEXP sampleSizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type groupSizes(groupSizesSEXP);
+    Rcpp::traits::input_parameter< double >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type minimumEvents(minimumEventsSEXP);
+    Rcpp::traits::input_parameter< int >::type sampleSize(sampleSizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(sampleBinomialMaxLrr(groupSizes, p, minimumEvents, sampleSize));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_EmpiricalCalibration_gridLlApproximation", (DL_FUNC) &_EmpiricalCalibration_gridLlApproximation, 2},
+    {"_EmpiricalCalibration_samplePoissonMaxLrr", (DL_FUNC) &_EmpiricalCalibration_samplePoissonMaxLrr, 3},
+    {"_EmpiricalCalibration_sampleBinomialMaxLrr", (DL_FUNC) &_EmpiricalCalibration_sampleBinomialMaxLrr, 4},
     {NULL, NULL, 0}
 };
 

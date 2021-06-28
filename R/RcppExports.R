@@ -5,3 +5,11 @@ gridLlApproximation <- function(x, parameters) {
     .Call('_EmpiricalCalibration_gridLlApproximation', PACKAGE = 'EmpiricalCalibration', x, parameters)
 }
 
+samplePoissonMaxLrr <- function(groupSizes, minimumEvents, sampleSize) {
+    .Call('_EmpiricalCalibration_samplePoissonMaxLrr', PACKAGE = 'EmpiricalCalibration', groupSizes, minimumEvents, sampleSize)
+}
+
+sampleBinomialMaxLrr <- function(groupSizes, p, minimumEvents, sampleSize) {
+    .Call('_EmpiricalCalibration_sampleBinomialMaxLrr', PACKAGE = 'EmpiricalCalibration', groupSizes, p, minimumEvents, sampleSize)
+}
+

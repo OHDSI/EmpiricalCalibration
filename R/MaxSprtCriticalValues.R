@@ -43,19 +43,19 @@
 #' computeCvPoisson(groupSizes)
 #' 
 #' @export
-computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sampleSize = 1e5) {
-  values <- rep(0, sampleSize)
-  for (i in 1:sampleSize) {
-    observed <- cumsum(rpois(length(groupSizes), groupSizes))
-    expected <- cumsum(groupSizes)
-    idx <- observed >= minimumEvents & observed >= expected
-    if (any(idx)) {
-      observed <- observed[idx]
-      expected <- expected[idx]
-      llr <- dpois(observed, observed, log = TRUE) - dpois(observed, expected, log = TRUE)
-      values[i] <- max(llr)
-    }
-  }
+computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6) {
+  if (any(groupSizes < 0))
+    stop("Group sizes should be positive")
+  if (minimumEvents < 0 || minimumEvents != round(minimumEvents))
+    stop("Minimum events should be a positive integer")
+  if (alpha <= 0 || alpha >= 1)
+    stop("Alpha should be a number between 0 and 1")
+  if (sampleSize < 0 || sampleSize != round(sampleSize))
+    stop("sampleSize should be a positive integer")
+  
+  values <- samplePoissonMaxLrr(groupSizes = groupSizes,
+                                minimumEvents = minimumEvents,
+                                sampleSize = sampleSize)
   values <- values[order(-values)]
   alphas <- 1:sampleSize / sampleSize
   idx <- !duplicated(values)
@@ -99,22 +99,23 @@ computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sample
 #' computeCvBinomial(groupSizes, z = 4)
 #' 
 #' @export
-computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sampleSize = 1e5) {
+computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6) {
+  if (any(groupSizes < 0))
+    stop("Group sizes should be positive")
+  if (z < 0)
+    stop("Z should be positive")
+  if (minimumEvents < 0 || minimumEvents != round(minimumEvents))
+    stop("Minimum events should be a positive integer")
+  if (alpha <= 0 || alpha >= 1)
+    stop("Alpha should be a number between 0 and 1")
+  if (sampleSize < 0 || sampleSize != round(sampleSize))
+    stop("sampleSize should be a positive integer")
+  
   p <- 1 / (1 + z)
-  counts <- cumsum(groupSizes)
-  expected <- counts * p
-  values <- rep(0, sampleSize)
-  for (i in 1:sampleSize) {
-    observed <- cumsum(rbinom(length(groupSizes), groupSizes, p))
-    idx <- observed >= minimumEvents & observed >= expected 
-    if (any(idx)) {
-      observed <- observed[idx]
-      countsSubset <- counts[idx]
-      llr <- dbinom(observed, countsSubset, observed / countsSubset, log = TRUE) - 
-        dbinom(observed, countsSubset, p, log = TRUE)
-      values[i] <- max(llr)
-    } 
-  }
+  values <- sampleBinomialMaxLrr(groupSizes = groupSizes,
+                                 p =  p,
+                                 minimumEvents = minimumEvents,
+                                 sampleSize = sampleSize)
   values <- values[order(-values)]
   alphas <- 1:sampleSize / sampleSize
   idx <- !duplicated(values)

@@ -51,4 +51,55 @@ NumericVector gridLlApproximation(NumericVector& x, const DataFrame& parameters)
   return result;
 }
 
+// [[Rcpp::export]]
+NumericVector samplePoissonMaxLrr(NumericVector groupSizes, int minimumEvents, int sampleSize) {
+  NumericVector values(sampleSize);
+  double expected;
+  double observed;
+  double maxLlr;
+  double llr;
+  for (int i = 0; i < sampleSize; i++) {
+    maxLlr = 0;
+    observed = 0;
+    expected = 0;
+    for (unsigned int j = 0; j < groupSizes.size(); j++) {
+      expected += groupSizes[j];
+      observed += R::rpois(groupSizes[j]);
+      if (observed >= minimumEvents && observed >= expected) {
+        llr = R::dpois(observed, observed, true) - R::dpois(observed, expected, true);
+        if (llr > maxLlr)
+          maxLlr = llr;
+      }
+      values[i] = maxLlr;
+    }
+  }
+  return(values);
+}
+
+// [[Rcpp::export]]
+NumericVector sampleBinomialMaxLrr(NumericVector groupSizes, double p, int minimumEvents, int sampleSize) {
+  NumericVector values(sampleSize);
+  double cumulativeCount;
+  double cumulativeObserved;
+  double maxLlr;
+  double llr;
+  for (int i = 0; i < sampleSize; i++) {
+    maxLlr = 0;
+    cumulativeObserved = 0;
+    cumulativeCount = 0;
+    for (unsigned int j = 0; j < groupSizes.size(); j++) {
+      cumulativeCount += groupSizes[j];
+      cumulativeObserved += R::rbinom(groupSizes[j], p);
+      if (cumulativeObserved >= minimumEvents && cumulativeObserved >= cumulativeCount * p) {
+        llr = R::dbinom(cumulativeObserved, cumulativeCount, cumulativeObserved / cumulativeCount, true) -
+          R::dbinom(cumulativeObserved, cumulativeCount, p, true);
+        if (llr > maxLlr)
+          maxLlr = llr;
+      }
+      values[i] = maxLlr;
+    }
+  }
+  return(values);
+}
+
 #endif // __RcppWrapper_cpp__

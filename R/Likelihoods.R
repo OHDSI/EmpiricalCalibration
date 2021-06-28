@@ -39,7 +39,6 @@ logLikelihoodNull <- function(theta, logRr, seLogRr) {
   }
   if (length(result) == 0 || is.infinite(result))
     result <- 99999
-  # print(sprintf("theta = c(%s, %s), ll = %s", theta[1], theta[2], result))
   result
 }
 
@@ -103,12 +102,12 @@ logLikelihoodNullNonNormalLl <- function(theta, llApproximationFunction, likelih
                                        mu = theta[1],
                                        sigma = sd,
                                        llApproximationFunction = llApproximationFunction,
-                                       likelihoodApproximation = likelihoodApproximations[[i]])$value)
+                                       likelihoodApproximation = likelihoodApproximations[[i]],
+                                       stop.on.error = FALSE)$value)
     }
   }
   if (length(result) == 0 || is.infinite(result))
     result <- 99999
-  # print(sprintf("theta = c(%s, %s), ll = %s", theta[1], theta[2], result))
   result
 }
 

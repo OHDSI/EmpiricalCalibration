@@ -33,12 +33,12 @@ simulate <- function(seed, parameters, useCalibration = TRUE, looks = 10) {
     } else {
       if (useCalibration) {
         llApproximation <- EvidenceSynthesis::approximateLikelihood(cyclopsFit = fit,
-                                                                   parameter = "exposureTRUE",
-                                                                   approximation = "grid")
+                                                                    parameter = "exposureTRUE",
+                                                                    approximation = "grid")
         null <- c(parameters$nullMu, parameters$nullSigma)
         names(null) <- c("mean", "sd")
         class(null) <- "null"
-      
+        
         llr <- EmpiricalCalibration::calibrateLlr(null = null, 
                                                   likelihoodApproximation = llApproximation, 
                                                   twoSided = FALSE, 
@@ -202,3 +202,24 @@ mean(unlist(ParallelLogger::clusterApply(cluster, 1:10000, simulate, parameters 
 # [1] 0.5726
 
 ParallelLogger::stopCluster(cluster)
+
+
+# Critical values -----------
+for (i in 1:100) {
+  print(i)
+  set.seed(i)
+  groupSizes <- round(runif(10, 1, 10))
+  z <- 4
+  goldStandard <- Sequential::CV.Binomial(N = sum(groupSizes),
+                                          z = z,
+                                          M = 1,
+                                          GroupSizes = groupSizes)$cv
+  
+  cv <- computeCvBinomial(groupSizes = groupSizes,
+                          z = z,
+                          minimumEvents = 1,
+                          sampleSize = 1e6)
+  if (round(cv, 4) != round(goldStandard, 4))
+    stop("mismatch")
+  
+}

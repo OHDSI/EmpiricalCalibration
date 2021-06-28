@@ -9,7 +9,7 @@ computeCvBinomial(
   z,
   minimumEvents = 1,
   alpha = 0.05,
-  sampleSize = 1e+05
+  sampleSize = 1e+06
 )
 }
 \arguments{
