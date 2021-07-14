@@ -1,8 +1,11 @@
 library(testthat)
 library(EmpiricalCalibration)
+library(Sequential)
 
 test_that("computeCvPoisson has same output as Sequential", {
   # Compare the output of the Sequential package with the one implemented in this package
+  
+
   groupSizes <- rep(1, 10)  
   goldStandard <- Sequential::CV.Poisson(SampleSize = sum(groupSizes),
                                          M = 1,
