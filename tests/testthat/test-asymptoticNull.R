@@ -32,3 +32,4 @@ test_that("fitNull output", {
   
   # null <- fitNull(negatives$logRr, negatives$seLogRr)
 })
+

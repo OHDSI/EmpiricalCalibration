@@ -7,7 +7,7 @@ test_that("simulateControls", {
   expect_equal(data$logRr, rep(mean + trueLogRr, n))
 })
   
-test_that("plotTrueAndObserved" {
+test_that("plotTrueAndObserved", {
   set.seed(123)
   data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
   fileName <- file.path(tempdir(), "output.png")
