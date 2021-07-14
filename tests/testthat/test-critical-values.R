@@ -1,5 +1,6 @@
 library(testthat)
 library(EmpiricalCalibration)
+library(Sequential)
 
 test_that("computeCvPoisson has same output as Sequential", {
   groupSizes <- rep(1, 10)  
