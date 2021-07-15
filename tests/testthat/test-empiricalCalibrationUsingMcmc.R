@@ -2,7 +2,7 @@ library(testthat)
 library(EmpiricalCalibration)
 
 data(sccs)
-negatives <- sccs[sccs$groundTruth == 0, ]
+# negatives <- sccs[sccs$groundTruth == 0, ]
 
 test_that("fitMcmcNull requirements", {
   
