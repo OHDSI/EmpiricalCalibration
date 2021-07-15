@@ -45,20 +45,30 @@ test_that("fitNullNonNormalLl gamma", {
   data(sccs)
   negatives <- sccs[sccs$groundTruth == 0, ]
   colnames(negatives)<- c("drugName","mu","gamma", "sigma")
-  negatives$mu[1]<- NA
   null <- fitNullNonNormalLl(negatives)
   expect_equivalent(round(null["mean"],1),0)
   expect_equivalent(round(null["sd"],1),0)
   
+  negatives$mu[1]<- NA
+  expect_warning(fitNullNonNormalLl(negatives), 
+                 regexp = ".*Approximations with NA parameters detected.*")
+  
+  negatives$mu[1]<- 0
   colnames(negatives)<- c("drugName","mu","alpha", "sigma")
   null <- fitNullNonNormalLl(negatives)
   expect_equivalent(round(null["mean"],2),0.06)
   expect_equivalent(round(null["sd"],2),0)
   
+  negatives$mu[1]<- NA
+  expect_warning(fitNullNonNormalLl(negatives), 
+                 regexp = ".*Approximations with NA parameters detected.*")
+  
+  negatives$mu[1]<- 0
   colnames(negatives)<- c("drugName","mu","grid", "sigma")
   expect_error(fitNullNonNormalLl(negatives),
-               regexp = ".*but not all column names are numeric*" )
+               regexp = ".*but not all column names are numeric.*" )
   
+
   colnames(negatives)<- c(1,2,3,4)
   null <- fitNullNonNormalLl(negatives)
   expect_equivalent(round(null["mean"],2),0)
