@@ -18,7 +18,7 @@ test_that("evaluateCiCalibration requirements", {
       trueLogRr = trueLogRr,
       strata    = strata
     ),
-    regexp = ".*factor or (null).*"
+    regexp = "factor"
   )
   
   # Infinite logRr
