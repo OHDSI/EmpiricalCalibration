@@ -249,11 +249,12 @@ fitNullNonNormalLl <- function(likelihoodApproximations) {
       }
       likelihoodApproximations <- lapply(1:nrow(likelihoodApproximations), convertToDataFrame) 
     }
-  } else {
+  }else {
     message("Detected data following grid distribution")
     type <- "grid"
     llApproximationFunction <- gridLlApproximation
   }
+  
   theta <- c(0, 100)
   fit <- optim(par = theta, 
                fn = logLikelihoodNullNonNormalLl, 
