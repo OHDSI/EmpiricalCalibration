@@ -25,18 +25,18 @@ test_that("computeExpectedAbsoluteSystematicError.null returns mean", {
   expect_equal(error, null["mean"], tolerance = 1e-3, check.attributes = FALSE)
 })
 
-# test_that("computeExpectedAbsoluteSystematicError.mcmcNull returns mean", {
-#   alpha = 0.05
-#   data(sccs)
-#   negatives <- sccs[sccs$groundTruth == 0, ]
-#   null <- fitMcmcNull(negatives$logRr, negatives$seLogRr) 
-#   chain <- attr(null, "mcmc")$chain
-#   dist <- apply(chain, 1, function(x) closedFormIntegeralAbsolute(x[1], 1 / sqrt(x[2])))
-#   result <- quantile(dist, c(0.5, alpha / 2, 1 - (alpha / 2)))
-#   
-#   error = computeExpectedAbsoluteSystematicError.mcmcNull(null)
-#   
-#   expect_equal(error[1], result[1], tolerance = 0, check.attributes = FALSE)
-#   expect_equal(error[2], result[2], tolerance = 0, check.attributes = FALSE)
-#   expect_equal(error[3], result[3], tolerance = 0, check.attributes = FALSE)
-# })
+test_that("computeExpectedAbsoluteSystematicError.mcmcNull returns mean", {
+  alpha = 0.05
+  data(sccs)
+  negatives <- sccs[sccs$groundTruth == 0, ]
+  null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
+  chain <- attr(null, "mcmc")$chain
+  dist <- apply(chain, 1, function(x) closedFormIntegeralAbsolute(x[1], 1 / sqrt(x[2])))
+  result <- quantile(dist, c(0.5, alpha / 2, 1 - (alpha / 2)))
+
+  error = computeExpectedAbsoluteSystematicError.mcmcNull(null)
+
+  expect_equal(error[1], result[1], tolerance = 0, check.attributes = FALSE)
+  expect_equal(error[2], result[2], tolerance = 0, check.attributes = FALSE)
+  expect_equal(error[3], result[3], tolerance = 0, check.attributes = FALSE)
+})
