@@ -1,7 +1,9 @@
 library(testthat)
 library(EmpiricalCalibration)
 
-test_that("computeExpectedAbsoluteSystematicError returns mean", {
+# First three tests check whether functions properly return theoretical values
+
+test_that("computeExpectedAbsoluteSystematicError returns mean value", {
   data(sccs)
   negatives <- sccs[sccs$groundTruth == 0, ]
   null <- fitNull(negatives$logRr, negatives$seLogRr)
@@ -17,7 +19,7 @@ test_that("computeExpectedAbsoluteSystematicError.null returns zero value", {
   expect_equal(error, 0, tolerance = 0, check.attributes = FALSE)
 })
 
-test_that("computeExpectedAbsoluteSystematicError.null returns mean", {
+test_that("computeExpectedAbsoluteSystematicError.null returns mean value", {
   data(sccs)
   negatives <- sccs[sccs$groundTruth == 0, ]
   null <- fitNull(negatives$logRr, negatives$seLogRr)
@@ -25,6 +27,7 @@ test_that("computeExpectedAbsoluteSystematicError.null returns mean", {
   expect_equal(error, null["mean"], tolerance = 1e-3, check.attributes = FALSE)
 })
 
+# Below test checks whether function properly returns values
 test_that("computeExpectedAbsoluteSystematicError.mcmcNull returns mean", {
   alpha = 0.05
   data(sccs)
