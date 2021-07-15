@@ -27,6 +27,7 @@ Imports:
   Rcpp
 Suggests:
   knitr,
+  markdown,
   rmarkdown,
   testthat,
   Sequential
