@@ -110,3 +110,20 @@ test_that("fitNullNonNormalLl test for errors and warnings", {
   expect_equivalent(round(null["mean"],2),0)
   expect_equivalent(round(null["sd"],2),0.1)
 })
+
+test_that("CalibrateP matches computeTraditionalP when mu = sigma = 0", {
+  
+  null <- c(
+    mean = 0,
+    sd = 0
+  )
+  class(null) <- "null"
+  logRr <- .2
+  seLogRr <- .2
+  
+  expect_equal(
+    calibrateP(null, logRr, seLogRr),
+    computeTraditionalP(logRr, seLogRr)
+  )
+  
+})
