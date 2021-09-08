@@ -22,6 +22,7 @@
 #define __RcppWrapper_cpp__
 
 #include <Rcpp.h>
+#include <cmath>
 
 using namespace Rcpp;
 
@@ -100,6 +101,35 @@ NumericVector sampleBinomialMaxLrr(NumericVector groupSizes, double p, int minim
     }
   }
   return(values);
+}
+double sqr(const double& x) {
+  return(x*x);
+}
+
+double gaussianProduct(const double& mu1, const double& mu2, const double& sd1, const double& sd2) {
+  return((1/(sqrt(2 * M_PI) * sqrt(sqr(sd1) + sqr(sd2)))) * exp(-sqr(mu1 - mu2)/(2 * (sqr(sd1) + sqr(sd2)))));
+}
+
+// [[Rcpp::export]]
+double logLikelihoodNull(const NumericVector& theta, const NumericVector& logRr, const NumericVector& seLogRr) {
+  if (theta[1] <= 0) {
+    return(99999);
+  }
+  double result(0);
+  double sd = 1/sqrt(theta[1]);
+  if (sd < 1e-6) {
+    for (unsigned int i = 0; i < logRr.size(); i++) {
+      result = result - R::dnorm(theta[0], logRr[i], seLogRr[i], true);
+    }
+  } else {
+    double x = 0;
+    for (unsigned int i = 0; i < logRr.size(); i++) {
+      result = result - log(gaussianProduct(logRr[i], theta[0], seLogRr[i], sd));
+    }
+  }
+  if (result == 0 || result > 1e10)
+    result = 99999;
+  return(result);
 }
 
 #endif // __RcppWrapper_cpp__

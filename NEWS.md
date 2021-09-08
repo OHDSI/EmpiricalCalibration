@@ -11,6 +11,8 @@ Changes
 
 4. Adding ability to fit null distribution using non-normal approximations of the per-negative control likelihood functions.
 
+5. Faster null distribution fitting using MCMC. Increasing default MCMC iterations for greater stability.
+
 
 EmpiricalCalibration 2.1.0
 ==========================

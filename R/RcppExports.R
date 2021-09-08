@@ -13,3 +13,7 @@ sampleBinomialMaxLrr <- function(groupSizes, p, minimumEvents, sampleSize) {
     .Call('_EmpiricalCalibration_sampleBinomialMaxLrr', PACKAGE = 'EmpiricalCalibration', groupSizes, p, minimumEvents, sampleSize)
 }
 
+logLikelihoodNull <- function(theta, logRr, seLogRr) {
+    .Call('_EmpiricalCalibration_logLikelihoodNull', PACKAGE = 'EmpiricalCalibration', theta, logRr, seLogRr)
+}
+

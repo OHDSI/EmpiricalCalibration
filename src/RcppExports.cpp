@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // gridLlApproximation
 NumericVector gridLlApproximation(NumericVector& x, const DataFrame& parameters);
 RcppExport SEXP _EmpiricalCalibration_gridLlApproximation(SEXP xSEXP, SEXP parametersSEXP) {
@@ -44,11 +49,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// logLikelihoodNull
+double logLikelihoodNull(const NumericVector& theta, const NumericVector& logRr, const NumericVector& seLogRr);
+RcppExport SEXP _EmpiricalCalibration_logLikelihoodNull(SEXP thetaSEXP, SEXP logRrSEXP, SEXP seLogRrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type logRr(logRrSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type seLogRr(seLogRrSEXP);
+    rcpp_result_gen = Rcpp::wrap(logLikelihoodNull(theta, logRr, seLogRr));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_EmpiricalCalibration_gridLlApproximation", (DL_FUNC) &_EmpiricalCalibration_gridLlApproximation, 2},
     {"_EmpiricalCalibration_samplePoissonMaxLrr", (DL_FUNC) &_EmpiricalCalibration_samplePoissonMaxLrr, 3},
     {"_EmpiricalCalibration_sampleBinomialMaxLrr", (DL_FUNC) &_EmpiricalCalibration_sampleBinomialMaxLrr, 4},
+    {"_EmpiricalCalibration_logLikelihoodNull", (DL_FUNC) &_EmpiricalCalibration_logLikelihoodNull, 3},
     {NULL, NULL, 0}
 };
 

@@ -26,20 +26,20 @@ proposalFunction <- function(param, scale) {
   return(draw)
 }
 
-runMetropolisMcmc <- function(startValue, ll, iterations, scale, logRr, seLogRr) {
+runMetropolisMcmc <- function(startValue, iterations, scale, logRr, seLogRr) {
   dim <- length(startValue)
   chain <- array(dim = c(iterations + 1, dim))
   logLik <- array(dim = c(iterations + 1, 1))
   acc <- array(dim = c(iterations + 1, 1))
 
-  logLik[1] <- -ll(startValue, logRr, seLogRr)
+  logLik[1] <- -logLikelihoodNullMcmc(startValue, logRr, seLogRr)
   chain[1, ] <- c(startValue)
   acc[1] <- 1
 
   for (i in 1:iterations) {
     # print(paste('itr =', i))
     proposal <- proposalFunction(chain[i, ], scale = scale)
-    newLogLik <- tryCatch(-ll(proposal, logRr, seLogRr), error = function(e) {
+    newLogLik <- tryCatch(-logLikelihoodNullMcmc(proposal, logRr, seLogRr), error = function(e) {
       -1e+10
     })
 
@@ -151,7 +151,7 @@ binarySearchSigma <- function(modeMu,
 #' calibrateP(null, positive$logRr, positive$seLogRr)
 #' }
 #' @export
-fitMcmcNull <- function(logRr, seLogRr, iter = 10000) {
+fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
   if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     logRr <- logRr[!is.infinite(seLogRr)]
@@ -185,7 +185,7 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 10000) {
                                       seLogRrNegatives = seLogRr))
 
   # writeLines(paste('Scale:', paste(scale,collapse=',')))
-  mcmc <- runMetropolisMcmc(fit$par, logLikelihoodNullMcmc, iterations = iter, scale, logRr, seLogRr)
+  mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr)
   result <- c(mean(mcmc$chain[, 1]), mean(mcmc$chain[, 2]))
   attr(result, "mcmc") <- mcmc
   class(result) <- "mcmcNull"

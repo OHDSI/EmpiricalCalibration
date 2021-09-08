@@ -20,27 +20,27 @@ gaussianProduct <- function(mu1, mu2, sd1, sd2) {
   (2 * pi)^(-1/2) * (sd1^2 + sd2^2)^(-1/2) * exp(-(mu1 - mu2)^2/(2 * (sd1^2 + sd2^2)))
 }
 
-logLikelihoodNull <- function(theta, logRr, seLogRr) {
-  if (theta[2] <= 0)
-    return(99999)
-  result <- 0
-  sd <- 1/sqrt(theta[2])
-  if (sd < 1e-6) {
-    # Note: not faster when vectorized
-    for (i in 1:length(logRr)) {
-      result <- result - dnorm(theta[1], logRr[i], seLogRr[i], log = TRUE)
-    }
-    
-  } else {
-    # Note: not faster when vectorized
-    for (i in 1:length(logRr)) {
-      result <- result - log(gaussianProduct(logRr[i], theta[1], seLogRr[i], sd))
-    }
-  }
-  if (length(result) == 0 || is.infinite(result))
-    result <- 99999
-  result
-}
+# logLikelihoodNullOld <- function(theta, logRr, seLogRr) {
+#   if (theta[2] <= 0)
+#     return(99999)
+#   result <- 0
+#   sd <- 1/sqrt(theta[2])
+#   if (sd < 1e-6) {
+#     # Note: not faster when vectorized
+#     for (i in 1:length(logRr)) {
+#       result <- result - dnorm(theta[1], logRr[i], seLogRr[i], log = TRUE)
+#     }
+#     
+#   } else {
+#     # Note: not faster when vectorized
+#     for (i in 1:length(logRr)) {
+#       result <- result - log(gaussianProduct(logRr[i], theta[1], seLogRr[i], sd))
+#     }
+#   }
+#   if (length(result) == 0 || is.infinite(result))
+#     result <- 99999
+#   result
+# }
 
 logLikelihoodNullMcmc <- function(theta, logRr, seLogRr) {
   result <- logLikelihoodNull(theta, logRr, seLogRr)
