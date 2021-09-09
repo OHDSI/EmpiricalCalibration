@@ -52,7 +52,7 @@ test_that("fitMcmcNull requirements", {
 })
   
 test_that("MCMC calibration of p-values returns values close to truth", {
-  
+  skip_on_cran()
   set.seed(124)
 
   negatives <- simulateControls(

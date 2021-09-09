@@ -239,7 +239,7 @@ fitNullNonNormalLl <- function(likelihoodApproximations) {
       message("Detected data following grid distribution")
       type <- "grid"
       llApproximationFunction <- gridLlApproximation
-      point <- as.numeric(colnames(likelihoodApproximations))
+      suppressWarnings(point <- as.numeric(colnames(likelihoodApproximations)))
       if (any(is.na(point))) {
         stop("Expecting grid data, but not all column names are numeric")
       }

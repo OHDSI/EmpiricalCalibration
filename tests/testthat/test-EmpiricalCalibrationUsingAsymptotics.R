@@ -42,7 +42,7 @@ test_that("fitNullNonNormalLl", {
 })
 
 test_that("fitNullNonNormalLl using non-normal approximation", {
-  
+  skip_on_cran()
   set.seed(123)
   
   # Test for fitting null using non-normal approximation and asymptotics

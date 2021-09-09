@@ -186,7 +186,7 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
 
   # writeLines(paste('Scale:', paste(scale,collapse=',')))
   mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr)
-  result <- c(mean(mcmc$chain[, 1]), mean(mcmc$chain[, 2]))
+  result <- c(median(mcmc$chain[, 1]), median(mcmc$chain[, 2]))
   attr(result, "mcmc") <- mcmc
   class(result) <- "mcmcNull"
   return(result)

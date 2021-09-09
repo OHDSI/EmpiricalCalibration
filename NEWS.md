@@ -13,6 +13,8 @@ Changes
 
 5. Faster null distribution fitting using MCMC. Increasing default MCMC iterations for greater stability.
 
+6. Using median instead of mean of posterior distributions when converting MCMC null to error model for greater consistency between calibrated CI and P.
+
 
 EmpiricalCalibration 2.1.0
 ==========================

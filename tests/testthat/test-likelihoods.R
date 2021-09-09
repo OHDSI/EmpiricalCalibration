@@ -32,11 +32,10 @@ test_that("logLikelihoodNull - negative theta2", {
   expect_equal(result, 99999)
 })
 test_that("logLikelihoodNull - logRr and seLogRr input", {
-  expect_equal(logLikelihoodNull(theta=c(1,2), logRr=c(NaN, 2), seLogRr=c(1,0.1)), NaN) 
-  expect_equal(logLikelihoodNull(theta=c(1,2), logRr=c(1, 2), seLogRr=c(1,NaN)), NaN)
-  expect_equal(logLikelihoodNull(theta=c(1,2), logRr=c(Inf, 2), seLogRr=c(1,0.1)), 99999)
-  expect_equal(logLikelihoodNull(theta=c(1,2), logRr=c(1, 2), seLogRr=c(1,Inf)), 99999)
-  expect_equal(logLikelihoodNull(theta=c(1,2), logRr=c(1, 2), seLogRr=c(1)), NaN)
+  expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta=c(1,2), logRr=c(NaN, 2), seLogRr=c(1,0.1)), NaN) 
+  expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta=c(1,2), logRr=c(1, 2), seLogRr=c(1,NaN)), NaN)
+  expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta=c(1,2), logRr=c(Inf, 2), seLogRr=c(1,0.1)), 99999)
+  expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta=c(1,2), logRr=c(1, 2), seLogRr=c(1,Inf)), 99999)
 })
 test_that("logLikelihoodNull - correct calculation", {
   sd <- 1e-7
@@ -52,7 +51,6 @@ test_that("logLikelihoodNull - result is infinite", {
 test_that("logLikelihoodNullMcmc - logRr and seLogRr input", {
   expect_equal(logLikelihoodNullMcmc(theta=c(1,2), logRr=c(NaN, 2), seLogRr=c(1,0.1)), NaN) 
   expect_equal(logLikelihoodNullMcmc(theta=c(1,2), logRr=c(1, 2), seLogRr=c(1,NaN)), NaN)
-  expect_equal(logLikelihoodNullMcmc(theta=c(1,2), logRr=c(1, 2), seLogRr=c(1)), NaN)
 })
 # calculations are straightforward
 test_that("logLikelihoodNullMcmc - result", {

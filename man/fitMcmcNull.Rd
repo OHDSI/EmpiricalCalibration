@@ -4,7 +4,7 @@
 \alias{fitMcmcNull}
 \title{Fit the null distribution using MCMC}
 \usage{
-fitMcmcNull(logRr, seLogRr, iter = 10000)
+fitMcmcNull(logRr, seLogRr, iter = 1e+05)
 }
 \arguments{
 \item{logRr}{A numeric vector of effect estimates on the log scale}
