@@ -89,7 +89,7 @@ jobs:
       - name: Check reverse dependencies
         run: |
           source("ReverseDependencyCheckFunctions.R")
-          reverseDependencies <- prepareForReverseDependencyCheck(pkgdir)
+          reverseDependencies <- prepareForReverseDependencyCheck()
           if (nrow(reverseDependencies) > 0)
             for (i in 1:nrow(reverseDependencies))
               checkPackage(package = reverseDependencies$name[i], inCran = reverseDependencies$inCran[i])
