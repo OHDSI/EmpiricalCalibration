@@ -8,3 +8,4 @@ compare_versions
 .github
 _pkgdown.yml
 docs
+ReverseDependencyCheckFunctions.R
