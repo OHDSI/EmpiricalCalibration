@@ -86,10 +86,16 @@ jobs:
           remotes::install_local(build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes", "--no-multiarch"))
         shell: Rscript {0}
         
+      - name: Install reverse dependencies
+        run: |
+          source("ReverseDependencyCheckFunctions.R")
+          saveRDS(prepareForReverseDependencyCheck(), ".github/reverseDependencies.rds")
+        shell: Rscript {0}
+
       - name: Check reverse dependencies
         run: |
           source("ReverseDependencyCheckFunctions.R")
-          reverseDependencies <- prepareForReverseDependencyCheck()
+          reverseDependencies <- readRDS(".github/reverseDependencies.rds")
           if (nrow(reverseDependencies) > 0)
             for (i in 1:nrow(reverseDependencies))
               checkPackage(package = reverseDependencies$name[i], inCran = reverseDependencies$inCran[i])
