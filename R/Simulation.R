@@ -114,7 +114,8 @@ simulateMaxSprtData <- function(n = 10000,
     time <- rep(tar, n)
     time[outcome] <- tOutcome[outcome]
     t <- seq(0, maxT, length.out = looks + 1)[-1]                 
-    results <- purrr::map_dfr(t, computeAtT)
+    results <- lapply(t, computeAtT)
+    results <- do.call(rbind, results)
     return(results)
   }
   
