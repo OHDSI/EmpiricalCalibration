@@ -19,6 +19,8 @@ Description: Routines for performing empirical calibration of observational
   For more details, see Schuemie et al. (2013) <doi:10.1002/sim.5925> and
   Schuemie et al. (2018) <doi:10.1073/pnas.1708282114>.
 VignetteBuilder: knitr
+Depends:
+  R (>= 3.5.0)
 Imports:
   ggplot2 (>= 2.0.0),
   gridExtra,
@@ -30,6 +32,8 @@ Suggests:
   markdown,
   rmarkdown,
   testthat,
+  Cyclops,
+  survival,
   Sequential
 License: Apache License 2.0
 LinkingTo: Rcpp

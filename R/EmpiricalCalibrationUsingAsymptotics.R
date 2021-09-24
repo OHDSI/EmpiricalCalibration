@@ -253,6 +253,12 @@ fitNullNonNormalLl <- function(likelihoodApproximations) {
     message("Detected data following grid distribution")
     type <- "grid"
     llApproximationFunction <- gridLlApproximation
+    for (i in 1:length(likelihoodApproximations)) {
+      likelihoodApproximation <- likelihoodApproximations[[i]]
+      maxValue <- max(likelihoodApproximation$value)
+      likelihoodApproximation$value <- likelihoodApproximation$value - maxValue
+      likelihoodApproximations[[i]] <- as.data.frame(likelihoodApproximation)
+    }
   }
   
   theta <- c(0, 100)

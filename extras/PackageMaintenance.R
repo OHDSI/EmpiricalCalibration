@@ -40,6 +40,13 @@ rmarkdown::render("vignettes/EmpiricalCICalibrationVignette.Rmd",
                                           number_sections = TRUE))
 unlink("inst/doc/EmpiricalCiCalibrationVignette.tex")
 
+rmarkdown::render("vignettes/EmpiricalMaxSprtCalibrationVignette.Rmd",
+                  output_file = "../inst/doc/EmpiricalMaxSprtCalibrationVignette.pdf",
+                  rmarkdown::pdf_document(latex_engine = "pdflatex",
+                                          toc = TRUE,
+                                          number_sections = TRUE))
+unlink("inst/doc/EmpiricalMaxSprtCalibrationVignette.tex")
+
 pkgdown::build_site()
 OhdsiRTools::fixHadesLogo()
 

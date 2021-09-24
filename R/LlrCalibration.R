@@ -74,7 +74,9 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
         stop("Expecting grid data, but not all column names are numeric")
       }
       convertToDataFrame <- function(i) {
-        data.frame(value = as.numeric(likelihoodApproximation[i, ]),
+        value <- as.numeric(likelihoodApproximation[i, ])
+        maxValue <- max(value)
+        data.frame(value = value - maxValue,
                    point = point)
       }
       likelihoodApproximation <- lapply(1:nrow(likelihoodApproximation), convertToDataFrame) 
