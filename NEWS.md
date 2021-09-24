@@ -1,4 +1,4 @@
-EmpiricalCalibration 2.2.0
+EmpiricalCalibration 3.0.0
 ==========================
 
 Changes
