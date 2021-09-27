@@ -177,7 +177,7 @@ calibratedLlr > cv
 
 # Demonstrating type 1 error with and without calibration
 
-It is always a good idea to compute the type 1 error based on the negative controls, to understand the operating characteristics of your study. Here we compute type 1 error both with and without calibration, to demonstrate why empirical calibration can be important.
+It is always a good idea to compute the type 1 error based on the negative controls, to understand the operating characteristics of your study. Unfortunately, when doing sequential testing we cannot evaluate the overall performance of our surveillance until our final look at the data. Here we compute type 1 error both with and without calibration, comparing it to the nominal type 1 error, to demonstrate why empirical calibration can be important.
 
 ## Computing the calibrated and uncalibrated log likelihood ratios
 

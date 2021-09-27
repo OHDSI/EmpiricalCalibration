@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">3.0.0</span>
       </span>
     </div>
 
@@ -99,6 +99,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/EmpiricalCiCalibrationVignette.html">Empirical calibration of confidence intervals</a>
+    </li>
+    <li>
+      <a href="../articles/EmpiricalMaxSprtCalibrationVignette.html">Empirical calibration and MaxSPRT</a>
     </li>
     <li>
       <a href="../articles/EmpiricalPCalibrationVignette.html">Empirical calibration of p-values</a>
@@ -138,13 +141,21 @@
     <p><code>calibrateP</code> computes calibrated p-values using the fitted null distribution</p>
     </div>
 
-    <pre class="usage"><span class='fu'>calibrateP</span><span class='op'>(</span><span class='va'>null</span>, <span class='va'>logRr</span>, <span class='va'>seLogRr</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>calibrateP</span><span class='op'>(</span><span class='va'>null</span>, <span class='va'>logRr</span>, <span class='va'>seLogRr</span>, twoSided <span class='op'>=</span> <span class='cn'>TRUE</span>, upper <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for null</span>
-<span class='fu'>calibrateP</span><span class='op'>(</span><span class='va'>null</span>, <span class='va'>logRr</span>, <span class='va'>seLogRr</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>calibrateP</span><span class='op'>(</span><span class='va'>null</span>, <span class='va'>logRr</span>, <span class='va'>seLogRr</span>, twoSided <span class='op'>=</span> <span class='cn'>TRUE</span>, upper <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for mcmcNull</span>
-<span class='fu'>calibrateP</span><span class='op'>(</span><span class='va'>null</span>, <span class='va'>logRr</span>, <span class='va'>seLogRr</span>, <span class='va'>pValueOnly</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>calibrateP</span><span class='op'>(</span>
+  <span class='va'>null</span>,
+  <span class='va'>logRr</span>,
+  <span class='va'>seLogRr</span>,
+  twoSided <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  upper <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>pValueOnly</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -165,6 +176,14 @@ error = (log(&lt;lower bound 95 percent confidence interval&gt;) - log(&lt;effec
 estimate&gt;))/qnorm(0.025)</p></td>
     </tr>
     <tr>
+      <th>twoSided</th>
+      <td><p>Compute two-sided (TRUE) or one-sided (FALSE) p-value?</p></td>
+    </tr>
+    <tr>
+      <th>upper</th>
+      <td><p>If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>Any additional parameters (currently none).</p></td>
     </tr>
@@ -177,7 +196,7 @@ interval.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The two-sided calibrated p-value.</p>
+    <p>The calibrated p-value.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function computes a calibrated two-sided p-value as described in Schuemie et al (2014).</p>

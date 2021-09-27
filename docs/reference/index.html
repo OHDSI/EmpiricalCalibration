@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">3.0.0</span>
       </span>
     </div>
 
@@ -98,6 +98,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/EmpiricalCiCalibrationVignette.html">Empirical calibration of confidence intervals</a>
+    </li>
+    <li>
+      <a href="../articles/EmpiricalMaxSprtCalibrationVignette.html">Empirical calibration and MaxSPRT</a>
     </li>
     <li>
       <a href="../articles/EmpiricalPCalibrationVignette.html">Empirical calibration of p-values</a>
@@ -163,6 +166,12 @@
           <p><code><a href="fitMcmcNull.html">fitMcmcNull()</a></code> </p>
         </td>
         <td><p>Fit the null distribution using MCMC</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="fitNullNonNormalLl.html">fitNullNonNormalLl()</a></code> </p>
+        </td>
+        <td><p>Fit the null distribution using non-normal log-likelihood approximations</p></td>
       </tr><tr>
         
         <td>
@@ -288,6 +297,37 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
+          <h2 id="section-maxsprt-and-calibration" class="hasAnchor"><a href="#section-maxsprt-and-calibration" class="anchor"></a>MaxSPRT and calibration</h2>
+          <p class="section-desc"><p>Functions for performing empirical calibration when adjusting for sequential testing using MaxSPRT.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="calibrateLlr.html">calibrateLlr()</a></code> </p>
+        </td>
+        <td><p>Calibrate the log likelihood ratio</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="computeCvBinomial.html">computeCvBinomial()</a></code> </p>
+        </td>
+        <td><p>Compute critical values for Binomial data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="computeCvPoisson.html">computeCvPoisson()</a></code> </p>
+        </td>
+        <td><p>Compute critical values for Poisson data</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
           <h2 id="section-data" class="hasAnchor"><a href="#section-data" class="anchor"></a>Data</h2>
           <p class="section-desc"><p>Data (real and simulated) for testing and demonstrating empirical calibration.</p></p>
         </th>
@@ -333,6 +373,12 @@
           <p><code><a href="simulateControls.html">simulateControls()</a></code> </p>
         </td>
         <td><p>Simulate (negative) controls</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="simulateMaxSprtData.html">simulateMaxSprtData()</a></code> </p>
+        </td>
+        <td><p>Simulate survival data for MaxSPRT computation</p></td>
       </tr>
     </tbody>
     </table>

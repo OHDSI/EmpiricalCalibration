@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Odds ratios from a case-control design — caseControl • EmpiricalCalibration</title>
+<title>Compute critical values for Binomial data — computeCvBinomial • EmpiricalCalibration</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,15 @@
 
 
 
-<meta property="og:title" content="Odds ratios from a case-control design — caseControl" />
-<meta property="og:description" content="Odds ratios from a case-control design" />
+<meta property="og:title" content="Compute critical values for Binomial data — computeCvBinomial" />
+<meta property="og:description" content="Obtains critical values for the group and continuous sequential MaxSPRT test with Binomial data, 
+using a Wald type upper boundary, which is flat with respect to the likelihood ratio function, 
+and with a pre-specified upper limit on the sample size.
+It is often not possible to select a critical value that corresponds to the exact alpha specified.
+Instead, this function will select the least conservative critical value having an alpha below
+the one specified, so the sequential analysis is conservative.
+This function is a re-implementation of the CV.Binomial function in the Sequential
+package, using Monte-Carlo." />
 
 
 
@@ -132,46 +139,69 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Odds ratios from a case-control design</h1>
-    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/Data.R'><code>R/Data.R</code></a></small>
-    <div class="hidden name"><code>caseControl.Rd</code></div>
+    <h1>Compute critical values for Binomial data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/MaxSprtCriticalValues.R'><code>R/MaxSprtCriticalValues.R</code></a></small>
+    <div class="hidden name"><code>computeCvBinomial.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Odds ratios from a case-control design</p>
+    <p>Obtains critical values for the group and continuous sequential MaxSPRT test with Binomial data, 
+using a Wald type upper boundary, which is flat with respect to the likelihood ratio function, 
+and with a pre-specified upper limit on the sample size.</p>
+<p>It is often not possible to select a critical value that corresponds to the exact alpha specified.
+Instead, this function will select the least conservative critical value having an alpha below
+the one specified, so the sequential analysis is conservative.</p>
+<p>This function is a re-implementation of the <code>CV.Binomial</code> function in the <code>Sequential</code>
+package, using Monte-Carlo.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>caseControl</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>computeCvBinomial</span><span class='op'>(</span>
+  <span class='va'>groupSizes</span>,
+  <span class='va'>z</span>,
+  minimumEvents <span class='op'>=</span> <span class='fl'>1</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.05</span>,
+  sampleSize <span class='op'>=</span> <span class='fl'>1e+06</span>
+<span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>groupSizes</th>
+      <td><p>Vector containing the expected number of events under H0 for each test.</p></td>
+    </tr>
+    <tr>
+      <th>z</th>
+      <td><p>For a matched case-control analysis, z is the number of controls matched to 
+each case under the null hypothesis. For a self-controlled analysis, z is the
+control time divided by the time at risk.</p></td>
+    </tr>
+    <tr>
+      <th>minimumEvents</th>
+      <td><p>The minimum number of events needed before the null hypothesis can be rejected.</p></td>
+    </tr>
+    <tr>
+      <th>alpha</th>
+      <td><p>The significance level, or the type 1 error probability, which is the probability 
+of rejecting the null hypothesis when it is true.</p></td>
+    </tr>
+    <tr>
+      <th>sampleSize</th>
+      <td><p>Sample size for the Monte-Carlo simulations.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame with 47 rows and 4 variables:</p><dl>
-<dt>drugName</dt><dd><p>Name of the drug</p></dd>
-<dt>groundTruth</dt><dd><p>Whether the drug is a positive (1) or negative (0) control</p></dd> <dt>logRr</dt><dd><p>The log
-of the incidence rate ratio</p></dd> <dt>seLogRr</dt><dd><p>The standard error of the log of the incidence rate
-ratio</p></dd> 
-</dl>
+    <p>The computed critical value. The 'alpha' attribute of the result indicates the selected alpha.</p>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>A dataset containing the odds ratios (and standard errors) produced using a case-control design.
-The outcome is upper GI bleeding, the drug of interest (groundTruth = 1) is sertraline. Also
-included are 46 negative control drugs, for which we believe there to be no causal relation with
-upper GI bleeding. We used a database of medical records from general practices in the USA, the
-General Electric (GE) Centricity database, which contains data on 11.2 million subjects. We
-restricted on study period (start of 1990 through November 2003), age requirements (18 years or
-older), available time prior to event (180 days), number of controls per case (6), and risk
-definition window (30 days following the prescription). Controls were matched on age and sex. Cases
-of upper GI bleeding were identified on the basis of the occurrence of ICD-9 diagnosis codes in the
-problem list. These codes pertain to esophageal, gastric, duodenal, peptic, and gastrojejunal
-ulceration, perforation, and hemorrhage, as well as gastritis and non-specific gastrointestinal
-hemorrhage. For more information on this set see Schuemie et al (2014).</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
-empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014</p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>groupSizes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>10</span><span class='op'>)</span>
+<span class='fu'>computeCvBinomial</span><span class='op'>(</span><span class='va'>groupSizes</span>, z <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Selected alpha: 0.049 (least conservative value below 0.05)</span></div><div class='output co'>#&gt; [1] 3.064954
+#&gt; attr(,"alpha")
+#&gt; [1] 0.049317</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

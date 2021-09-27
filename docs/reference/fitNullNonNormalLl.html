@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Odds ratios from a case-control design — caseControl • EmpiricalCalibration</title>
+<title>Fit the null distribution using non-normal log-likelihood approximations — fitNullNonNormalLl • EmpiricalCalibration</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Odds ratios from a case-control design — caseControl" />
-<meta property="og:description" content="Odds ratios from a case-control design" />
+<meta property="og:title" content="Fit the null distribution using non-normal log-likelihood approximations — fitNullNonNormalLl" />
+<meta property="og:description" content="fitNullNonNormalLl fits the null distribution to a set of negative controls" />
 
 
 
@@ -132,46 +132,46 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Odds ratios from a case-control design</h1>
-    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/Data.R'><code>R/Data.R</code></a></small>
-    <div class="hidden name"><code>caseControl.Rd</code></div>
+    <h1>Fit the null distribution using non-normal log-likelihood approximations</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/EmpiricalCalibration/blob/master/R/EmpiricalCalibrationUsingAsymptotics.R'><code>R/EmpiricalCalibrationUsingAsymptotics.R</code></a></small>
+    <div class="hidden name"><code>fitNullNonNormalLl.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Odds ratios from a case-control design</p>
+    <p><code>fitNullNonNormalLl</code> fits the null distribution to a set of negative controls</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>caseControl</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>fitNullNonNormalLl</span><span class='op'>(</span><span class='va'>likelihoodApproximations</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>likelihoodApproximations</th>
+      <td><p>Either a data frame containing normal, skew-normal, or custom parametric likelihood
+approximations, or a list of (adaptive) grid likelihood profiles.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame with 47 rows and 4 variables:</p><dl>
-<dt>drugName</dt><dd><p>Name of the drug</p></dd>
-<dt>groundTruth</dt><dd><p>Whether the drug is a positive (1) or negative (0) control</p></dd> <dt>logRr</dt><dd><p>The log
-of the incidence rate ratio</p></dd> <dt>seLogRr</dt><dd><p>The standard error of the log of the incidence rate
-ratio</p></dd> 
-</dl>
-
+    <p>An object containing the parameters of the null distribution.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>A dataset containing the odds ratios (and standard errors) produced using a case-control design.
-The outcome is upper GI bleeding, the drug of interest (groundTruth = 1) is sertraline. Also
-included are 46 negative control drugs, for which we believe there to be no causal relation with
-upper GI bleeding. We used a database of medical records from general practices in the USA, the
-General Electric (GE) Centricity database, which contains data on 11.2 million subjects. We
-restricted on study period (start of 1990 through November 2003), age requirements (18 years or
-older), available time prior to event (180 days), number of controls per case (6), and risk
-definition window (30 days following the prescription). Controls were matched on age and sex. Cases
-of upper GI bleeding were identified on the basis of the occurrence of ICD-9 diagnosis codes in the
-problem list. These codes pertain to esophageal, gastric, duodenal, peptic, and gastrojejunal
-ulceration, perforation, and hemorrhage, as well as gastritis and non-specific gastrointestinal
-hemorrhage. For more information on this set see Schuemie et al (2014).</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+    <p>This function fits a Gaussian function to the negative control estimates, using non-normal
+approximations of the per-negative control log likelihood.</p>
 
-    <p>Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
-empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014</p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sccs</span><span class='op'>)</span>
+<span class='va'>negatives</span> <span class='op'>&lt;-</span> <span class='va'>sccs</span><span class='op'>[</span><span class='va'>sccs</span><span class='op'>$</span><span class='va'>groundTruth</span> <span class='op'>==</span> <span class='fl'>0</span>, <span class='op'>]</span>
+<span class='va'>null</span> <span class='op'>&lt;-</span> <span class='fu'>fitNullNonNormalLl</span><span class='op'>(</span><span class='va'>negatives</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Detected data following normal distribution</span></div><div class='input'><span class='va'>null</span>
+</div><div class='output co'>#&gt; Estimated null distribution
+#&gt; 
+#&gt;      Estimate
+#&gt; Mean   0.7920
+#&gt; SD     0.2835</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

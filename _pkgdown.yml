@@ -13,7 +13,8 @@ reference:
       Functions for calibrating p-values based on an empirical null distribution estimated using negative controls.
     contents:
       - fitNull 
-      - fitMcmcNull 
+      - fitMcmcNull
+      - fitNullNonNormalLl
       - computeTraditionalP 
       - calibrateP 
       - plotMcmcTrace 
@@ -36,6 +37,13 @@ reference:
       - plotCiCalibrationEffect 
       - plotCiCoverage 
       - plotErrorModel 
+  - title: "MaxSPRT and calibration"
+    desc: >
+      Functions for performing empirical calibration when adjusting for sequential testing using MaxSPRT.
+    contents:
+      - calibrateLlr
+      - computeCvBinomial
+      - computeCvPoisson
   - title: "Data"
     desc: >
       Data (real and simulated) for testing and demonstrating empirical calibration.
@@ -46,6 +54,7 @@ reference:
       - southworthReplication 
       - grahamReplication       
       - simulateControls 
+      - simulateMaxSprtData
       
 navbar:
   structure:
