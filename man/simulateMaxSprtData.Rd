@@ -58,7 +58,7 @@ The outcome IDs are assigned sequentially starting at 1, with the first IDs used
 for the positive controls.
 }
 \examples{
-data <- simulateMaxSprtData()
+data <- simulateMaxSprtData(n = 1000)
 head(data)
 
 }

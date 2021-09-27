@@ -72,7 +72,7 @@ install_github("ohdsi/EmpiricalCalibration")
   
 User Documentation
 ==================
-Documentation can be found on the [package website](https://ohdsi.github.io/EmpiricalCalibration).
+Documentation can be found on the [package website](https://ohdsi.github.io/EmpiricalCalibration/).
 
 PDF versions of the documentation is also available:
 * Vignette: [Empirical calibration of p-values](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalPCalibrationVignette.pdf)

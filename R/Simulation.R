@@ -68,7 +68,7 @@ simulateControls <- function(n = 50,
 #' for the positive controls.
 #'
 #' @examples
-#' data <- simulateMaxSprtData()
+#' data <- simulateMaxSprtData(n = 1000)
 #' head(data)
 #' 
 #' @return
