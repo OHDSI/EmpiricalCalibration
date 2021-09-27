@@ -41,10 +41,13 @@ prepareForReverseDependencyCheck <- function(pkgdir = ".") {
   packagesToInstallFromCran <- packagesToInstall[!packagesToInstall %in% packagesToInstallFromGitHub]
   
   if (length(packagesToInstallFromCran) > 0) {
-    remotes::install_cran(packagesToInstallFromCran)
+    remotes::install_cran(packagesToInstallFromCran,
+                          build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes", "--no-multiarch"))
   }
   for (package in packagesToInstallFromGitHub) {
-    remotes::install_github(sprintf("%s/%s", gitHubOrganization, package), upgrade = FALSE)
+    remotes::install_github(sprintf("%s/%s", gitHubOrganization, package), 
+                            build_opts = c("--no-resave-data", "--no-manual", "--no-build-vignettes", "--no-multiarch"), 
+                            upgrade = FALSE)
   }
   
   return(hadesPackageList[hadesPackageList$name %in% reverseDependencies, ])
