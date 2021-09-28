@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">3.0.0</span>
       </span>
     </div>
 
@@ -99,6 +99,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/EmpiricalCiCalibrationVignette.html">Empirical calibration of confidence intervals</a>
+    </li>
+    <li>
+      <a href="../articles/EmpiricalMaxSprtCalibrationVignette.html">Empirical calibration and MaxSPRT</a>
     </li>
     <li>
       <a href="../articles/EmpiricalPCalibrationVignette.html">Empirical calibration of p-values</a>
@@ -191,7 +194,7 @@ therefore represented by an intercept and a slope.</p>
 <span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'>fitSystematicErrorModel</span><span class='op'>(</span><span class='va'>controls</span><span class='op'>$</span><span class='va'>logRr</span>, <span class='va'>controls</span><span class='op'>$</span><span class='va'>seLogRr</span>, <span class='va'>controls</span><span class='op'>$</span><span class='va'>trueLogRr</span><span class='op'>)</span>
 <span class='va'>model</span>
 </div><div class='output co'>#&gt; meanIntercept     meanSlope   sdIntercept       sdSlope 
-#&gt;   0.255355383   1.017296096   0.244055061  -0.006022851 
+#&gt;    0.27583155    0.97286679    0.23982661    0.02208369 
 #&gt; attr(,"class")
 #&gt; [1] "systematicErrorModel"</div><div class='input'>
 </div></pre>

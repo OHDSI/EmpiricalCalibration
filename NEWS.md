@@ -1,10 +1,27 @@
+EmpiricalCalibration 3.0.0
+==========================
+
+Changes
+
+1. Adding option to make p-values one-sided.
+
+2. Adding empirical calibration of the log likelihood ratio.
+
+3. Adding functions for computing critical values for the log likelihood ratio when performing sequential testing (MaxSPRT).
+
+4. Adding ability to fit null distribution using non-normal approximations of the per-negative control likelihood functions.
+
+5. Faster null distribution fitting using MCMC. Increasing default MCMC iterations for greater stability.
+
+6. Using median instead of mean of posterior distributions when converting MCMC null to error model for greater consistency between calibrated CI and P.
+
+
 EmpiricalCalibration 2.1.0
 ==========================
 
 Changes
 
 1. Adding computation of expected absolute systematic error. Can be shown in plots.
-
 
 
 EmpiricalCalibration 2.0.2

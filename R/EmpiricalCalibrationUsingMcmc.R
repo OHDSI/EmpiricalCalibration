@@ -26,20 +26,20 @@ proposalFunction <- function(param, scale) {
   return(draw)
 }
 
-runMetropolisMcmc <- function(startValue, ll, iterations, scale, logRr, seLogRr) {
+runMetropolisMcmc <- function(startValue, iterations, scale, logRr, seLogRr) {
   dim <- length(startValue)
   chain <- array(dim = c(iterations + 1, dim))
   logLik <- array(dim = c(iterations + 1, 1))
   acc <- array(dim = c(iterations + 1, 1))
 
-  logLik[1] <- -ll(startValue, logRr, seLogRr)
+  logLik[1] <- -logLikelihoodNullMcmc(startValue, logRr, seLogRr)
   chain[1, ] <- c(startValue)
   acc[1] <- 1
 
   for (i in 1:iterations) {
     # print(paste('itr =', i))
     proposal <- proposalFunction(chain[i, ], scale = scale)
-    newLogLik <- tryCatch(-ll(proposal, logRr, seLogRr), error = function(e) {
+    newLogLik <- tryCatch(-logLikelihoodNullMcmc(proposal, logRr, seLogRr), error = function(e) {
       -1e+10
     })
 
@@ -151,7 +151,7 @@ binarySearchSigma <- function(modeMu,
 #' calibrateP(null, positive$logRr, positive$seLogRr)
 #' }
 #' @export
-fitMcmcNull <- function(logRr, seLogRr, iter = 10000) {
+fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
   if (any(is.infinite(seLogRr))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     logRr <- logRr[!is.infinite(seLogRr)]
@@ -185,8 +185,8 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 10000) {
                                       seLogRrNegatives = seLogRr))
 
   # writeLines(paste('Scale:', paste(scale,collapse=',')))
-  mcmc <- runMetropolisMcmc(fit$par, logLikelihoodNullMcmc, iterations = iter, scale, logRr, seLogRr)
-  result <- c(mean(mcmc$chain[, 1]), mean(mcmc$chain[, 2]))
+  mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr)
+  result <- c(median(mcmc$chain[, 1]), median(mcmc$chain[, 2]))
   attr(result, "mcmc") <- mcmc
   class(result) <- "mcmcNull"
   return(result)
@@ -217,7 +217,7 @@ print.mcmcNull <- function(x, ...) {
 #'                     interval.
 #'
 #' @export
-calibrateP.mcmcNull <- function(null, logRr, seLogRr, pValueOnly, ...) {
+calibrateP.mcmcNull <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, pValueOnly, ...) {
   mcmc <- attr(null, "mcmc")
   adjustedP <- data.frame(p = rep(1, length(logRr)), lb95ci = 0, ub95ci = 0)
   for (i in 1:length(logRr)) {
@@ -226,13 +226,17 @@ calibrateP.mcmcNull <- function(null, logRr, seLogRr, pValueOnly, ...) {
       adjustedP$lb95ci[i] <- NA
       adjustedP$ub95ci[i] <- NA
     } else {
-      P_upper_bound <- pnorm((mcmc$chain[,
-                              1] - logRr[i])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-      P_lower_bound <- pnorm((logRr[i] - mcmc$chain[,
-                              1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-      p <- P_upper_bound
-      p[P_lower_bound < p] <- P_lower_bound[P_lower_bound < p]
-      p <- p * 2
+      pUpperBound <- pnorm((mcmc$chain[, 1] - logRr[i])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+      pLowerBound <- pnorm((logRr[i] - mcmc$chain[, 1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+      if (twoSided) {
+        p <- pUpperBound
+        p[pLowerBound < p] <- pLowerBound[pLowerBound < p]
+        p <- p * 2
+      } else if (upper) {
+        p <- pUpperBound
+      } else {
+        p <- pLowerBound
+      }
       adjustedP$p[i] <- quantile(p, 0.5)
       adjustedP$lb95ci[i] <- quantile(p, 0.025)
       adjustedP$ub95ci[i] <- quantile(p, 0.975)
