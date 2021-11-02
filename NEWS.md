@@ -1,3 +1,10 @@
+EmpiricalCalibration 3.0.1
+==========================
+
+Bugfixes
+
+1. Fixing `computeTraditionalP()` when using vectors as input.
+
 EmpiricalCalibration 3.0.0
 ==========================
 

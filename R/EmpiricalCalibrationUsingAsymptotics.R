@@ -178,7 +178,7 @@ computeTraditionalP <- function(logRr, seLogRr, twoSided = TRUE, upper = TRUE) {
   pUpperBound <- 1 - pnorm(z)
   pLowerBound <- pnorm(z)
   if (twoSided) {
-    return(2 * min(pUpperBound, pLowerBound))
+    return(2 * pmin(pUpperBound, pLowerBound))
   } else if (upper) {
     return(pUpperBound)
   } else {
