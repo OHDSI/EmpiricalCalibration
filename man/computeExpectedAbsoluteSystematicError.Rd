@@ -18,10 +18,10 @@ the credible interval (defined by \code{alpha}) is also returned.
 }
 \description{
 For a random study estimate, what is the expected value of the absolute systematic error?
-Provides a single summary value for a null distribution. The expected systematic error of a null 
-distribution is equal to its mean (mu), and is insensitive to the spread of the null distribution (sigma). 
+Provides a single summary value for a null distribution. The expected systematic error of a null
+distribution is equal to its mean (mu), and is insensitive to the spread of the null distribution (sigma).
 
-Taking the absolute value of the expected systematic error we can express both mean and spread of the 
+Taking the absolute value of the expected systematic error we can express both mean and spread of the
 estimated null distribution.
 }
 \examples{
@@ -29,5 +29,4 @@ data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
 null <- fitNull(negatives$logRr, negatives$seLogRr)
 computeExpectedAbsoluteSystematicError(null)
-
 }

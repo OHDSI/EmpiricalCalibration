@@ -96,18 +96,19 @@ p
 # Null distribution for paired EASE (null hypothesis: set 1 and 2 derive from same process) ------------------
 # Boostrapping
 
-method1Ncs <- simulateControls(n = 50, mean = 0, sd = 0, seLogRr = runif(50, 0.1, 0.5))
+
+method1Ncs <- simulateControls(n = 50, mean = 0, sd = 0, seLogRr = runif(50, 0.1, 1))
 # second method slightly more biased:
 method2Ncs <- method1Ncs
-method2Ncs$logRr <- method2Ncs$logRr + rnorm(nrow(method2Ncs), mean = 0.1, sd = 0.01)
+method2Ncs$logRr <- method2Ncs$logRr + rnorm(nrow(method2Ncs), mean = 0, sd = 0.01)
 
-deltaLogRr <- method2Ncs$logRr - method1Ncs$logRr
-mean(deltaLogRr)
-sd(deltaLogRr)
+# deltaLogRr <- method2Ncs$logRr - method1Ncs$logRr
+# mean(deltaLogRr)
+# sd(deltaLogRr)
 
-ggplot(data.frame(method1 = method1Ncs$logRr, method2 = method2Ncs$logRr), aes(x = method1, y = method2)) +
-  geom_abline(slope = 1) +
-  geom_point()
+# ggplot(data.frame(method1 = method1Ncs$logRr, method2 = method2Ncs$logRr), aes(x = method1, y = method2)) +
+#   geom_abline(slope = 1) +
+#   geom_point()
 
 
 null1 <- fitNull(method1Ncs$logRr, method1Ncs$seLogRr)
@@ -133,13 +134,66 @@ ggplot(data.frame(x = nullSamples), aes(x = x)) +
   geom_vline(xintercept = 0, size = 1) +
   geom_density(color = rgb(0.2, 0.2, 0.8), fill = rgb(0.2, 0.2, 0.8), alpha = 0.6) +
   geom_vline(xintercept = delta, linetype = "dashed")
-
+# 
 # hist(nullSamples)
 if (delta > 0) {
-  p <-  mean(nullSamples < 0)
+  p <-  mean(nullSamples < 0) 
 } else {
-  p <-  mean(nullSamples > 0)
+  p <-  mean(nullSamples > 0) 
 }
 p
 
 
+
+sampleP <- function(i) {
+  ncs1 <- simulateControls(n = 50, mean = 0.01, sd = 0.01, seLogRr = runif(50, 0.1, 1))
+  
+  # Simulate second method to be more biased:
+  ncs2 <- ncs1
+  ncs2$logRr <- ncs2$logRr + rnorm(nrow(ncs2), mean = 0, sd = 0.01)
+  
+  delta <- compareEase(logRr1 = ncs1$logRr, 
+                                                  seLogRr1 = ncs1$seLogRr, 
+                                                  logRr2 = ncs2$logRr, 
+                                                  seLogRr2 = ncs2$seLogRr)
+  return(delta$p)
+}
+
+
+cluster <- ParallelLogger::makeCluster(20)
+ParallelLogger::clusterRequire(cluster, "EmpiricalCalibration")
+p <- ParallelLogger::clusterApply(cluster, 1:500, sampleP)
+p <- do.call(c, p)
+mean(p < 0.05)
+ParallelLogger::stopCluster(cluster)
+
+
+
+
+boostrapEase <- function(i, ncs) {
+  idx <- sample.int(nrow(ncs), nrow(ncs), replace = TRUE)
+  null <- fitNull(ncs$logRr[idx], ncs$seLogRr[idx])
+  return(computeExpectedAbsoluteSystematicError(null))
+}
+nullSamples <- sapply(1:1000, boostrapEase, ncs = method1Ncs)
+quantile(nullSamples, c(0.5, 0.025, 0.975))
+
+null <- fitMcmcNull(method1Ncs$logRr, method1Ncs$seLogRr)
+computeExpectedAbsoluteSystematicError(null)
+
+
+
+# Simulate results of first method:
+ncs1 <- simulateControls(n = 50)
+
+# Simulate second method to be more biased:
+ncs2 <- ncs1
+ncs2$logRr <- ncs2$logRr + rnorm(nrow(ncs2), mean = 0, sd = 0.01)
+
+delta <- compareExpectedAbsoluteSystematicError(logRr1 = ncs1$logRr, 
+                                                seLogRr1 = ncs1$seLogRr, 
+                                                logRr2 = ncs2$logRr, 
+                                                seLogRr2 = ncs2$seLogRr)
+delta
+attr(delta, "ease1") 
+attr(delta, "ease2") 

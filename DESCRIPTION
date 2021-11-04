@@ -40,5 +40,5 @@ LinkingTo: Rcpp
 NeedsCompilation: yes
 URL: https://ohdsi.github.io/EmpiricalCalibration/, https://github.com/OHDSI/EmpiricalCalibration
 BugReports: https://github.com/OHDSI/EmpiricalCalibration/issues
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Encoding: UTF-8
