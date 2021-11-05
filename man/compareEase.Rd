@@ -32,7 +32,7 @@ between EASE in the two sets of negative controls, and a p value against the nul
 same for the two sets.
 
 The data frame has two attributes: ease1 and ease2, providing the EASE estimates (and confidence intervals) for the
-two sets, computed using bootstrapping. Note that these estimates may somwhat different from those generated using
+two sets, computed using bootstrapping. Note that these estimates may somewhat different from those generated using
 \code{\link{computeExpectedAbsoluteSystematicError}}, because a different approach is used to compute the confidence
 interval. The approach used here will more closely align with the computation of the difference in EASE.
 }
@@ -41,6 +41,9 @@ Compare EASE of correlated sets of estimates
 }
 \details{
 Compare the expected absolute systematic error (EASE) of two sets of estimates for the same set of negative controls.
+
+Important: the two sets of estimates (logRr1 + seLogRr1 and logRr2 + seLogRr2) should be in identical order, so that for
+example the first item in each vector corresponds to the same negative control.
 }
 \examples{
 # Simulate results of first method:

@@ -30,3 +30,6 @@ negatives <- sccs[sccs$groundTruth == 0, ]
 null <- fitNull(negatives$logRr, negatives$seLogRr)
 computeExpectedAbsoluteSystematicError(null)
 }
+\seealso{
+\code{\link{compareEase}} for comparing the expected absolute systematic error of two sets of estimates for the same negative controls.
+}

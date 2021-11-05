@@ -1,6 +1,10 @@
 EmpiricalCalibration 3.0.1
 ==========================
 
+Changes
+
+1. Adding the [compareEase()] function to compare EASE of correlated sets of estimates.
+
 Bugfixes
 
 1. Fixing `computeTraditionalP()` when using vectors as input.

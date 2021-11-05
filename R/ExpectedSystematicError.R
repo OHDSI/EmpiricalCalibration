@@ -41,6 +41,8 @@ closedFormIntegeralAbsolute <- function(mu, sigma) {
 #' @return
 #' The expected absolute systematic error. If the provided \code{null} argument is of type \code{mcmcNull},
 #' the credible interval (defined by \code{alpha}) is also returned.
+#' 
+#' @seealso \code{\link{compareEase}} for comparing the expected absolute systematic error of two sets of estimates for the same negative controls.
 #'
 #' @examples
 #' data(sccs)
@@ -97,6 +99,9 @@ computeEaseBoostrap <- function(logRr, seLogRr, alpha, sampleSize) {
 #'
 #' @details
 #' Compare the expected absolute systematic error (EASE) of two sets of estimates for the same set of negative controls.
+#' 
+#' Important: the two sets of estimates (logRr1 + seLogRr1 and logRr2 + seLogRr2) should be in identical order, so that for
+#' example the first item in each vector corresponds to the same negative control.
 #'
 #' @param logRr1     A numeric vector of effect estimates generated using the first method on the log scale.
 #' @param seLogRr1   The standard error of the log of the effect estimates generated using the first method.
@@ -128,12 +133,15 @@ computeEaseBoostrap <- function(logRr, seLogRr, alpha, sampleSize) {
 #' same for the two sets.
 #'
 #' The data frame has two attributes: ease1 and ease2, providing the EASE estimates (and confidence intervals) for the
-#' two sets, computed using bootstrapping. Note that these estimates may somwhat different from those generated using
+#' two sets, computed using bootstrapping. Note that these estimates may somewhat different from those generated using
 #' \code{\link{computeExpectedAbsoluteSystematicError}}, because a different approach is used to compute the confidence
 #' interval. The approach used here will more closely align with the computation of the difference in EASE.
 #'
 #' @export
 compareEase <- function(logRr1, seLogRr1, logRr2, seLogRr2, alpha = 0.05, sampleSize = 1000) {
+  if (length(unique(c(length(logRr1), length(seLogRr1), length(logRr2), length(seLogRr2)))) != 1) 
+    stop("Arguments logRr1, seLogRr1, logRr2, and seLogRr2 should be of equal length.")
+  
   ease1 <- computeEaseBoostrap(logRr = logRr1, seLogRr = seLogRr1, alpha = alpha, sampleSize = sampleSize)
   ease2 <- computeEaseBoostrap(logRr = logRr2, seLogRr = seLogRr2, alpha = alpha, sampleSize = sampleSize)
   delta <- ease1$ease - ease2$ease

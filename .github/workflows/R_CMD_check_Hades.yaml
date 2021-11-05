@@ -83,6 +83,11 @@ jobs:
         if: runner.os == 'Linux'
         run: |    
           sudo apt-get install libssh-dev
+          
+      - name: Install libcurl
+        if: runner.os == 'Linux'
+        run: |    
+          sudo apt-get install libcurl4
 
       - name: Install dependencies
         run: |
