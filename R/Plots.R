@@ -161,8 +161,10 @@ plotCalibrationEffect <- function(logRrNegatives,
   }
   if (showCis && is(null, "null"))
     stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
-  
-  x <- exp(seq(log(0.25), log(10), by = 0.01))
+
+  xlim <- c(min(exp(c(logRrNegatives, logRrPositives)), 0.25), max(exp(c(logRrNegatives, logRrPositives)), 10))
+
+  x <- exp(seq(log(xlim[1]), log(xlim[2]), by = 0.01))
   if (is(null, "null")) {
     y <- logRrtoSE(log(x), alpha, null[1], null[2])
   } else {
@@ -178,6 +180,11 @@ plotCalibrationEffect <- function(logRrNegatives,
     abs(log(x))/qnorm(1 - alpha/2)
   })
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+
+  if (xlim[1] < 0.25) {
+    breaks <- c(0.125, breaks)
+  }
+
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
   plot <- ggplot2::ggplot(data.frame(x, y, seTheoretical),
@@ -234,7 +241,7 @@ plotCalibrationEffect <- function(logRrNegatives,
     ggplot2::geom_hline(yintercept = 0) +
     ggplot2::scale_x_continuous(xLabel,
                                 trans = "log10",
-                                limits = c(0.25, 10),
+                                limits = xlim,
                                 breaks = breaks,
                                 labels = breaks) +
     ggplot2::scale_y_continuous("Standard Error") +
@@ -561,7 +568,7 @@ plotTrueAndObserved <- function(logRr,
     ggplot2::geom_point(shape = 21, size = 1.5) + 
     ggplot2::scale_colour_manual(values = col) + 
     ggplot2::scale_fill_manual(values = colFill) + 
-    ggplot2::coord_cartesian(xlim = c(0.25, 10)) + 
+    ggplot2::coord_cartesian(xlim = c(0.25, 10)) +
     ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
     ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + 
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
