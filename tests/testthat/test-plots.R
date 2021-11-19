@@ -150,6 +150,17 @@ test_that("output of plotCalibrationEffect", {
     ),
     "ggplot"
   )
+
+  # Test extreme input values
+  expect_is(
+    plotCalibrationEffect(
+      logRrNegatives   = negatives$logRr,
+      seLogRrNegatives = negatives$seLogRr,
+      logRrPositives = c(-3,-2, 11),
+      seLogRrPositives = c(0.1, 1.2)
+    ),
+    "ggplot"
+  )
   
 })
 
