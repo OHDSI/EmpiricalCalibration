@@ -130,6 +130,8 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function \code{ggsave} in the ggplot2 package for supported file
 #'                           formats.
+#' @param xLimits            Vector of length 2 for limits of the plot x axis - defaults to 0.25, 10
+#' @param yLimits            Vector of length 2 for size limits of the y axis - defaults to 0, 1.5
 #'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -151,7 +153,9 @@ plotCalibrationEffect <- function(logRrNegatives,
                                   title,
                                   showCis = FALSE,
                                   showExpectedAbsoluteSystematicError = FALSE,
-                                  fileName = NULL) {
+                                  fileName = NULL,
+                                  xLimits = c(0.25, 10),
+                                  yLimits = c(0, 1.5)) {
   if (is.null(null)) {
     if (showCis) {
       null <- fitMcmcNull(logRrNegatives, seLogRrNegatives)
@@ -161,8 +165,15 @@ plotCalibrationEffect <- function(logRrNegatives,
   }
   if (showCis && is(null, "null"))
     stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
-  
-  x <- exp(seq(log(0.25), log(10), by = 0.01))
+
+  if (!is.vector(xLimits) | !length(xLimits) >= 2) {
+    stop("xLimits must be a vector of length 2")
+  }
+  if (!is.vector(yLimits) | !length(yLimits) >= 2) {
+    stop("yLimits must be a vector of length 2")
+  }
+
+  x <- exp(seq(log(xLimits[1]), log(xLimits[2]), by = 0.01))
   if (is(null, "null")) {
     y <- logRrtoSE(log(x), alpha, null[1], null[2])
   } else {
@@ -177,7 +188,22 @@ plotCalibrationEffect <- function(logRrNegatives,
   seTheoretical <- sapply(x, FUN = function(x) {
     abs(log(x))/qnorm(1 - alpha/2)
   })
-  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+
+  breaks <- c(0.25, 0.5, 1, 2 * (1:ceiling(xLimits[2]/2.0)))
+  if (xLimits[1] < 1) {
+    breaks <- c(0.125, breaks)
+  }
+
+  if (xLimits[1] > min(exp(logRrPositives), exp(logRrNegatives)) |
+        xLimits[2] < max(exp(logRrPositives), exp(logRrNegatives))) {
+    warning("Values are outside plotted range. Consider adjusting xLimits parameter")
+  }
+
+  if (yLimits[1] > min(seLogRrNegatives, seLogRrPositives) |
+        yLimits[2] < max(seLogRrNegatives, seLogRrPositives)) {
+    warning("Values are outside plotted range. Consider adjusting yLimits parameter")
+  }
+
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
   plot <- ggplot2::ggplot(data.frame(x, y, seTheoretical),
@@ -234,11 +260,11 @@ plotCalibrationEffect <- function(logRrNegatives,
     ggplot2::geom_hline(yintercept = 0) +
     ggplot2::scale_x_continuous(xLabel,
                                 trans = "log10",
-                                limits = c(0.25, 10),
+                                limits = xLimits,
                                 breaks = breaks,
                                 labels = breaks) +
     ggplot2::scale_y_continuous("Standard Error") +
-    ggplot2::coord_cartesian(ylim = c(0, 1.5)) +
+    ggplot2::coord_cartesian(ylim = yLimits) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
                    panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
                    panel.grid.major = ggplot2::element_blank(),
@@ -561,7 +587,7 @@ plotTrueAndObserved <- function(logRr,
     ggplot2::geom_point(shape = 21, size = 1.5) + 
     ggplot2::scale_colour_manual(values = col) + 
     ggplot2::scale_fill_manual(values = colFill) + 
-    ggplot2::coord_cartesian(xlim = c(0.25, 10)) + 
+    ggplot2::coord_cartesian(xlim = c(0.25, 10)) +
     ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) + 
     ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") + 
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), 
