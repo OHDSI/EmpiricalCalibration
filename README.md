@@ -2,6 +2,7 @@ EmpiricalCalibration
 ====================
 
 [![Build Status](https://github.com/OHDSI/EmpiricalCalibration/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/EmpiricalCalibration/actions?query=workflow%3AR-CMD-check)
+[![codecov.io](https://codecov.io/github/OHDSI/EmpiricalCalibration/coverage.svg?branch=main)](https://codecov.io/github/OHDSI/EmpiricalCalibration?branch=main)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 [![CRAN_Status_Badge](http://cranlogs.r-pkg.org/badges/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 
@@ -26,7 +27,7 @@ Features
 
 Screenshots and examples
 ========================
-<img src="https://github.com/OHDSI/EmpiricalCalibration/raw/master/extras/plot.png" alt="Calibration effect plot" title="Calibration effect plot" />
+<img src="https://github.com/OHDSI/EmpiricalCalibration/raw/main/extras/plot.png" alt="Calibration effect plot" title="Calibration effect plot" />
 
 ```r
 data(sccs) #Load one of the included data sets
@@ -75,10 +76,10 @@ User Documentation
 Documentation can be found on the [package website](https://ohdsi.github.io/EmpiricalCalibration/).
 
 PDF versions of the documentation is also available:
-* Vignette: [Empirical calibration of p-values](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalPCalibrationVignette.pdf)
-* Vignette: [Empirical calibration of confidence intervals](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalCiCalibrationVignette.pdf)
-* Vignette: [Empirical calibration and MaxSPRT](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalMaxSprtCalibrationVignette.pdf)
-* Package manual: [EmpiricalCalibration.pdf](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/extras/EmpiricalCalibration.pdf) 
+* Vignette: [Empirical calibration of p-values](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalPCalibrationVignette.pdf)
+* Vignette: [Empirical calibration of confidence intervals](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalCiCalibrationVignette.pdf)
+* Vignette: [Empirical calibration and MaxSPRT](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalMaxSprtCalibrationVignette.pdf)
+* Package manual: [EmpiricalCalibration.pdf](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/extras/EmpiricalCalibration.pdf) 
 
 Support
 =======
