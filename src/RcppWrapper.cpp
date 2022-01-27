@@ -102,6 +102,40 @@ NumericVector sampleBinomialMaxLrr(NumericVector groupSizes, double p, int minim
   }
   return(values);
 }
+
+// [[Rcpp::export]]
+NumericVector samplePoissonRegressionMaxLrr(NumericVector groupSizes, double z, int minimumEvents, int sampleSize) {
+  NumericVector values(sampleSize);
+  double observed1;
+  double observed2;
+  double maxLlr;
+  double llr;
+  double lambda1;
+  double lambda2;
+  double expected1;
+  for (int i = 0; i < sampleSize; i++) {
+    maxLlr = 0;
+    observed1 = 0;
+    observed2 = 0;
+    for (unsigned int j = 0; j < groupSizes.size(); j++) {
+      lambda1 = groupSizes[j] / (z + 1);
+      lambda2 = lambda1 * z;
+      observed1 += R::rpois(lambda1);
+      observed2 += R::rpois(lambda2);
+      if (observed1 >= minimumEvents && observed2 / observed1 < z) {
+        expected1 = (observed1 + observed2) / (z + 1);
+        llr = (R::dpois(observed1, observed1, true) + R::dpois(observed2, observed2, true)) -
+          (R::dpois(observed1, expected1, true) + R::dpois(observed2, expected1 * z, true));
+        if (llr > maxLlr)
+          maxLlr = llr;
+      }
+      values[i] = maxLlr;
+    }
+  }
+  return(values);
+}
+
+
 double sqr(const double& x) {
   return(x*x);
 }

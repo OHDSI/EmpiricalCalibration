@@ -49,6 +49,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// samplePoissonRegressionMaxLrr
+NumericVector samplePoissonRegressionMaxLrr(NumericVector groupSizes, double z, int minimumEvents, int sampleSize);
+RcppExport SEXP _EmpiricalCalibration_samplePoissonRegressionMaxLrr(SEXP groupSizesSEXP, SEXP zSEXP, SEXP minimumEventsSEXP, SEXP sampleSizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type groupSizes(groupSizesSEXP);
+    Rcpp::traits::input_parameter< double >::type z(zSEXP);
+    Rcpp::traits::input_parameter< int >::type minimumEvents(minimumEventsSEXP);
+    Rcpp::traits::input_parameter< int >::type sampleSize(sampleSizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(samplePoissonRegressionMaxLrr(groupSizes, z, minimumEvents, sampleSize));
+    return rcpp_result_gen;
+END_RCPP
+}
 // logLikelihoodNull
 double logLikelihoodNull(const NumericVector& theta, const NumericVector& logRr, const NumericVector& seLogRr);
 RcppExport SEXP _EmpiricalCalibration_logLikelihoodNull(SEXP thetaSEXP, SEXP logRrSEXP, SEXP seLogRrSEXP) {
@@ -67,6 +81,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_EmpiricalCalibration_gridLlApproximation", (DL_FUNC) &_EmpiricalCalibration_gridLlApproximation, 2},
     {"_EmpiricalCalibration_samplePoissonMaxLrr", (DL_FUNC) &_EmpiricalCalibration_samplePoissonMaxLrr, 3},
     {"_EmpiricalCalibration_sampleBinomialMaxLrr", (DL_FUNC) &_EmpiricalCalibration_sampleBinomialMaxLrr, 4},
+    {"_EmpiricalCalibration_samplePoissonRegressionMaxLrr", (DL_FUNC) &_EmpiricalCalibration_samplePoissonRegressionMaxLrr, 4},
     {"_EmpiricalCalibration_logLikelihoodNull", (DL_FUNC) &_EmpiricalCalibration_logLikelihoodNull, 3},
     {NULL, NULL, 0}
 };

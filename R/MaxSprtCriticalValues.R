@@ -127,3 +127,57 @@ computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sa
   attr(result, "alpha") <- alphas[pick]
   return(result)
 }
+
+#' Compute critical values for Poisson regression data
+#' 
+#' @description
+#' Obtains critical values for the group and continuous sequential MaxSPRT test with Poisson regression data, 
+#' using a Wald type upper boundary, which is flat with respect to the likelihood ratio function, 
+#' and with a pre-specified upper limit on the sample size.
+#' 
+#' It is often not possible to select a critical value that corresponds to the exact alpha specified.
+#' Instead, this function will select the least conservative critical value having an alpha below
+#' the one specified, so the sequential analysis is conservative.
+#'
+#' @param groupSizes    Vector containing the expected number of events under H0 for each test. 
+#' @param z             The control time divided by the time at risk.
+#' @param minimumEvents The minimum number of events needed before the null hypothesis can be rejected.
+#' @param alpha         The significance level, or the type 1 error probability, which is the probability 
+#'                      of rejecting the null hypothesis when it is true. 
+#' @param sampleSize    Sample size for the Monte-Carlo simulations.
+#'
+#' @return 
+#' The computed critical value. The 'alpha' attribute of the result indicates the selected alpha.
+#'
+#' @examples
+#' groupSizes <- rep(1, 10)
+#' computeCvPoissonRegression(groupSizes, z = 4)
+#' 
+#' @export
+computeCvPoissonRegression <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6) {
+  if (any(groupSizes < 0))
+    stop("Group sizes should be positive")
+  if (minimumEvents < 0 || minimumEvents != round(minimumEvents))
+    stop("Minimum events should be a positive integer")
+  if (alpha <= 0 || alpha >= 1)
+    stop("Alpha should be a number between 0 and 1")
+  if (sampleSize < 0 || sampleSize != round(sampleSize))
+    stop("sampleSize should be a positive integer")
+  if (z < 0)
+    stop("Z should be positive")
+  
+  values <- samplePoissonRegressionMaxLrr(groupSizes = groupSizes,
+                                          z = z,
+                                          minimumEvents = minimumEvents,
+                                          sampleSize = sampleSize)
+  values <- values[order(-values)]
+  alphas <- 1:sampleSize / sampleSize
+  idx <- !duplicated(values)
+  alphas <- alphas[idx]
+  values <- values[idx]  
+  pick <- max(which(alphas < alpha))
+  message(sprintf("Selected alpha: %0.3f (least conservative value below %s)", alphas[pick], alpha))
+  result <- values[pick]
+  attr(result, "alpha") <- alphas[pick]
+  return(result)
+}
