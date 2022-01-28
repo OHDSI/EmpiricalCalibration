@@ -194,15 +194,8 @@ plotCalibrationEffect <- function(logRrNegatives,
     breaks <- c(0.125, breaks)
   }
 
-  if (xLimits[1] > min(exp(logRrPositives), exp(logRrNegatives)) |
-        xLimits[2] < max(exp(logRrPositives), exp(logRrNegatives))) {
-    warning("Values are outside plotted range. Consider adjusting xLimits parameter")
-  }
-
-  if (yLimits[1] > min(seLogRrNegatives, seLogRrPositives) |
-        yLimits[2] < max(seLogRrNegatives, seLogRrPositives)) {
-    warning("Values are outside plotted range. Consider adjusting yLimits parameter")
-  }
+  checkWithinLimits(yLimits, c(seLogRrNegatives, seLogRrPositives), "yLimits")
+  checkWithinLimits(log(xLimits), c(logRrNegatives, logRrPositives), "xLimits")
 
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
@@ -291,6 +284,15 @@ plotCalibrationEffect <- function(logRrNegatives,
   if (!is.null(fileName))
     ggplot2::ggsave(fileName, plot, width = 6, height = 4.5, dpi = 400)
   return(plot)
+}
+
+checkWithinLimits <- function(limits, values, label) {
+  values <- values[!is.na(values)]
+  if (length(values) > 0) {
+    if (limits[1] > min(values) || limits[2] < max(values)) {
+      warning(sprintf("Values are outside plotted range. Consider adjusting %s parameter", label))
+    }
+  }
 }
 
 #' Create a calibration plot

@@ -144,6 +144,6 @@ In this case, even though the point estimate has not changed much, the calibrate
 
 # References
 
-```{r tidy=TRUE,evale=TRUE}
+```{r eval=TRUE}
 citation("EmpiricalCalibration")
 ```

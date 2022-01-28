@@ -157,6 +157,6 @@ plotCalibrationEffect(negatives$logRr,
 
 # References
 
-```{r tidy=TRUE,evale=TRUE}
+```{r evale=TRUE}
 citation("EmpiricalCalibration")
 ```

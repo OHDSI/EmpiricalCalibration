@@ -144,6 +144,15 @@ test_that("output of plotCalibrationEffect", {
     plotCalibrationEffect(
       logRrNegatives   = negatives$logRr,
       seLogRrNegatives = negatives$seLogRr,
+      null             = null
+    ),
+    "ggplot"
+  )
+  
+  expect_is(
+    plotCalibrationEffect(
+      logRrNegatives   = negatives$logRr,
+      seLogRrNegatives = negatives$seLogRr,
       logRrPositives   = positives$logRr,
       seLogRrPositives = positives$seLogRr,
       showCis          = TRUE
@@ -152,18 +161,6 @@ test_that("output of plotCalibrationEffect", {
   )
 
   # Custom x and y limits
-  expect_is(
-    plotCalibrationEffect(
-      logRrNegatives   = negatives$logRr,
-      seLogRrNegatives = negatives$seLogRr,
-      logRrPositives = c(-3,-2, 2.5),
-      seLogRrPositives = c(0.1, 1.2, 2.5),
-      xLimits = c(0.01, 12),
-      yLimits = c(0.0, 2.6)
-    ),
-    "ggplot"
-  )
-
   expect_warning(
     plotCalibrationEffect(
       logRrNegatives   = negatives$logRr,

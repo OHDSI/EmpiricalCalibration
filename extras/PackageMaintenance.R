@@ -16,8 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Manually delete package from library. Avoids "Already in use" message when rebuilding
+unloadNamespace("EmpiricalCalibration")
+.rs.restartR()
+folder <- system.file(package = "EmpiricalCalibration")
+folder
+unlink(folder, recursive = TRUE, force = TRUE)
+file.exists(folder)
+
 # Format and check code:
-OhdsiRTools::formatRFolder()
+styler::style_pkg()
 OhdsiRTools::checkUsagePackage("EmpiricalCalibration")
 OhdsiRTools::updateCopyrightYearFolder()
 devtools::spell_check()
