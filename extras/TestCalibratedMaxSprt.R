@@ -10,7 +10,7 @@ parameters <- data.frame(n = 100000, # Number of subjects
                          nullSigma = 0.2, # Null distribution SD (at log HR scale)
                          maxT = 100) 
 
-simulate <- function(seed, parameters, useCalibration = TRUE, looks = 10) {
+simulate <- function(seed, parameters, calibration = "llr", looks = 10) {
   set.seed(seed)
   
   computeAtT <- function(t) {
@@ -31,7 +31,7 @@ simulate <- function(seed, parameters, useCalibration = TRUE, looks = 10) {
                         exposedTime = sum(data$time[data$exposure]),
                         unexposedTime = sum(data$time[!data$exposure])))
     } else {
-      if (useCalibration) {
+      if (calibration == "llr") {
         llApproximation <- EvidenceSynthesis::approximateLikelihood(cyclopsFit = fit,
                                                                     parameter = "exposureTRUE",
                                                                     approximation = "grid")
@@ -81,10 +81,21 @@ simulate <- function(seed, parameters, useCalibration = TRUE, looks = 10) {
     events[2:looks] <- events[2:looks] - events[1:(looks - 1)]
     events <- events[events != 0]
   }
-  cv <- Sequential::CV.Binomial(N = sampleSizeUpperLimit,
-                                M = 1,
-                                z = max(results$unexposedTime) / max(results$exposedTime),
-                                GroupSizes = events)$cv
+  if (calibration == "cv") {
+    cv <- EmpiricalCalibration::computeCvBinomial(groupSizes = events,
+                            z = max(results$unexposedTime) / max(results$exposedTime),
+                            minimumEvents = 1,
+                            nullMean = parameters$nullMu,
+                            nullSd = parameters$nullSigma)
+  } else {
+    cv <- EmpiricalCalibration::computeCvBinomial(groupSizes = events,
+                            z = max(results$unexposedTime) / max(results$exposedTime),
+                            minimumEvents = 1)
+  }
+  # cv <- Sequential::CV.Binomial(N = sampleSizeUpperLimit,
+  #                               M = 1,
+  #                               z = max(results$unexposedTime) / max(results$exposedTime),
+  #                               GroupSizes = events,)$cv
   return(any(results$llr > cv, na.rm = TRUE))
 }
 
@@ -117,15 +128,20 @@ parameters$nullSigma <- 0.2
 mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = TRUE, looks = 1)), na.rm = TRUE)
 # [1] 0.045
 
-mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = FALSE, looks = 1)), na.rm = TRUE)
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, calibration = "cv", looks = 1)), na.rm = TRUE)
+
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, calibration = "llr", looks = 1)), na.rm = TRUE)
 # [1] 0.324
 
 
 # Scenario 4: systematic error, 10 sequential looks
-mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = TRUE, looks = 10)), na.rm = TRUE)
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, calibration = "llr", looks = 10)), na.rm = TRUE)
 # [1] 0.04
 
-mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, useCalibration = FALSE, looks = 10)), na.rm = TRUE)
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, calibration = "cv", looks = 10)), na.rm = TRUE)
+# [1] 0.039
+
+mean(unlist(ParallelLogger::clusterApply(cluster, 1:1000, simulate, parameters = parameters, calibration = "none", looks = 10)), na.rm = TRUE)
 # [1] 0.258
 
 

@@ -9,8 +9,8 @@ samplePoissonMaxLrr <- function(groupSizes, minimumEvents, sampleSize) {
     .Call('_EmpiricalCalibration_samplePoissonMaxLrr', PACKAGE = 'EmpiricalCalibration', groupSizes, minimumEvents, sampleSize)
 }
 
-sampleBinomialMaxLrr <- function(groupSizes, p, minimumEvents, sampleSize) {
-    .Call('_EmpiricalCalibration_sampleBinomialMaxLrr', PACKAGE = 'EmpiricalCalibration', groupSizes, p, minimumEvents, sampleSize)
+sampleBinomialMaxLrr <- function(groupSizes, p, minimumEvents, sampleSize, nullMean, nullSd) {
+    .Call('_EmpiricalCalibration_sampleBinomialMaxLrr', PACKAGE = 'EmpiricalCalibration', groupSizes, p, minimumEvents, sampleSize, nullMean, nullSd)
 }
 
 samplePoissonRegressionMaxLrr <- function(groupSizes, z, minimumEvents, sampleSize) {

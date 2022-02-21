@@ -99,7 +99,7 @@ computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sample
 #' computeCvBinomial(groupSizes, z = 4)
 #' 
 #' @export
-computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6) {
+computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6, nullMean = 0, nullSd = 0) {
   if (any(groupSizes < 0))
     stop("Group sizes should be positive")
   if (z < 0)
@@ -115,7 +115,9 @@ computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sa
   values <- sampleBinomialMaxLrr(groupSizes = groupSizes,
                                  p =  p,
                                  minimumEvents = minimumEvents,
-                                 sampleSize = sampleSize)
+                                 sampleSize = sampleSize,
+                                 nullMean = nullMean,
+                                 nullSd = nullSd)
   values <- values[order(-values)]
   alphas <- 1:sampleSize / sampleSize
   idx <- !duplicated(values)

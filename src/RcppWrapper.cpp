@@ -78,19 +78,21 @@ NumericVector samplePoissonMaxLrr(NumericVector groupSizes, int minimumEvents, i
 }
 
 // [[Rcpp::export]]
-NumericVector sampleBinomialMaxLrr(NumericVector groupSizes, double p, int minimumEvents, int sampleSize) {
+NumericVector sampleBinomialMaxLrr(NumericVector groupSizes, double p, int minimumEvents, int sampleSize, double nullMean, double nullSd) {
   NumericVector values(sampleSize);
   double cumulativeCount;
   double cumulativeObserved;
   double maxLlr;
+  double systematicError;
   double llr;
   for (int i = 0; i < sampleSize; i++) {
     maxLlr = 0;
     cumulativeObserved = 0;
     cumulativeCount = 0;
+    systematicError = exp(R::rnorm(nullMean, nullSd));
     for (unsigned int j = 0; j < groupSizes.size(); j++) {
       cumulativeCount += groupSizes[j];
-      cumulativeObserved += R::rbinom(groupSizes[j], p);
+      cumulativeObserved += R::rbinom(groupSizes[j], p * systematicError / (1 + p * (systematicError - 1)));
       if (cumulativeObserved >= minimumEvents && cumulativeObserved >= cumulativeCount * p) {
         llr = R::dbinom(cumulativeObserved, cumulativeCount, cumulativeObserved / cumulativeCount, true) -
           R::dbinom(cumulativeObserved, cumulativeCount, p, true);
