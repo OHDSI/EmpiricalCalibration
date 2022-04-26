@@ -34,6 +34,8 @@
 #' @param alpha         The significance level, or the type 1 error probability, which is the probability 
 #'                      of rejecting the null hypothesis when it is true. 
 #' @param sampleSize    Sample size for the Monte-Carlo simulations.
+#' @param nullMean      The mean of the empirical null distribution.
+#' @param nullSd        The standard deviation of the empirical null distribution.
 #'
 #' @return 
 #' The computed critical value. The 'alpha' attribute of the result indicates the selected alpha.
@@ -43,7 +45,7 @@
 #' computeCvPoisson(groupSizes)
 #' 
 #' @export
-computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6) {
+computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6, nullMean = 0, nullSd = 0) {
   if (any(groupSizes < 0))
     stop("Group sizes should be positive")
   if (minimumEvents < 0 || minimumEvents != round(minimumEvents))
@@ -55,7 +57,9 @@ computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sample
   
   values <- samplePoissonMaxLrr(groupSizes = groupSizes,
                                 minimumEvents = minimumEvents,
-                                sampleSize = sampleSize)
+                                sampleSize = sampleSize,
+                                nullMean = nullMean,
+                                nullSd = nullSd)
   values <- values[order(-values)]
   alphas <- 1:sampleSize / sampleSize
   idx <- !duplicated(values)
@@ -90,6 +94,8 @@ computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sample
 #' @param alpha         The significance level, or the type 1 error probability, which is the probability 
 #'                      of rejecting the null hypothesis when it is true. 
 #' @param sampleSize    Sample size for the Monte-Carlo simulations.
+#' @param nullMean      The mean of the empirical null distribution.
+#' @param nullSd        The standard deviation of the empirical null distribution.
 #'
 #' @return 
 #' The computed critical value. The 'alpha' attribute of the result indicates the selected alpha.

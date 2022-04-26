@@ -53,19 +53,21 @@ NumericVector gridLlApproximation(NumericVector& x, const DataFrame& parameters)
 }
 
 // [[Rcpp::export]]
-NumericVector samplePoissonMaxLrr(NumericVector groupSizes, int minimumEvents, int sampleSize) {
+NumericVector samplePoissonMaxLrr(NumericVector groupSizes, int minimumEvents, int sampleSize, double nullMean, double nullSd) {
   NumericVector values(sampleSize);
   double expected;
   double observed;
   double maxLlr;
+  double systematicError;
   double llr;
   for (int i = 0; i < sampleSize; i++) {
     maxLlr = 0;
     observed = 0;
     expected = 0;
+    systematicError = exp(R::rnorm(nullMean, nullSd));
     for (unsigned int j = 0; j < groupSizes.size(); j++) {
       expected += groupSizes[j];
-      observed += R::rpois(groupSizes[j]);
+      observed += R::rpois(groupSizes[j] * systematicError);
       if (observed >= minimumEvents && observed >= expected) {
         llr = R::dpois(observed, observed, true) - R::dpois(observed, expected, true);
         if (llr > maxLlr)

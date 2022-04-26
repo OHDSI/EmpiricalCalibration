@@ -112,18 +112,46 @@ calibrateP(null = null, logRr = logRr, seLogRr = seLogRr, twoSided = FALSE, uppe
 # 0.2264623
 
 f <- function(x) {
+  # print(x)
   llr <- log(likelihood(logRr) / likelihood(x))
   p <- computePFromLlr(llr, nullRr = x)
   p * dnorm(x, null[1], null[2])
 }
-calibratedP <- integrate(f = f, lower = null[1] - 10 * null[2], upper = null[1] + 10 * null[2])$value
+calibratedP <- integrate(f = f, subdivisions = 10000, lower = null[1] - 5 * null[2], upper = null[1] + 5 * null[2])$value
 calibratedP
 # 0.2274269  # Not the same because asymptotics don't hold
 
-calibratedLlr <- computeLlrFromP(calibratedP)
+# x <- seq(null[1] - 5 * null[2], null[1] + 5 * null[2], length.out = 1000)
+# plot(x, f(x))
 
-computePFromLlr(calibratedLlr)
-# 0.2274269 
+calibratedLlr <- computeLlrFromP(calibratedP)
+calibratedLlr
+# [1] 0.2792607
+
+values <- EmpiricalCalibration:::sampleBinomialMaxLrr(groupSizes = sum(outcome),
+                                                      p = mean(treatment),
+                                                      minimumEvents = 1,
+                                                      sampleSize = 1e6,
+                                                      nullMean = 0,
+                                                      nullSd = 0)
+values <- values[order(-values)]
+computeNewPFromLlr <- function(llr, nullRr = 0) {
+  ifelse(logRr < nullRr,
+         sapply(llr, function(x) mean(x > values)),
+         1-sapply(llr, function(x) mean(x > values)))
+}
+computeNewLlrFromP <- function(p) {
+    values[p*length(values)]
+}
+f <- function(x) {
+  # print(x)
+  llr <- log(likelihood(logRr) / likelihood(x))
+  p <- computeNewPFromLlr(llr, nullRr = x)
+  p * dnorm(x, null[1], null[2])
+}
+calibratedP <- integrate(f = f, subdivisions = 10000, lower = null[1] - 5 * null[2], upper = null[1] + 5 * null[2])$value
+computeNewLlrFromP(calibratedP)
+# [1] 0.4106933
 
 # Simulate example using grid likelihood approximation with MCMC ----------------------------
 library(Cyclops)

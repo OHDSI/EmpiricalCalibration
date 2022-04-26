@@ -9,7 +9,9 @@ computeCvBinomial(
   z,
   minimumEvents = 1,
   alpha = 0.05,
-  sampleSize = 1e+06
+  sampleSize = 1e+06,
+  nullMean = 0,
+  nullSd = 0
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ control time divided by the time at risk.}
 of rejecting the null hypothesis when it is true.}
 
 \item{sampleSize}{Sample size for the Monte-Carlo simulations.}
+
+\item{nullMean}{The mean of the empirical null distribution.}
+
+\item{nullSd}{The standard deviation of the empirical null distribution.}
 }
 \value{
 The computed critical value. The 'alpha' attribute of the result indicates the selected alpha.
