@@ -60,6 +60,12 @@ computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sample
                                 sampleSize = sampleSize,
                                 nullMean = nullMean,
                                 nullSd = nullSd)
+  if (max(values) == 0) {
+    warning("Unable to find a critical value that could lead to rejection of the null")
+    result <- Inf
+    attr(result, "alpha") <- 0
+    return(result)
+  }
   values <- values[order(-values)]
   alphas <- 1:sampleSize / sampleSize
   idx <- !duplicated(values)
@@ -124,6 +130,12 @@ computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sa
                                  sampleSize = sampleSize,
                                  nullMean = nullMean,
                                  nullSd = nullSd)
+  if (max(values) == 0) {
+    warning("Unable to find a critical value that could lead to rejection of the null")
+    result <- Inf
+    attr(result, "alpha") <- 0
+    return(result)
+  }
   values <- values[order(-values)]
   alphas <- 1:sampleSize / sampleSize
   idx <- !duplicated(values)
