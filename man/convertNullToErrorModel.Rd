@@ -14,7 +14,7 @@ or the \code{\link{fitMcmcNull}} function.}
 is the same for different values of the true relative risk.}
 
 \item{sdSlope}{The slope for the log of the standard deviation of the error distribution. A slope
-of 0 means the standard deviation is the same for different values of the true 
+of 0 means the standard deviation is the same for different values of the true
 relative risk.}
 }
 \value{
@@ -23,11 +23,11 @@ An object of type \code{systematicErrorModel}.
 \description{
 This function converts an empirical null distribution, fitted using estimates only for negative controls,
 into a systematic error distribution that can be used to calibrate confidence intervals in addition to
-p-values. 
+p-values.
 
-Whereas the \code{\link{fitSystematicErrorModel}} uses positive controls to determine how the error 
+Whereas the \code{\link{fitSystematicErrorModel}} uses positive controls to determine how the error
 distribution changes with true effect size, this function requires the user to make an assumption. The
-default assumption, \code{meanSlope = 1} and \code{sdSlope = 0}, specify a belief that the error 
+default assumption, \code{meanSlope = 1} and \code{sdSlope = 0}, specify a belief that the error
 distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
 however, if an estimation method is biased towards the null this assumption will be violated, causing the
 calibrated confidence intervals to have lower than nominal coverage.

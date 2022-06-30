@@ -52,9 +52,9 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 \code{plotExpectedType1Error} creates a plot showing the expected type 1 error as a function of standard error.
 }
 \details{
-Creates a plot with the standard error on the x-axis and the expected type 1 error on the y-axis. The 
-red line indicates the expected type 1 error  given the estimated empirical null distribution if no 
-calibration is performed. The dashed line indicated the nominal expected type 1 error rate, assuming 
+Creates a plot with the standard error on the x-axis and the expected type 1 error on the y-axis. The
+red line indicates the expected type 1 error  given the estimated empirical null distribution if no
+calibration is performed. The dashed line indicated the nominal expected type 1 error rate, assuming
 the theoretical null distribution.
 
 If standard errors are provided for non-negative estimates these will be plotted on the red line as

@@ -24,7 +24,7 @@ estimate>))/qnorm(0.025).}
 
 \item{trueLogRr}{A vector of the true effect sizes.}
 
-\item{legacy}{If true, a legacy error model will be fitted, meaning standard 
+\item{legacy}{If true, a legacy error model will be fitted, meaning standard
 deviation is linear on the log scale. If false, standard deviation
 is assumed to be simply linear.}
 
@@ -44,7 +44,7 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 \description{
 Creates a plot with the effect estimate on the x-axis and the standard error on the y-axis. The plot
 is trellised by true effect size. Negative and positive controls are shown as blue dots. The area below the
-dashed line indicated estimates that are statistically significant different from the true effect size (p < 0.05). 
+dashed line indicated estimates that are statistically significant different from the true effect size (p < 0.05).
 The orange area indicates estimates with calibrated p < 0.05.
 }
 \examples{

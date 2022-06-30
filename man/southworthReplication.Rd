@@ -6,7 +6,7 @@
 \title{Relative risks from an unadjusted new-user cohort design}
 \format{
 A data frame with 174 rows and 4 variables: \describe{ \item{outcomeName}{Name of the outcome}
-\item{trueLogRr}{The log of the true effect size. Only provided for negative and positive controls, 
+\item{trueLogRr}{The log of the true effect size. Only provided for negative and positive controls,
 is NA for the outcome of interest (GI bleeding).} \item{logRr}{The log of the incidence rate ratio} \item{seLogRr}{
 The standard error of the log of the incidence rate ratio} }
 }
@@ -17,24 +17,24 @@ data(southworthReplication)
 Relative risks from an unadjusted new-user cohort design
 }
 \details{
-A dataset containing the incidence rate ratios (and standard errors) produced using a new-user 
-cohort design that compares new-users of dabigatran to new-users of warfarin for the outcome of 
+A dataset containing the incidence rate ratios (and standard errors) produced using a new-user
+cohort design that compares new-users of dabigatran to new-users of warfarin for the outcome of
 GI hemorrhage. The dataset includes estimates both for the outcome of interest as well as negative
-and positive control outcomes. Subjects are required to have 183 days of continuous observation prior to 
-initiating treatment, a prior diagnosis of atrial fibrillation, and are required to have no prior 
-exposure to either dabigatran or warfarin. The study computes an incidence rate ratio without 
-any adjustment for confounders. Time at risk is defined as the time on the drug. The original 
-study (Southworth 2013) uses the 'Mini-Sentinel Database'. For our replication, we use the Optum 
-databases since both databases are US insurance claims databases. We analyzed 5,982 
-dabigatran-exposed and 19,155 warfarin-exposed subjects. For more information on this set see 
+and positive control outcomes. Subjects are required to have 183 days of continuous observation prior to
+initiating treatment, a prior diagnosis of atrial fibrillation, and are required to have no prior
+exposure to either dabigatran or warfarin. The study computes an incidence rate ratio without
+any adjustment for confounders. Time at risk is defined as the time on the drug. The original
+study (Southworth 2013) uses the 'Mini-Sentinel Database'. For our replication, we use the Optum
+databases since both databases are US insurance claims databases. We analyzed 5,982
+dabigatran-exposed and 19,155 warfarin-exposed subjects. For more information on this set see
 Schuemie et al (2017).
 }
 \references{
-Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA. Empirical confidence interval calibration 
-for population-level effect estimation studies in observational healthcare data. Proc Natl Acad Sci 
+Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA. Empirical confidence interval calibration
+for population-level effect estimation studies in observational healthcare data. Proc Natl Acad Sci
 U S A. 2018 Mar 13;115(11):2571-2577
 
-Southworth MR, Reichman ME, Unger EF. Dabigatran and postmarketing reports of bleeding. N Engl 
+Southworth MR, Reichman ME, Unger EF. Dabigatran and postmarketing reports of bleeding. N Engl
 J Med 368(14):1272-1274, 2013
 }
 \keyword{datasets}

@@ -18,7 +18,7 @@ computeCvPoisson(
 
 \item{minimumEvents}{The minimum number of events needed before the null hypothesis can be rejected.}
 
-\item{alpha}{The significance level, or the type 1 error probability, which is the probability 
+\item{alpha}{The significance level, or the type 1 error probability, which is the probability
 of rejecting the null hypothesis when it is true.}
 
 \item{sampleSize}{Sample size for the Monte-Carlo simulations.}
@@ -31,8 +31,8 @@ of rejecting the null hypothesis when it is true.}
 The computed critical value. The 'alpha' attribute of the result indicates the selected alpha.
 }
 \description{
-Obtains critical values for the group and continuous sequential MaxSPRT test with Poisson data, 
-using a Wald type upper boundary, which is flat with respect to the likelihood ratio function, 
+Obtains critical values for the group and continuous sequential MaxSPRT test with Poisson data,
+using a Wald type upper boundary, which is flat with respect to the likelihood ratio function,
 and with a pre-specified upper limit on the sample size.
 
 It is often not possible to select a critical value that corresponds to the exact alpha specified.

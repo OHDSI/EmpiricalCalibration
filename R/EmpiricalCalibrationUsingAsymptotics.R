@@ -66,11 +66,11 @@ fitNull <- function(logRr, seLogRr) {
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
   }
-  
+
   theta <- c(0, 100)
   fit <- optim(theta, logLikelihoodNull, logRr = logRr, seLogRr = seLogRr)
   null <- fit$par
-  null[2] <- 1/sqrt(null[2])
+  null[2] <- 1 / sqrt(null[2])
   names(null) <- c("mean", "sd")
   class(null) <- "null"
   return(null)
@@ -125,18 +125,20 @@ calibrateP <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...)
 
 #' @describeIn
 #' calibrateP Computes the calibrated P-value using asymptotic assumptions.
-#' 
+#'
 #' @export
 calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...) {
-  if (length(logRr) != length(seLogRr)) 
+  if (length(logRr) != length(seLogRr)) {
     stop("The logRr and seLogRr arguments must be of equal length")
-  
+  }
+
   calibrateOneP <- function(i) {
     if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
       return(NA)
-    } else
-      pUpperBound <- pnorm((null[1] - logRr[i])/sqrt(null[2]^2 + seLogRr[i]^2))
-    pLowerBound <- pnorm((logRr[i] - null[1])/sqrt(null[2]^2 + seLogRr[i]^2))
+    } else {
+      pUpperBound <- pnorm((null[1] - logRr[i]) / sqrt(null[2]^2 + seLogRr[i]^2))
+    }
+    pLowerBound <- pnorm((logRr[i] - null[1]) / sqrt(null[2]^2 + seLogRr[i]^2))
     if (twoSided) {
       return(2 * min(pUpperBound, pLowerBound))
     } else if (upper) {
@@ -145,7 +147,7 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
       return(pLowerBound)
     }
   }
-  
+
   calibratedP <- sapply(1:length(logRr), calibrateOneP)
   names(calibratedP) <- NULL
   return(calibratedP)
@@ -174,7 +176,7 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
 #'
 #' @export
 computeTraditionalP <- function(logRr, seLogRr, twoSided = TRUE, upper = TRUE) {
-  z <- logRr/seLogRr
+  z <- logRr / seLogRr
   pUpperBound <- 1 - pnorm(z)
   pLowerBound <- pnorm(z)
   if (twoSided) {
@@ -244,12 +246,14 @@ fitNullNonNormalLl <- function(likelihoodApproximations) {
         stop("Expecting grid data, but not all column names are numeric")
       }
       convertToDataFrame <- function(i) {
-        data.frame(value = as.numeric(likelihoodApproximations[i, ]),
-                   point = point)
+        data.frame(
+          value = as.numeric(likelihoodApproximations[i, ]),
+          point = point
+        )
       }
-      likelihoodApproximations <- lapply(1:nrow(likelihoodApproximations), convertToDataFrame) 
+      likelihoodApproximations <- lapply(1:nrow(likelihoodApproximations), convertToDataFrame)
     }
-  }else {
+  } else {
     message("Detected data following grid distribution")
     type <- "grid"
     llApproximationFunction <- gridLlApproximation
@@ -260,14 +264,16 @@ fitNullNonNormalLl <- function(likelihoodApproximations) {
       likelihoodApproximations[[i]] <- as.data.frame(likelihoodApproximation)
     }
   }
-  
+
   theta <- c(0, 100)
-  fit <- optim(par = theta, 
-               fn = logLikelihoodNullNonNormalLl, 
-               likelihoodApproximations = likelihoodApproximations, 
-               llApproximationFunction = llApproximationFunction)
+  fit <- optim(
+    par = theta,
+    fn = logLikelihoodNullNonNormalLl,
+    likelihoodApproximations = likelihoodApproximations,
+    llApproximationFunction = llApproximationFunction
+  )
   null <- fit$par
-  null[2] <- 1/sqrt(null[2])
+  null[2] <- 1 / sqrt(null[2])
   names(null) <- c("mean", "sd")
   class(null) <- "null"
   return(null)

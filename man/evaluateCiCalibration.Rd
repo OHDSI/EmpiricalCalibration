@@ -30,7 +30,7 @@ is a single control, but a different grouping can be provided, for
 example linking a negative control to synthetic positive controls
 derived from that negative control.}
 
-\item{legacy}{If true, a legacy error model will be fitted, meaning standard 
+\item{legacy}{If true, a legacy error model will be fitted, meaning standard
 deviation is linear on the log scale. If false, standard deviation
 is assumed to be simply linear.}
 }
@@ -40,7 +40,7 @@ of the confidence interval. The result also includes the fraction of estimates t
 the confidence interval.
 }
 \description{
-\code{evaluateCiCalibration} performs a leave-one-out cross-validation to evaluate the calibration 
+\code{evaluateCiCalibration} performs a leave-one-out cross-validation to evaluate the calibration
 confidence intervals.
 }
 \details{

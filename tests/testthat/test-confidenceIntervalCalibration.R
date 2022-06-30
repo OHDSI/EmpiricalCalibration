@@ -5,10 +5,10 @@ data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
 
 test_that("fitSystematicErrorModel requirements", {
-  logRr     <- c(0, 0)
-  seLogRr   <- c(1, Inf)
+  logRr <- c(0, 0)
+  seLogRr <- c(1, Inf)
   trueLogRr <- c(0, 0)
-  
+
   # Infinite standard error
   expect_warning(
     fitSystematicErrorModel(
@@ -18,9 +18,9 @@ test_that("fitSystematicErrorModel requirements", {
     ),
     regexp = ".*infinite standard error"
   )
-  
+
   # Infinite logRr
-  logRr   <- c(0, Inf)
+  logRr <- c(0, Inf)
   seLogRr <- c(1, 0)
   expect_warning(
     fitSystematicErrorModel(
@@ -30,9 +30,9 @@ test_that("fitSystematicErrorModel requirements", {
     ),
     regexp = ".*infinite logRr"
   )
-  
+
   # seLogRr is NA
-  logRr   <- c(0, 0)
+  logRr <- c(0, 0)
   seLogRr <- c(1, NA)
   expect_warning(
     fitSystematicErrorModel(
@@ -42,9 +42,9 @@ test_that("fitSystematicErrorModel requirements", {
     ),
     regexp = ".*NA standard error.*"
   )
-  
+
   # logRr is NA
-  logRr   <- c(0, NA)
+  logRr <- c(0, NA)
   seLogRr <- c(1, 0)
   expect_warning(
     fitSystematicErrorModel(
@@ -54,12 +54,12 @@ test_that("fitSystematicErrorModel requirements", {
     ),
     regexp = ".*NA logRr.*"
   )
-  
+
   controls <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
   model <- fitSystematicErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr,
-                                   legacy=TRUE, estimateCovarianceMatrix = TRUE)
-  expect_equal(model[1],0.254, tolerance = 0.1,check.attributes = FALSE )
-  
+    legacy = TRUE, estimateCovarianceMatrix = TRUE
+  )
+  expect_equal(model[1], 0.254, tolerance = 0.1, check.attributes = FALSE)
 })
 
 test_that("convertNullToErrorModel requirements", {
@@ -78,6 +78,5 @@ test_that("convertNullToErrorModel", {
   model <- convertNullToErrorModel(null)
   positive <- sccs[sccs$groundTruth == 1, ]
   result <- calibrateConfidenceInterval(positive$logRr, positive$seLogRr, model)
-  expect_equal(result$logRr,-0.0593, tolerance = 0.1, check.attributes = FALSE)
+  expect_equal(result$logRr, -0.0593, tolerance = 0.1, check.attributes = FALSE)
 })
-

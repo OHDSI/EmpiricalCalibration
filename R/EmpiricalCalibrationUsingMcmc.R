@@ -3,13 +3,13 @@
 # Copyright 2022 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,12 +65,12 @@ binarySearchMu <- function(modeMu,
                            logRrNegatives = logRrNegatives,
                            seLogRrNegatives = seLogRrNegatives,
                            precision = 1e-07) {
-  q <- qchisq(1 - alpha, 1)/2
+  q <- qchisq(1 - alpha, 1) / 2
   L <- modeMu
   H <- 10
   llMode <- -logLikelihoodNullMcmc(c(modeMu, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
   while (H >= L) {
-    M <- L + (H - L)/2
+    M <- L + (H - L) / 2
     llM <- -logLikelihoodNullMcmc(c(M, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
     metric <- llMode - llM - q
     # writeLines(paste('M =', M, 'Metric = ',metric))
@@ -81,8 +81,9 @@ binarySearchMu <- function(modeMu,
     } else {
       return(abs(M - modeMu))
     }
-    if (M == modeMu || M == 10)
+    if (M == modeMu || M == 10) {
       return(0)
+    }
   }
 }
 
@@ -92,7 +93,7 @@ binarySearchSigma <- function(modeMu,
                               logRrNegatives = logRrNegatives,
                               seLogRrNegatives = seLogRrNegatives,
                               precision = 1e-07) {
-  q <- qchisq(1 - alpha, 1)/2
+  q <- qchisq(1 - alpha, 1) / 2
   llMode <- -logLikelihoodNullMcmc(c(modeMu, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
   L <- modeSigma
   for (i in 1:10) {
@@ -104,7 +105,7 @@ binarySearchSigma <- function(modeMu,
     }
   }
   while (H >= L) {
-    M <- L + (H - L)/2
+    M <- L + (H - L) / 2
     llM <- -logLikelihoodNullMcmc(c(modeMu, M), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
     metric <- llMode - llM - q
     # writeLines(paste('M =', M, 'Metric = ',metric))
@@ -115,8 +116,9 @@ binarySearchSigma <- function(modeMu,
     } else {
       return(abs(M - modeSigma))
     }
-    if (M == modeSigma || M == 1500)
+    if (M == modeSigma || M == 1500) {
       return(0)
+    }
   }
 }
 
@@ -176,13 +178,15 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
 
   # Profile likelihood for roughly correct scale:
   scale <- binarySearchMu(fit$par[1],
-                          fit$par[2],
-                          logRrNegatives = logRr,
-                          seLogRrNegatives = seLogRr)
+    fit$par[2],
+    logRrNegatives = logRr,
+    seLogRrNegatives = seLogRr
+  )
   scale <- c(scale, binarySearchSigma(fit$par[1],
-                                      fit$par[2],
-                                      logRrNegatives = logRr,
-                                      seLogRrNegatives = seLogRr))
+    fit$par[2],
+    logRrNegatives = logRr,
+    seLogRrNegatives = seLogRr
+  ))
 
   # writeLines(paste('Scale:', paste(scale,collapse=',')))
   mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr)
@@ -200,9 +204,11 @@ print.mcmcNull <- function(x, ...) {
   ub95Mean <- quantile(mcmc$chain[, 1], 0.975)
   lb95Precision <- quantile(mcmc$chain[, 2], 0.025)
   ub95Precision <- quantile(mcmc$chain[, 2], 0.975)
-  output <- data.frame(Estimate = c(x[1], x[2]),
-                       lb95 = c(lb95Mean, lb95Precision),
-                       ub95 = c(ub95Mean, ub95Precision))
+  output <- data.frame(
+    Estimate = c(x[1], x[2]),
+    lb95 = c(lb95Mean, lb95Precision),
+    ub95 = c(ub95Mean, ub95Precision)
+  )
   colnames(output) <- c("Estimate", "lower .95", "upper .95")
   rownames(output) <- c("Mean", "Precision")
   printCoefmat(output)
@@ -226,8 +232,8 @@ calibrateP.mcmcNull <- function(null, logRr, seLogRr, twoSided = TRUE, upper = T
       adjustedP$lb95ci[i] <- NA
       adjustedP$ub95ci[i] <- NA
     } else {
-      pUpperBound <- pnorm((mcmc$chain[, 1] - logRr[i])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-      pLowerBound <- pnorm((logRr[i] - mcmc$chain[, 1])/sqrt((1/sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+      pUpperBound <- pnorm((mcmc$chain[, 1] - logRr[i]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+      pLowerBound <- pnorm((logRr[i] - mcmc$chain[, 1]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
       if (twoSided) {
         p <- pUpperBound
         p[pLowerBound < p] <- pLowerBound[pLowerBound < p]

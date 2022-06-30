@@ -3,13 +3,13 @@
 # Copyright 2022 Observational Health Data Sciences and Informatics
 #
 # This file is part of EmpiricalCalibration
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,8 +60,8 @@ simulateControls <- function(n = 50,
 #' @param numberOfPositiveControls  Number of positive controls to simulate.
 #' @param positiveControlEffectSize The true effect size of the positive controls.
 #'
-#' @details 
-#' Simulate survival data for negative and positive controls. The data provides multiple looks at data accruing over time, with 
+#' @details
+#' Simulate survival data for negative and positive controls. The data provides multiple looks at data accruing over time, with
 #' each look having more data than the one before. Systematic error for each outcome is drawn from the prespecified null distribution.
 #'
 #' The outcome IDs are assigned sequentially starting at 1, with the first IDs used for the negative controls, and the latter IDs used
@@ -70,13 +70,13 @@ simulateControls <- function(n = 50,
 #' @examples
 #' data <- simulateMaxSprtData(n = 1000)
 #' head(data)
-#' 
+#'
 #' @return
-#' A data frame with 5 variables: \describe{ \item{time}{Time from index date to either the event or 
-#' end of observation, whichever came first} \item{outcome}{Whether the outcome occurred (1) or not (0)} \item{exposure}{Whether 
-#' the subject was exposed (TRUE) or not (FALSE)} \item{lookTime}{The time point when the look occurred. } \item{outcomeId}{A unique 
+#' A data frame with 5 variables: \describe{ \item{time}{Time from index date to either the event or
+#' end of observation, whichever came first} \item{outcome}{Whether the outcome occurred (1) or not (0)} \item{exposure}{Whether
+#' the subject was exposed (TRUE) or not (FALSE)} \item{lookTime}{The time point when the look occurred. } \item{outcomeId}{A unique
 #' identifier for data corresponding to a single outcome. Lower IDs indicate negative controls, higher IDs indicate the positive control} }
-#' 
+#'
 #' @export
 simulateMaxSprtData <- function(n = 10000,
                                 pExposure = 0.5,
@@ -89,7 +89,6 @@ simulateMaxSprtData <- function(n = 10000,
                                 numberOfNegativeControls = 50,
                                 numberOfPositiveControls = 1,
                                 positiveControlEffectSize = 4) {
-  
   simulateOutcome <- function(trueEffectSize) {
     computeAtT <- function(t) {
       truncatedTime <- time
@@ -97,44 +96,46 @@ simulateMaxSprtData <- function(n = 10000,
       truncatedTime[idxTruncated] <- t - tIndex[idxTruncated]
       truncatedOutcome <- outcome
       truncatedOutcome[idxTruncated] <- 0
-      data <- data.frame(time = truncatedTime,
-                         outcome = truncatedOutcome,
-                         exposure = exposure)
+      data <- data.frame(
+        time = truncatedTime,
+        outcome = truncatedOutcome,
+        exposure = exposure
+      )
       data <- data[data$time > 0, ]
       data$lookTime <- t
       return(data)
-    }   
-    
-    tIndex <- runif(n,  0, maxT)
+    }
+
+    tIndex <- runif(n, 0, maxT)
     exposure <- runif(n) < pExposure
     systematicError <- rnorm(n = 1, mean = nullMu, sd = nullSigma)
     hazard <- ifelse(exposure, backgroundHazard * trueEffectSize * exp(systematicError), backgroundHazard)
-    tOutcome <- rexp(n,  hazard)
+    tOutcome <- rexp(n, hazard)
     outcome <- tOutcome < tar
     time <- rep(tar, n)
     time[outcome] <- tOutcome[outcome]
-    t <- seq(0, maxT, length.out = looks + 1)[-1]                 
+    t <- seq(0, maxT, length.out = looks + 1)[-1]
     results <- lapply(t, computeAtT)
     results <- do.call(rbind, results)
     return(results)
   }
-  
+
   dataSets <- list()
-  
+
   # Negative controls
   for (i in 1:numberOfNegativeControls) {
     dataSet <- simulateOutcome(1)
     dataSet$outcomeId <- i
     dataSets[[i]] <- dataSet
   }
-  
+
   # Positive controls
   for (i in numberOfNegativeControls + (1:numberOfPositiveControls)) {
     dataSet <- simulateOutcome(positiveControlEffectSize)
     dataSet$outcomeId <- i
     dataSets[[i]] <- dataSet
   }
-  
+
   maxSprtSimulationData <- do.call(rbind, dataSets)
   return(maxSprtSimulationData)
 }

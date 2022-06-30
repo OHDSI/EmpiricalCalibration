@@ -6,7 +6,7 @@
 \alias{EmpiricalCalibration-package}
 \title{EmpiricalCalibration: Routines for Performing Empirical Calibration of Observational Study Estimates}
 \description{
-Routines for performing empirical calibration of observational study estimates. By using a set of negative control hypotheses we can estimate the empirical null distribution of a particular observational study setup. This empirical null distribution can be used to compute a calibrated p-value, which reflects the probability of observing an estimated effect size when the null hypothesis is true taking both random and systematic error into account. A similar approach can be used to calibrate confidence intervals, using both negative and positive controls. For more details, see Schuemie et al. (2013) <doi:10.1002/sim.5925> and Schuemie et al. (2018) <doi:10.1073/pnas.1708282114>.
+Routines for performing empirical calibration of observational study estimates. By using a set of negative control hypotheses we can estimate the empirical null distribution of a particular observational study setup. This empirical null distribution can be used to compute a calibrated p-value, which reflects the probability of observing an estimated effect size when the null hypothesis is true taking both random and systematic error into account. A similar approach can be used to calibrate confidence intervals, using both negative and positive controls. For more details, see Schuemie et al. (2013) \doi{10.1002/sim.5925} and Schuemie et al. (2018) \doi{10.1073/pnas.1708282114}.
 }
 \seealso{
 Useful links:

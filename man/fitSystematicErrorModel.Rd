@@ -24,7 +24,7 @@ interval>) - log(<effect estimate>))/qnorm(0.025).}
 \item{estimateCovarianceMatrix}{Should a covariance matrix be computed? If so, confidence
 intervals for the model parameters will be available.}
 
-\item{legacy}{If true, a legacy error model will be fitted, meaning standard 
+\item{legacy}{If true, a legacy error model will be fitted, meaning standard
 deviation is linear on the log scale. If false, standard deviation
 is assumed to be simply linear.}
 }

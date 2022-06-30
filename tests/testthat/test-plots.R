@@ -19,18 +19,15 @@ mcmcNull <- fitMcmcNull(
 )
 
 test_that("output of plotMcmcTrace", {
-  
   expect_is(
     plotMcmcTrace(
       mcmcNull = mcmcNull
     ),
     "ggplot"
   )
-  
 })
 
 test_that("output of plotForest", {
-  
   expect_is(
     plotForest(
       logRr = negatives$logRr,
@@ -39,48 +36,45 @@ test_that("output of plotForest", {
     ),
     "ggplot"
   )
-  
 })
 
 test_that("output of plotCalibration", {
-  
   expect_warning(
     plotCalibration(
-      c(negatives$logRr, Inf), 
+      c(negatives$logRr, Inf),
       c(negatives$seLogRr, 0)
     ),
     "infinite logRr"
   )
-  
+
   expect_warning(
     plotCalibration(
-      c(negatives$logRr, 0), 
+      c(negatives$logRr, 0),
       c(negatives$seLogRr, Inf)
     ),
     "infinite standard error"
   )
-  
+
   expect_warning(
     plotCalibration(
-      c(negatives$logRr, NA), 
+      c(negatives$logRr, NA),
       c(negatives$seLogRr, 0)
     ),
     "NA logRr"
   )
-  
+
   expect_warning(
     plotCalibration(
-      c(negatives$logRr, 0), 
+      c(negatives$logRr, 0),
       c(negatives$seLogRr, NA)
     ),
     "NA standard error"
   )
-  
+
   expect_is(
     plotCalibration(negatives$logRr, negatives$seLogRr),
     "ggplot"
   )
-  
 })
 
 test_that("output of plotCalibrationEffect", {
@@ -95,7 +89,7 @@ test_that("output of plotCalibrationEffect", {
     ),
     "fitMcmcNull"
   )
-  
+
   expect_is(
     plotCalibrationEffect(
       logRrNegatives   = negatives$logRr,
@@ -105,7 +99,7 @@ test_that("output of plotCalibrationEffect", {
     ),
     "ggplot"
   )
-  
+
   expect_is(
     plotCalibrationEffect(
       logRrNegatives                      = negatives$logRr,
@@ -116,7 +110,7 @@ test_that("output of plotCalibrationEffect", {
     ),
     "ggplot"
   )
-  
+
   expect_is(
     plotCalibrationEffect(
       logRrNegatives                      = negatives$logRr,
@@ -128,7 +122,7 @@ test_that("output of plotCalibrationEffect", {
     ),
     "ggplot"
   )
-  
+
   expect_is(
     plotCalibrationEffect(
       logRrNegatives   = negatives$logRr,
@@ -139,7 +133,7 @@ test_that("output of plotCalibrationEffect", {
     ),
     "ggplot"
   )
-  
+
   expect_is(
     plotCalibrationEffect(
       logRrNegatives   = negatives$logRr,
@@ -148,7 +142,7 @@ test_that("output of plotCalibrationEffect", {
     ),
     "ggplot"
   )
-  
+
   expect_is(
     plotCalibrationEffect(
       logRrNegatives   = negatives$logRr,
@@ -163,9 +157,9 @@ test_that("output of plotCalibrationEffect", {
   # Custom x and y limits
   expect_warning(
     plotCalibrationEffect(
-      logRrNegatives   = negatives$logRr,
+      logRrNegatives = negatives$logRr,
       seLogRrNegatives = negatives$seLogRr,
-      logRrPositives = c(-3,-2, 11),
+      logRrPositives = c(-3, -2, 11),
       seLogRrPositives = c(0.1, 1.2, 2.5)
     ),
     regexp = "xLimits"
@@ -173,18 +167,16 @@ test_that("output of plotCalibrationEffect", {
 
   expect_warning(
     plotCalibrationEffect(
-      logRrNegatives   = negatives$logRr,
+      logRrNegatives = negatives$logRr,
       seLogRrNegatives = negatives$seLogRr,
-      logRrPositives = c(-3,-2, 2),
+      logRrPositives = c(-3, -2, 2),
       seLogRrPositives = c(0.1, 1.2, 2.5)
     ),
     regexp = "yLimits"
   )
-
 })
 
 test_that("output of plotCiCalibration", {
-  
   expect_is(
     plotCiCalibration(
       logRr     = negatives$logRr,
@@ -193,11 +185,9 @@ test_that("output of plotCiCalibration", {
     ),
     "ggplot"
   )
-  
 })
 
 test_that("output of plotCiCalibrationEffect", {
-  
   expect_is(
     plotCiCalibrationEffect(
       logRr = negatives$logRr,
@@ -206,11 +196,9 @@ test_that("output of plotCiCalibrationEffect", {
     ),
     "ggplot"
   )
-  
 })
 
 test_that("output of plotCiCoverage", {
-  
   expect_is(
     plotCiCoverage(
       logRr = negatives$logRr,
@@ -219,12 +207,10 @@ test_that("output of plotCiCoverage", {
     ),
     "ggplot"
   )
-  
 })
 
 
 test_that("output of plotErrorModel", {
-  
   expect_is(
     plotErrorModel(
       logRr     = negatives$logRr,
@@ -233,49 +219,46 @@ test_that("output of plotErrorModel", {
     ),
     "ggplot"
   )
-  
 })
 
 test_that("output of plotExpectedType1Error", {
-  
   expect_error(
     plotExpectedType1Error(
-      negatives$logRr, 
-      negatives$seLogRr, 
+      negatives$logRr,
+      negatives$seLogRr,
       positives$seLogRr,
       showCis = TRUE,
       null    = null
     ),
     regexp = "fitMcmcNull"
   )
-  
+
   expect_is(
     plotExpectedType1Error(
-      negatives$logRr, 
-      negatives$seLogRr, 
+      negatives$logRr,
+      negatives$seLogRr,
       positives$seLogRr
     ),
     "ggplot"
   )
-  
+
   expect_is(
     plotExpectedType1Error(
-      negatives$logRr, 
-      negatives$seLogRr, 
+      negatives$logRr,
+      negatives$seLogRr,
       positives$seLogRr,
       showCis = TRUE
     ),
     "ggplot"
   )
-  
+
   expect_is(
     plotExpectedType1Error(
-      negatives$logRr, 
-      negatives$seLogRr, 
+      negatives$logRr,
+      negatives$seLogRr,
       positives$seLogRr,
       showEffectSizes = TRUE
     ),
     "gtable"
   )
-  
 })

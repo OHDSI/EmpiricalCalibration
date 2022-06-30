@@ -38,9 +38,10 @@
 #'
 #' @export
 calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper = TRUE) {
-  if (twoSided || !upper)
+  if (twoSided || !upper) {
     stop("Currently only one-sided upper LLRs are supported")
-  
+  }
+
   if (is.data.frame(likelihoodApproximation) || is.numeric(likelihoodApproximation)) {
     if ("logRr" %in% colnames(likelihoodApproximation)) {
       message("Detected data following normal distribution")
@@ -76,10 +77,12 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
       convertToDataFrame <- function(i) {
         value <- as.numeric(likelihoodApproximation[i, ])
         maxValue <- max(value)
-        data.frame(value = value - maxValue,
-                   point = point)
+        data.frame(
+          value = value - maxValue,
+          point = point
+        )
       }
-      likelihoodApproximation <- lapply(1:nrow(likelihoodApproximation), convertToDataFrame) 
+      likelihoodApproximation <- lapply(1:nrow(likelihoodApproximation), convertToDataFrame)
     }
   } else {
     message("Detected data following grid distribution")
@@ -87,7 +90,7 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
     logLikelihood <- gridLlApproximation
   }
   useMcmc <- is(null, "mcmcNull")
-  
+
   calibrateOneLlr <- function(i) {
     parameters <- likelihoodApproximation[[i]]
     if (type == "grid") {
@@ -95,42 +98,47 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
       mle <- parameters$point[idx]
       ml <- parameters$value[idx]
     } else if (type == "normal") {
-      if (is.na(parameters$logRr) || 
-          is.na(parameters$seLogRr) ||
-          is.infinite(parameters$logRr) || 
-          is.infinite(parameters$seLogRr)) {
+      if (is.na(parameters$logRr) ||
+        is.na(parameters$seLogRr) ||
+        is.infinite(parameters$logRr) ||
+        is.infinite(parameters$seLogRr)) {
         return(NA)
       }
       mle <- parameters$logRr
       ml <- logLikelihood(mle, parameters = parameters)
     } else {
-      optimum <-  suppressWarnings(optim(0, function(x) -logLikelihood(x = x, parameters = parameters)))
+      optimum <- suppressWarnings(optim(0, function(x) -logLikelihood(x = x, parameters = parameters)))
       mle <- optimum$par
       ml <- -optimum$value
     }
     if (useMcmc) {
       chain <- attr(null, "mcmc")$chain
-      calibratedLlr <- mapply(FUN = calibrateOneLlrOneNull, 
-                              nullMu = chain[, 1], 
-                              nullSigma = 1/sqrt(chain[, 2]),
-                              MoreArgs = list(
-                                logLikelihood = logLikelihood,
-                                parameters = parameters,
-                                mle = mle,
-                                ml = ml))
+      calibratedLlr <- mapply(
+        FUN = calibrateOneLlrOneNull,
+        nullMu = chain[, 1],
+        nullSigma = 1 / sqrt(chain[, 2]),
+        MoreArgs = list(
+          logLikelihood = logLikelihood,
+          parameters = parameters,
+          mle = mle,
+          ml = ml
+        )
+      )
       result <- quantile(calibratedLlr, c(0.5, 0.025, 0.975))
       return(result)
     } else {
-      result <- calibrateOneLlrOneNull(nullMu = null[1],
-                                       nullSigma = null[2],
-                                       logLikelihood = logLikelihood,
-                                       parameters = parameters,
-                                       mle = mle,
-                                       ml = ml)
-      return(result    )
+      result <- calibrateOneLlrOneNull(
+        nullMu = null[1],
+        nullSigma = null[2],
+        logLikelihood = logLikelihood,
+        parameters = parameters,
+        mle = mle,
+        ml = ml
+      )
+      return(result)
     }
   }
-  
+
   calibratedLlr <- sapply(1:length(likelihoodApproximation), calibrateOneLlr)
   if (useMcmc) {
     calibratedLlr <- as.data.frame(t(calibratedLlr))
@@ -142,7 +150,7 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
 }
 
 computePFromLlr <- function(llr, mle, nullLogRr = 0) {
-  # For very large llr values pchisq returns 0. 
+  # For very large llr values pchisq returns 0.
   # Behaves roughly log linear in that region, so using linear extrapolation.
   # llr <- 20:33
   # p <- (1 - pchisq(2 * llr, df = 1))/2
@@ -152,8 +160,9 @@ computePFromLlr <- function(llr, mle, nullLogRr = 0) {
   # formatC(log(p[length(p)]) - llr[length(llr)] * coef(fit)[2], digits = 20)
   # formatC(coef(fit)[2], digits = 20)
   p <- ifelse(llr > 33,
-              exp(-2.4039960592000753081 - 1.0193835554520327413 * llr),
-              (1 - pchisq(2 * llr, df = 1))/2)
+    exp(-2.4039960592000753081 - 1.0193835554520327413 * llr),
+    (1 - pchisq(2 * llr, df = 1)) / 2
+  )
   ifelse(mle < nullLogRr, 1 - p, p)
 }
 
@@ -162,7 +171,7 @@ computeLlrFromP <- function(p) {
     return(0)
   } else {
     if (p < 1e-16) {
-      # For very small p values qchisq returns Inf. 
+      # For very small p values qchisq returns Inf.
       # Behaves roughly log linear in that region, so using linear extrapolation.
       # p <- exp(-10:-25)
       # llr <- qchisq(1 - 2 * p, df = 1) / 2
@@ -190,15 +199,17 @@ calibrateOneLlrOneNull <- function(nullMu, nullSigma, logLikelihood, parameters,
       calibratedLlr <- ml - logLikelihood(x = nullMu, parameters = parameters)
     }
   } else {
-    calibratedP <- integrate(f = computePAtNull, 
-                             logLikelihood = logLikelihood, 
-                             parameters = parameters,
-                             mle = mle,
-                             ml = ml,
-                             null = c(nullMu, nullSigma),
-                             lower = nullMu - 10 * nullSigma, 
-                             upper = nullMu + 10 * nullSigma,
-                             stop.on.error = FALSE)$value
+    calibratedP <- integrate(
+      f = computePAtNull,
+      logLikelihood = logLikelihood,
+      parameters = parameters,
+      mle = mle,
+      ml = ml,
+      null = c(nullMu, nullSigma),
+      lower = nullMu - 10 * nullSigma,
+      upper = nullMu + 10 * nullSigma,
+      stop.on.error = FALSE
+    )$value
     calibratedLlr <- computeLlrFromP(calibratedP)
   }
   return(calibratedLlr)

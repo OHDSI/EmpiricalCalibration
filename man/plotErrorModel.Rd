@@ -24,7 +24,7 @@ log(<effect estimate>))/qnorm(0.025).}
 
 \item{title}{Optional: the main title for the plot}
 
-\item{legacy}{If true, a legacy error model will be fitted, meaning standard 
+\item{legacy}{If true, a legacy error model will be fitted, meaning standard
 deviation is linear on the log scale. If false, standard deviation
 is assumed to be simply linear.}
 
@@ -39,8 +39,8 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 \code{plotErrorModel} creates a plot showing the systematic error model.
 }
 \details{
-Creates a plot with the true effect size on the x-axis, and the mean plus and minus the standard 
-deviation shown on the y-axis. Also shown are simple error models fitted at each true relative 
+Creates a plot with the true effect size on the x-axis, and the mean plus and minus the standard
+deviation shown on the y-axis. Also shown are simple error models fitted at each true relative
 risk in the input.
 }
 \examples{
