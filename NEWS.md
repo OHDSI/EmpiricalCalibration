@@ -1,4 +1,4 @@
-EmpiricalCalibration 3.0.1
+EmpiricalCalibration 3.1.0
 ==========================
 
 Changes
@@ -7,9 +7,15 @@ Changes
 
 2. Adding the `computeCvPoissonRegression()` function to compute critical values for Poisson regressions. 
 
+3. The `plotCalibrationEffect()` function warns if there are values outside the plot limits.
+
+4. Changing the MaxSPRT calibration vignette to use CV calibration instead of LLR calibration.
+
 Bugfixes
 
 1. Fixing `computeTraditionalP()` when using vectors as input.
+
+2. Fix error when no critical value meets requirements (throwing warning instead).
 
 
 EmpiricalCalibration 3.0.0

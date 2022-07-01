@@ -23,6 +23,7 @@ reference:
       - plotCalibrationEffect 
       - plotExpectedType1Error 
       - computeExpectedAbsoluteSystematicError
+      - compareEase
   - title: "Confidence interval calibration"
     desc: >
       Functions for calibrating confidence intervals based on a systematic error model fitted using negative and positive controls.
@@ -44,6 +45,7 @@ reference:
       - calibrateLlr
       - computeCvBinomial
       - computeCvPoisson
+      - computeCvPoissonRegression
   - title: "Data"
     desc: >
       Data (real and simulated) for testing and demonstrating empirical calibration.

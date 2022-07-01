@@ -14,8 +14,7 @@ vignette: >
   
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 library(EmpiricalCalibration)
-cvs <- readRDS("cvs.rds")
-allLlrs <- readRDS("allLlrs.rds")
+allCvsAndLlrs <- readRDS("allCvsAndLlrs.rds")
 set.seed(123)
 ```
   
@@ -32,7 +31,19 @@ This vignette demonstrates combining adjusting for sequential testing through Ma
 For this vignette we will use simulated data that can be generated using the `simulateMaxSprtData` function
   
 ```{r}
-maxSprtSimulationData <- simulateMaxSprtData()
+maxSprtSimulationData <- simulateMaxSprtData(
+  n = 10000,
+  pExposure = 0.5,
+  backgroundHazard = 0.001,
+  tar = 10,
+  nullMu = 0.2,
+  nullSigma = 0.2,
+  maxT = 100,
+  looks = 10,
+  numberOfNegativeControls = 50,
+  numberOfPositiveControls = 1,
+  positiveControlEffectSize = 4
+)
 head(maxSprtSimulationData)
 ```
   
@@ -53,9 +64,11 @@ library(survival)
 dataOutcome51 <- maxSprtSimulationData[maxSprtSimulationData$outcomeId == 51, ]
 dataOutcome51LookT50 <- dataOutcome51[dataOutcome51$lookTime == 50, ]
 
-cyclopsData <- createCyclopsData(Surv(time, outcome) ~ exposure , 
-                                 modelType = "cox", 
-                                 data = dataOutcome51LookT50)
+cyclopsData <- createCyclopsData(
+  Surv(time, outcome) ~ exposure , 
+  modelType = "cox", 
+  data = dataOutcome51LookT50
+)
 fit <- fitCyclopsModel(cyclopsData)
 coef(fit)
 ```
@@ -71,9 +84,11 @@ fit$log_likelihood
 We can use Cyclops to compute the log likelihood of parameter value 0 (hazard ratio = 1):
 
 ```{r}
-llNull <- getCyclopsProfileLogLikelihood(object = fit,
-                                         parm = "exposureTRUE",
-                                         x = 0)$value
+llNull <- getCyclopsProfileLogLikelihood(
+  object = fit,
+  parm = "exposureTRUE",
+  x = 0
+)$value
 llNull
 ```
 
@@ -102,10 +117,12 @@ exposedTime <- sum(dataOutcome51$time[dataOutcome51$exposure == TRUE &
                                         dataOutcome51$lookTime == 100])
 unexposedTime <- sum(dataOutcome51$time[dataOutcome51$exposure == FALSE & 
                                           dataOutcome51$lookTime == 100])
-cv <- computeCvBinomial(groupSizes = outcomesPerLook,
-                        z = unexposedTime / exposedTime,
-                        minimumEvents = 1,
-                        alpha = 0.05)
+cv <- computeCvBinomial(
+  groupSizes = outcomesPerLook,
+  z = unexposedTime / exposedTime,
+  minimumEvents = 1,
+  alpha = 0.05
+)
 cv
 ```
 
@@ -122,13 +139,23 @@ llr > cv
 For empirical calibration, we'll need more than just the likelihood at the maximum and at the null hypothesis. Instead, we'll need information on the entire likelihood distribution. A convenient way to approximate the likelihood function is the likelihood profile. This profile provides, at various values the hazard ratio, the computed likelihood. The `Cyclops package has a convenient function for computing likelihood profiles:
 
 ```{r}
-llProfileOutcome51LookT50 <- getCyclopsProfileLogLikelihood(object = fit,
-                                                            parm = "exposureTRUE",
-                                                            bounds = log(c(0.1, 10)))
+llProfileOutcome51LookT50 <- getCyclopsProfileLogLikelihood(
+  object = fit,
+  parm = "exposureTRUE",
+  bounds = log(c(0.1, 10))
+)
 head(llProfileOutcome51LookT50)
 ```
 
-Here we've specified that the true hazard ratio is almost certainly in the [0.1, 10] range, so the profile will be restricted to this region. This function uses an adaptive grid, using more grid points if the likelihood shows higher curvature to avoid loss of information.
+Here we've specified that the true hazard ratio is almost certainly in the [0.1, 10] range, so the profile will be restricted to this region. This function uses an adaptive grid, using more grid points if the likelihood shows higher curvature to avoid loss of information. If we want, we could also plot the profile:
+
+```{r}
+library(ggplot2)
+ggplot(llProfileOutcome51LookT50, aes(x = point, y = value)) +
+  geom_line()
+```
+
+Note that the x-axis is the log of the hazard ratio, and the y-axis represents the log of the likelihood.
 
 ## Fitting a null distribution using likelihood profiles
 
@@ -139,13 +166,17 @@ negativeControlProfilesLookT50 <- list()
 dataLookT50 <- maxSprtSimulationData[maxSprtSimulationData$lookTime == 50, ]
 for (i in 1:50) {
   dataOutcomeIlookT50 <- dataLookT50[dataLookT50$outcomeId == i, ]
-  cyclopsData <- createCyclopsData(Surv(time, outcome) ~ exposure , 
-                                   modelType = "cox", 
-                                   data = dataOutcomeIlookT50)
+  cyclopsData <- createCyclopsData(
+    Surv(time, outcome) ~ exposure , 
+    modelType = "cox", 
+    data = dataOutcomeIlookT50
+  )
   fit <- fitCyclopsModel(cyclopsData)
-  llProfile <- getCyclopsProfileLogLikelihood(object = fit,
-                                              parm = "exposureTRUE",
-                                              bounds = log(c(0.1, 10)))
+  llProfile <- getCyclopsProfileLogLikelihood(
+    object = fit,
+    parm = "exposureTRUE",
+    bounds = log(c(0.1, 10))
+  )
   negativeControlProfilesLookT50[[i]] <- llProfile
 }
 ```
@@ -157,76 +188,68 @@ nullLookT50 <- fitNullNonNormalLl(negativeControlProfilesLookT50)
 nullLookT50
 ```
 
-This shows substantial systematic error in the negative controls.
+This shows substantial systematic error in the negative controls, with mean and standard deviation away from 0.
 
-## Computing a calibrated log likelihood ratio
+## Computing a calibrated critical value
 
-Using the fitted null distribution, and the likelihood profile of our outcome of interest, we can compute the empirically calibrated LLR:
+Using the fitted null distribution, we can compute an empirically calibrated CV:
 
 ```{r}
-calibratedLlr <- calibrateLlr(null = nullLookT50,
-                              likelihoodApproximation = llProfileOutcome51LookT50)
-calibratedLlr
+calibratedCv <- computeCvBinomial(
+  groupSizes = outcomesPerLook,
+  z = unexposedTime / exposedTime,
+  minimumEvents = 1,
+  alpha = 0.05,
+  nullMean = nullLookT50[1],
+  nullSd = nullLookT50[2]
+)
+calibratedCv
 ```
 
-Which is substantially lower than the uncalibrated LLR we computed earlier (LLR = `r llr`). We can compare our calibrated LLR to the critical value computed earlier to determine whether there is a signal:
+Which is substantially higher than the uncalibrated CV we computed earlier (CV = `r cv`). We can compare the LLR computed earlier to the calibrated critical value to determine whether there is a signal:
 
 ```{r}
-calibratedLlr > cv
+llr > calibratedCv
 ```
 
 # Demonstrating type 1 error with and without calibration
 
 It is always a good idea to compute the type 1 error based on the negative controls, to understand the operating characteristics of your study. Unfortunately, when doing sequential testing we cannot evaluate the overall performance of our surveillance until our final look at the data. Here we compute type 1 error both with and without calibration, comparing it to the nominal type 1 error, to demonstrate why empirical calibration can be important.
 
-## Computing the calibrated and uncalibrated log likelihood ratios
+## Computing log likelihood ratios and (uncalibrated and calibrated) critical values
 
-We re-use the example code provided earlier to compute the calibrated and uncalibrated LLR for each negative control at each look. Note that this code will take some time to complete. 
+We re-use the example code provided earlier to compute the log likelihood ratios, uncalibrated critical values and calibrated critical values for each negative control at each look. Note that this code will take some time to complete. 
 
 ```{r eval=FALSE}
-allLlrs <- data.frame()
+allCvsAndLlrs <- data.frame()
 for (t in unique(maxSprtSimulationData$lookTime)) {
-  
-  # Compute likelihood profiles for all negative controls:
+
+  # Compute likelihood profiles and LLR for all negative controls:
   negativeControlProfilesLookTt <- list()
+  llrsLookTt <- c()
   dataLookTt <- maxSprtSimulationData[maxSprtSimulationData$lookTime == t, ]
   for (i in 1:50) {
     dataOutcomeIlookTt <- dataLookTt[dataLookTt$outcomeId == i, ]
-    cyclopsData <- createCyclopsData(Surv(time, outcome) ~ exposure , 
-                                     modelType = "cox", 
-                                     data = dataOutcomeIlookTt)
+    cyclopsData <- createCyclopsData(Surv(time, outcome) ~ exposure,
+      modelType = "cox",
+      data = dataOutcomeIlookTt
+    )
     fit <- fitCyclopsModel(cyclopsData)
-    llProfile <- getCyclopsProfileLogLikelihood(object = fit,
-                                                parm = "exposureTRUE",
-                                                bounds = log(c(0.1, 10)))
+    
+    # likelihood profile:
+    llProfile <- getCyclopsProfileLogLikelihood(
+      object = fit,
+      parm = "exposureTRUE",
+      bounds = log(c(0.1, 10))
+    )
     negativeControlProfilesLookTt[[i]] <- llProfile
-  }
-  
-  # Fit null distribution:
-  nullLookTt <- fitNullNonNormalLl(negativeControlProfilesLookTt)
-
-  # Compute calibrated and uncalibrated LLRs for all negative controls:
-  llrsLookTt <- c()
-  calibratedLlrsLookTt <- c()
-  for (i in 1:50) {
-    dataOutcomeIlookTt <- dataLookTt[dataLookTt$outcomeId == i, ]
-    cyclopsData <- createCyclopsData(Surv(time, outcome) ~ exposure , 
-                                     modelType = "cox", 
-                                     data = dataOutcomeIlookTt)
-    fit <- fitCyclopsModel(cyclopsData)
-    llProfile <- getCyclopsProfileLogLikelihood(object = fit,
-                                                parm = "exposureTRUE",
-                                                bounds = log(c(0.1, 10)))
     
-    # Calibrated LLR:
-    calibrateLlr <- calibrateLlr(null = nullLookTt, 
-                 likelihoodApproximation = llProfile)
-    calibratedLlrsLookTt[i] <- calibrateLlr
-    
-    # Uncalibrated LLR:
-    llNull <- getCyclopsProfileLogLikelihood(object = fit,
-                                             parm = "exposureTRUE",
-                                             x = 0)$value
+    # LLR:
+    llNull <- getCyclopsProfileLogLikelihood(
+      object = fit,
+      parm = "exposureTRUE",
+      x = 0
+    )$value
     if (fit$return_flag == "ILLCONDITIONED" || coef(fit) < 0) {
       llr <- 0
     } else {
@@ -234,45 +257,60 @@ for (t in unique(maxSprtSimulationData$lookTime)) {
     }
     llrsLookTt[i] <- llr
   }
-  
+
+  # Fit null distribution:
+  nullLookTt <- fitNullNonNormalLl(negativeControlProfilesLookTt)
+
+  # Compute calibrated and uncalibrated CV for all negative controls:
+  cvs <- c()
+  calibratedCvsLookT <- c()
+  for (i in 1:50) {
+    dataOutcomeI <- maxSprtSimulationData[maxSprtSimulationData$outcomeId == i, ]
+    outcomesPerLook <- aggregate(outcome ~ lookTime, dataOutcomeI, sum)
+    # Need incremental outcomes per look:
+    outcomesPerLook <- outcomesPerLook$outcome[order(outcomesPerLook$lookTime)]
+    outcomesPerLook[2:10] <- outcomesPerLook[2:10] - outcomesPerLook[1:9]
+    
+    exposedTime <- sum(dataOutcomeI$time[dataOutcomeI$exposure == TRUE &
+                                           dataOutcomeI$lookTime == 100])
+    unexposedTime <- sum(dataOutcomeI$time[dataOutcomeI$exposure == FALSE &
+                                             dataOutcomeI$lookTime == 100])
+    
+    # Note: uncalibrated CV will be same for every t, but computing in loop 
+    # over t for clarity of code:
+    cv <- computeCvBinomial(
+      groupSizes = outcomesPerLook,
+      z = unexposedTime / exposedTime,
+      minimumEvents = 1,
+      alpha = 0.05
+    )
+    cvs[i] <- cv
+    
+    calibratedCv <- computeCvBinomial(
+      groupSizes = outcomesPerLook,
+      z = unexposedTime / exposedTime,
+      minimumEvents = 1,
+      alpha = 0.05,
+      nullMean = nullLookTt[1],
+      nullSd = nullLookTt[2]
+    )
+    calibratedCvsLookT[i] <- calibratedCv
+  }
+
   # Store in a data frame:
-  allLlrs <- rbind(allLlrs,
-                   data.frame(t = t,
-                              outcomeId = 1:50,
-                              llr = llrsLookTt,
-                              calibrateLlr = calibratedLlrsLookTt))
-  
+  allCvsAndLlrs <- rbind(
+    allCvsAndLlrs,
+    data.frame(
+      t = t,
+      outcomeId = 1:50,
+      llr = llrsLookTt,
+      cv = cvs,
+      calibrateCv = calibratedCvsLookT
+    )
+  )
 }
 ```
 
-Here, for clarity we fit the Cox model and compute the likelihood profiles twice, once for fitting the null distribution, and once to compute the LLRs. Of course it would be more efficient to remove this duplication, but it might make the code harder to read.
-
-
-## Computing critical values for all negative controls
-
-We re-use the code shown earlier to compute the critical value for each negative control:
-
-```{r eval=FALSE}
-cvs <- c()
-for (i in 1:50) {
-  dataOutcomeI <- maxSprtSimulationData[maxSprtSimulationData$outcomeId == i, ]
-  outcomesPerLook <- aggregate(outcome ~ lookTime, dataOutcomeI, sum)
-  # Need incremental outcomes per look:
-  outcomesPerLook <- outcomesPerLook$outcome[order(outcomesPerLook$lookTime)]
-  outcomesPerLook[2:10] <- outcomesPerLook[2:10] - outcomesPerLook[1:9]
-  
-  exposedTime <- sum(dataOutcomeI$time[dataOutcomeI$exposure == TRUE & 
-                                         dataOutcomeI$lookTime == 100])
-  unexposedTime <- sum(dataOutcomeI$time[dataOutcomeI$exposure == FALSE & 
-                                            dataOutcomeI$lookTime == 100])
-  cv <- computeCvBinomial(groupSizes = outcomesPerLook,
-                          z = unexposedTime / exposedTime,
-                          minimumEvents = 1,
-                          alpha = 0.05)
-  cvs[i] <- cv
-}
-
-```
 
 ## Computing overall type 1 error
 
@@ -282,9 +320,9 @@ We compare the computed LLRs to the computed critical values to determine how of
 signals <- c()
 calibratedSignals <- c()
 for (i in 1:50) {
-  cv <- cvs[i]
-  signals[i] <- any(allLlrs$llr[allLlrs$outcomeId == i] > cv)
-  calibratedSignals[i] <- any(allLlrs$calibrateLlr[allLlrs$outcomeId == i] > cv)
+  idx <- allCvsAndLlrs$outcomeId == i
+  signals[i] <- any(allCvsAndLlrs$llr[idx] > allCvsAndLlrs$cv[idx])
+  calibratedSignals[i] <-  any(allCvsAndLlrs$llr[idx] > allCvsAndLlrs$calibrateCv[idx])
 }
 # Type 1 error when not calibrated (should be 0.05):
 mean(signals)

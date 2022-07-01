@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,26 +33,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">3.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -67,13 +60,16 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://ohdsi.github.io/Hades"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
 <li>
-  <a href="https://github.com/OHDSI/EmpiricalCalibration/">
+  <a href="https://github.com/OHDSI/EmpiricalCalibration/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -88,303 +84,438 @@
 
       
 
-      </header><script src="EmpiricalMaxSprtCalibrationVignette_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Empirical calibration and MaxSPRT</h1>
-                        <h4 class="author">Martijn J. Schuemie</h4>
+                        <h4 data-toc-skip class="author">Martijn J.
+Schuemie</h4>
             
-            <h4 class="date">2021-09-27</h4>
+            <h4 data-toc-skip class="date">2022-07-01</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/master/vignettes/EmpiricalMaxSprtCalibrationVignette.Rmd"><code>vignettes/EmpiricalMaxSprtCalibrationVignette.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/HEAD/vignettes/EmpiricalMaxSprtCalibrationVignette.Rmd" class="external-link"><code>vignettes/EmpiricalMaxSprtCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalMaxSprtCalibrationVignette.Rmd</code></div>
 
     </div>
 
     
     
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
-<p>When new drugs or vaccines are brought to market, it is important to continue to monitor their safety. The phase 2 and 3 trials preceding marketing may uncover most common adverse events, but rare adverse events may go undetected due to limited sample size of the trials. Other adverse events may go undetected if they only affect a subpopulation that was excluded from the clinical trials. To catch these types of adverse events requires post-marketing drug and vaccine safety surveillance, for example using routinely collected healthcare data, such as administrative claims and electronic health records. To detect adverse events as quickly as possible, data should be analyzed as it accrues, for example once every month analyzing all data up to that point in time. It is important to realize that such sequential testing for a safety signal is a form of multiple testing that needs to be adjusted for if one aims to maintain the prespecified type 1 error (i.e. if one aims to keep the probability of rejecting the null when the null is true at the specified alpha level). A common approach to adjusting for sequential testing is maximum sequential probability ratio testing (MaxSPRT), used by the U.S Food and Drug Administration (FDA) in its safety surveillance.</p>
-<p>However, there is another important reason why the true type 1 error might deviate from the prespecified alpha, and that is systematic error due to the observational nature of the study. Systematic error can manifest from multiple sources, including confounding, selection bias, and measurement error. For example, in a study comparing vaccinated to unvaccinated, the vaccinated group may differ from the unvaccinated one in terms of age and fragility that impact the baseline probability of having the outcome, and failing to adjust for these differences will lead to biased effect size estimates.</p>
-<p>This vignette demonstrates combining adjusting for sequential testing through MaxSPRT with adjusting for systematic error using empirical calibration. We use a simulated dataset of survival data for several negative controls and a single positive control.</p>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>When new drugs or vaccines are brought to market, it is important to
+continue to monitor their safety. The phase 2 and 3 trials preceding
+marketing may uncover most common adverse events, but rare adverse
+events may go undetected due to limited sample size of the trials. Other
+adverse events may go undetected if they only affect a subpopulation
+that was excluded from the clinical trials. To catch these types of
+adverse events requires post-marketing drug and vaccine safety
+surveillance, for example using routinely collected healthcare data,
+such as administrative claims and electronic health records. To detect
+adverse events as quickly as possible, data should be analyzed as it
+accrues, for example once every month analyzing all data up to that
+point in time. It is important to realize that such sequential testing
+for a safety signal is a form of multiple testing that needs to be
+adjusted for if one aims to maintain the prespecified type 1 error
+(i.e. if one aims to keep the probability of rejecting the null when the
+null is true at the specified alpha level). A common approach to
+adjusting for sequential testing is maximum sequential probability ratio
+testing (MaxSPRT), used by the U.S Food and Drug Administration (FDA) in
+its safety surveillance.</p>
+<p>However, there is another important reason why the true type 1 error
+might deviate from the prespecified alpha, and that is systematic error
+due to the observational nature of the study. Systematic error can
+manifest from multiple sources, including confounding, selection bias,
+and measurement error. For example, in a study comparing vaccinated to
+unvaccinated, the vaccinated group may differ from the unvaccinated one
+in terms of age and fragility that impact the baseline probability of
+having the outcome, and failing to adjust for these differences will
+lead to biased effect size estimates.</p>
+<p>This vignette demonstrates combining adjusting for sequential testing
+through MaxSPRT with adjusting for systematic error using empirical
+calibration. We use a simulated dataset of survival data for several
+negative controls and a single positive control.</p>
 </div>
-<div id="simulated-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#simulated-data" class="anchor"></a>Simulated data</h1>
-<p>For this vignette we will use simulated data that can be generated using the <code>simulateMaxSprtData</code> function</p>
+<div class="section level2">
+<h2 id="simulated-data">Simulated data<a class="anchor" aria-label="anchor" href="#simulated-data"></a>
+</h2>
+<p>For this vignette we will use simulated data that can be generated
+using the <code>simulateMaxSprtData</code> function</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">maxSprtSimulationData</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulateMaxSprtData.html">simulateMaxSprtData</a></span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">maxSprtSimulationData</span><span class="op">)</span></code></pre></div>
-<pre><code>##         time outcome exposure lookTime outcomeId
-## 6  5.4443501       0     TRUE       10         1
-## 18 5.7940466       0     TRUE       10         1
-## 35 7.5386315       0     TRUE       10         1
-## 51 5.4168833       0     TRUE       10         1
-## 62 0.5159339       0    FALSE       10         1
-## 74 9.9375227       0    FALSE       10         1</code></pre>
-<p>This is simulated survival data for 50 negative controls (outcome IDs 1-50), and 1 positive control (outcome ID 51). The data provides 10 looks at data accruing over time (at times t = 10, 20, 30, …, 100), with each look having more data than the one before. We simulated moderate systematic error (mean = 0.2, SD = 0,2), and the positive control has a true hazard ratio of 4.</p>
+<code class="sourceCode R"><span><span class="va">maxSprtSimulationData</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulateMaxSprtData.html">simulateMaxSprtData</a></span><span class="op">(</span></span>
+<span>  n <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>  pExposure <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  backgroundHazard <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  tar <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  nullMu <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  nullSigma <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  maxT <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  looks <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  numberOfNegativeControls <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  numberOfPositiveControls <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  positiveControlEffectSize <span class="op">=</span> <span class="fl">4</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">maxSprtSimulationData</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##         time outcome exposure lookTime outcomeId</span></span>
+<span><span class="co">## 6  5.4443501       0     TRUE       10         1</span></span>
+<span><span class="co">## 18 5.7940466       0     TRUE       10         1</span></span>
+<span><span class="co">## 35 7.5386315       0     TRUE       10         1</span></span>
+<span><span class="co">## 51 5.4168833       0     TRUE       10         1</span></span>
+<span><span class="co">## 62 0.5159339       0    FALSE       10         1</span></span>
+<span><span class="co">## 74 9.9375227       0    FALSE       10         1</span></span></code></pre>
+<p>This is simulated survival data for 50 negative controls (outcome IDs
+1-50), and 1 positive control (outcome ID 51). The data provides 10
+looks at data accruing over time (at times t = 10, 20, 30, …, 100), with
+each look having more data than the one before. We simulated moderate
+systematic error (mean = 0.2, SD = 0,2), and the positive control has a
+true hazard ratio of 4.</p>
 </div>
-<div id="maxsprt" class="section level1">
-<h1 class="hasAnchor">
-<a href="#maxsprt" class="anchor"></a>MaxSPRT</h1>
-<p>MaxSPRT (Maximum Sequential Probability Ratio Testing) is a well-known procedure for adjusting for sequential testing. It requires computing the log likelihood ratio (LLR), and comparing it against a prespecified critical value to determine whether there is a signal (suggesting an effect).</p>
-<div id="log-likelihood-ratio" class="section level2">
-<h2 class="hasAnchor">
-<a href="#log-likelihood-ratio" class="anchor"></a>Log likelihood ratio</h2>
-<p>In this case, because we have survival data we will use a Cox proportional hazards model. For any outcome, at any look, we can fit a Cox model using the <code>Cyclops</code> package. In this example, we use outcome 51, and the look at t = 50:</p>
+<div class="section level2">
+<h2 id="maxsprt">MaxSPRT<a class="anchor" aria-label="anchor" href="#maxsprt"></a>
+</h2>
+<p>MaxSPRT (Maximum Sequential Probability Ratio Testing) is a
+well-known procedure for adjusting for sequential testing. It requires
+computing the log likelihood ratio (LLR), and comparing it against a
+prespecified critical value to determine whether there is a signal
+(suggesting an effect).</p>
+<div class="section level3">
+<h3 id="log-likelihood-ratio">Log likelihood ratio<a class="anchor" aria-label="anchor" href="#log-likelihood-ratio"></a>
+</h3>
+<p>In this case, because we have survival data we will use a Cox
+proportional hazards model. For any outcome, at any look, we can fit a
+Cox model using the <code>Cyclops</code> package. In this example, we
+use outcome 51, and the look at t = 50:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ohdsi/cyclops">Cyclops</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival">survival</a></span><span class="op">)</span>
-
-<span class="va">dataOutcome51</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="fl">51</span>, <span class="op">]</span>
-<span class="va">dataOutcome51LookT50</span> <span class="op">&lt;-</span> <span class="va">dataOutcome51</span><span class="op">[</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">50</span>, <span class="op">]</span>
-
-<span class="va">cyclopsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/createCyclopsData.html">createCyclopsData</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">~</span> <span class="va">exposure</span> , 
-                                 modelType <span class="op">=</span> <span class="st">"cox"</span>, 
-                                 data <span class="op">=</span> <span class="va">dataOutcome51LookT50</span><span class="op">)</span>
-<span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
-<pre><code>## exposureTRUE 
-##     1.829709</code></pre>
-<p>For MaxSPRT, we’re not interested in the point estimate of the hazard ratio, but rather the LLR. This is the log of the ratio between the maximum likelihood, and the likelihood of the null hypothesis. The maximum likelihood is already available from the <code>fit</code> object:</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ohdsi/cyclops" class="external-link">Cyclops</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival" class="external-link">survival</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dataOutcome51</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="fl">51</span>, <span class="op">]</span></span>
+<span><span class="va">dataOutcome51LookT50</span> <span class="op">&lt;-</span> <span class="va">dataOutcome51</span><span class="op">[</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">50</span>, <span class="op">]</span></span>
+<span></span>
+<span><span class="va">cyclopsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/createCyclopsData.html" class="external-link">createCyclopsData</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">~</span> <span class="va">exposure</span> , </span>
+<span>  modelType <span class="op">=</span> <span class="st">"cox"</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">dataOutcome51LookT50</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html" class="external-link">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## exposureTRUE </span></span>
+<span><span class="co">##     1.829709</span></span></code></pre>
+<p>For MaxSPRT, we’re not interested in the point estimate of the hazard
+ratio, but rather the LLR. This is the log of the ratio between the
+maximum likelihood, and the likelihood of the null hypothesis. The
+maximum likelihood is already available from the <code>fit</code>
+object:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Maximum log likelihood:</span>
-<span class="va">fit</span><span class="op">$</span><span class="va">log_likelihood</span></code></pre></div>
-<pre><code>## [1] -1167.396</code></pre>
-<p>We can use Cyclops to compute the log likelihood of parameter value 0 (hazard ratio = 1):</p>
+<code class="sourceCode R"><span><span class="co"># Maximum log likelihood:</span></span>
+<span><span class="va">fit</span><span class="op">$</span><span class="va">log_likelihood</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] -1167.396</span></span></code></pre>
+<p>We can use Cyclops to compute the log likelihood of parameter value 0
+(hazard ratio = 1):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">llNull</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>,
-                                         parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,
-                                         x <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">$</span><span class="va">value</span>
-<span class="va">llNull</span></code></pre></div>
-<pre><code>## [1] -1210.618</code></pre>
-<p>And we can compute the LLR by subtracting the two. Note that we use a single-sided test, so we will set LLR to 0 if the point estimate (the maximum likelihood estimate) is below 0. It might also be the case that no maximum likelihood estimate exists, for example because there are zero counts, in which case we also set the LLR to 0:</p>
+<code class="sourceCode R"><span><span class="va">llNull</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html" class="external-link">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">fit</span>,</span>
+<span>  parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,</span>
+<span>  x <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">value</span></span>
+<span><span class="va">llNull</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] -1210.618</span></span></code></pre>
+<p>And we can compute the LLR by subtracting the two. Note that we use a
+single-sided test, so we will set LLR to 0 if the point estimate (the
+maximum likelihood estimate) is below 0. It might also be the case that
+no maximum likelihood estimate exists, for example because there are
+zero counts, in which case we also set the LLR to 0:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">return_flag</span> <span class="op">==</span> <span class="st">"ILLCONDITIONED"</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">llr</span> <span class="op">&lt;-</span> <span class="fl">0</span>
-<span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-  <span class="va">llr</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">log_likelihood</span> <span class="op">-</span> <span class="va">llNull</span>
-<span class="op">}</span>
-<span class="va">llr</span></code></pre></div>
-<pre><code>## [1] 43.22212</code></pre>
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">return_flag</span> <span class="op">==</span> <span class="st">"ILLCONDITIONED"</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">llr</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="va">llr</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">log_likelihood</span> <span class="op">-</span> <span class="va">llNull</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">llr</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 43.22212</span></span></code></pre>
 </div>
-<div id="critical-value" class="section level2">
-<h2 class="hasAnchor">
-<a href="#critical-value" class="anchor"></a>Critical value</h2>
-<p>The critical value for the LLR is computed based on the total number of looks that are expected to be made, and the expected sample size at each look. Because we have already simulated all looks, we will use the actual sample sizes instead of expected ones. For Cox models it is recommended to use the binomial critical value computation:</p>
+<div class="section level3">
+<h3 id="critical-value">Critical value<a class="anchor" aria-label="anchor" href="#critical-value"></a>
+</h3>
+<p>The critical value for the LLR is computed based on the total number
+of looks that are expected to be made, and the expected sample size at
+each look. Because we have already simulated all looks, we will use the
+actual sample sizes instead of expected ones. For Cox models it is
+recommended to use the binomial critical value computation:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html">aggregate</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">~</span> <span class="va">lookTime</span>, <span class="va">dataOutcome51</span>, <span class="va">sum</span><span class="op">)</span>
-<span class="co"># Need incremental outcomes per look:</span>
-<span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">outcome</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span><span class="op">(</span><span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">lookTime</span><span class="op">)</span><span class="op">]</span>
-<span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">-</span> <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>
-
-<span class="va">exposedTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">exposure</span> <span class="op">==</span> <span class="cn">TRUE</span> <span class="op">&amp;</span> 
-                                        <span class="va">dataOutcome51</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">100</span><span class="op">]</span><span class="op">)</span>
-<span class="va">unexposedTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">exposure</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">&amp;</span> 
-                                          <span class="va">dataOutcome51</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">100</span><span class="op">]</span><span class="op">)</span>
-<span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeCvBinomial.html">computeCvBinomial</a></span><span class="op">(</span>groupSizes <span class="op">=</span> <span class="va">outcomesPerLook</span>,
-                        z <span class="op">=</span> <span class="va">unexposedTime</span> <span class="op">/</span> <span class="va">exposedTime</span>,
-                        minimumEvents <span class="op">=</span> <span class="fl">1</span>,
-                        alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></code></pre></div>
-<pre><code>## Selected alpha: 0.046 (least conservative value below 0.05)</code></pre>
+<code class="sourceCode R"><span><span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">~</span> <span class="va">lookTime</span>, <span class="va">dataOutcome51</span>, <span class="va">sum</span><span class="op">)</span></span>
+<span><span class="co"># Need incremental outcomes per look:</span></span>
+<span><span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">outcome</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">lookTime</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">-</span> <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">exposedTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">exposure</span> <span class="op">==</span> <span class="cn">TRUE</span> <span class="op">&amp;</span> </span>
+<span>                                        <span class="va">dataOutcome51</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">100</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">unexposedTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dataOutcome51</span><span class="op">$</span><span class="va">exposure</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">&amp;</span> </span>
+<span>                                          <span class="va">dataOutcome51</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">100</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeCvBinomial.html">computeCvBinomial</a></span><span class="op">(</span></span>
+<span>  groupSizes <span class="op">=</span> <span class="va">outcomesPerLook</span>,</span>
+<span>  z <span class="op">=</span> <span class="va">unexposedTime</span> <span class="op">/</span> <span class="va">exposedTime</span>,</span>
+<span>  minimumEvents <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.05</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Selected alpha: 0.046 (least conservative value below 0.05)</span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cv</span></code></pre></div>
-<pre><code>## [1] 2.689342
-## attr(,"alpha")
-## [1] 0.04597</code></pre>
-<p>By comparing the LLR to the critical value we can determine whether there is a signal:</p>
+<code class="sourceCode R"><span><span class="va">cv</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 2.689342</span></span>
+<span><span class="co">## attr(,"alpha")</span></span>
+<span><span class="co">## [1] 0.04597</span></span></code></pre>
+<p>By comparing the LLR to the critical value we can determine whether
+there is a signal:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">llr</span> <span class="op">&gt;</span> <span class="va">cv</span></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
+<code class="sourceCode R"><span><span class="va">llr</span> <span class="op">&gt;</span> <span class="va">cv</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 </div>
-<div id="maxsprt-and-empirical-calibration" class="section level1">
-<h1 class="hasAnchor">
-<a href="#maxsprt-and-empirical-calibration" class="anchor"></a>MaxSPRT and empirical calibration</h1>
-<div id="likelihood-profiles" class="section level2">
-<h2 class="hasAnchor">
-<a href="#likelihood-profiles" class="anchor"></a>Likelihood profiles</h2>
-<p>For empirical calibration, we’ll need more than just the likelihood at the maximum and at the null hypothesis. Instead, we’ll need information on the entire likelihood distribution. A convenient way to approximate the likelihood function is the likelihood profile. This profile provides, at various values the hazard ratio, the computed likelihood. The `Cyclops package has a convenient function for computing likelihood profiles:</p>
+<div class="section level2">
+<h2 id="maxsprt-and-empirical-calibration">MaxSPRT and empirical calibration<a class="anchor" aria-label="anchor" href="#maxsprt-and-empirical-calibration"></a>
+</h2>
+<div class="section level3">
+<h3 id="likelihood-profiles">Likelihood profiles<a class="anchor" aria-label="anchor" href="#likelihood-profiles"></a>
+</h3>
+<p>For empirical calibration, we’ll need more than just the likelihood
+at the maximum and at the null hypothesis. Instead, we’ll need
+information on the entire likelihood distribution. A convenient way to
+approximate the likelihood function is the likelihood profile. This
+profile provides, at various values the hazard ratio, the computed
+likelihood. The `Cyclops package has a convenient function for computing
+likelihood profiles:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">llProfileOutcome51LookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>,
-                                                            parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,
-                                                            bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">llProfileOutcome51LookT50</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 6 x 2
-##   point  value
-##   &lt;dbl&gt;  &lt;dbl&gt;
-## 1 -2.30 -1411.
-## 2 -2.29 -1410.
-## 3 -2.29 -1410.
-## 4 -2.28 -1409.
-## 5 -2.27 -1408.
-## 6 -2.26 -1407.</code></pre>
-<p>Here we’ve specified that the true hazard ratio is almost certainly in the [0.1, 10] range, so the profile will be restricted to this region. This function uses an adaptive grid, using more grid points if the likelihood shows higher curvature to avoid loss of information.</p>
-</div>
-<div id="fitting-a-null-distribution-using-likelihood-profiles" class="section level2">
-<h2 class="hasAnchor">
-<a href="#fitting-a-null-distribution-using-likelihood-profiles" class="anchor"></a>Fitting a null distribution using likelihood profiles</h2>
-<p>We can fit our null distribution as usual, using the point estimates and standard errors of the negative controls as described in the other vignettes, but when counts are low this may lead to biased estimates of the null distribution parameters. Especially for the earlier looks, we can expect counts to be low, and therefore it is better to take the full likelihood distribution of each negative control into account. Again the likelihood profiles are a convenient way of capturing the full likelihood function. Here we compute the likelihood profile for all negative controls (having outcome IDs 1-50) at time t = 50:</p>
+<code class="sourceCode R"><span><span class="va">llProfileOutcome51LookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html" class="external-link">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">fit</span>,</span>
+<span>  parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,</span>
+<span>  bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">llProfileOutcome51LookT50</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 x 2</span></span></span>
+<span><span class="co">##   point  value</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> -<span style="color: #BB0000;">2.30</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">411.</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> -<span style="color: #BB0000;">2.29</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">410.</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> -<span style="color: #BB0000;">2.29</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">410.</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> -<span style="color: #BB0000;">2.28</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">409.</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> -<span style="color: #BB0000;">2.27</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">408.</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">6</span> -<span style="color: #BB0000;">2.26</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">407.</span></span></span></code></pre>
+<p>Here we’ve specified that the true hazard ratio is almost certainly
+in the [0.1, 10] range, so the profile will be restricted to this
+region. This function uses an adaptive grid, using more grid points if
+the likelihood shows higher curvature to avoid loss of information. If
+we want, we could also plot the profile:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">negativeControlProfilesLookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">dataLookT50</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">50</span>, <span class="op">]</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">dataOutcomeIlookT50</span> <span class="op">&lt;-</span> <span class="va">dataLookT50</span><span class="op">[</span><span class="va">dataLookT50</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span>, <span class="op">]</span>
-  <span class="va">cyclopsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/createCyclopsData.html">createCyclopsData</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">~</span> <span class="va">exposure</span> , 
-                                   modelType <span class="op">=</span> <span class="st">"cox"</span>, 
-                                   data <span class="op">=</span> <span class="va">dataOutcomeIlookT50</span><span class="op">)</span>
-  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span>
-  <span class="va">llProfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>,
-                                              parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,
-                                              bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-  <span class="va">negativeControlProfilesLookT50</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">llProfile</span>
-<span class="op">}</span></code></pre></div>
-<p>We can use these profiles to fit the null distribution:</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">llProfileOutcome51LookT50</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">point</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="EmpiricalMaxSprtCalibrationVignette_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p>Note that the x-axis is the log of the hazard ratio, and the y-axis
+represents the log of the likelihood.</p>
+</div>
+<div class="section level3">
+<h3 id="fitting-a-null-distribution-using-likelihood-profiles">Fitting a null distribution using likelihood profiles<a class="anchor" aria-label="anchor" href="#fitting-a-null-distribution-using-likelihood-profiles"></a>
+</h3>
+<p>We can fit our null distribution as usual, using the point estimates
+and standard errors of the negative controls as described in the other
+vignettes, but when counts are low this may lead to biased estimates of
+the null distribution parameters. Especially for the earlier looks, we
+can expect counts to be low, and therefore it is better to take the full
+likelihood distribution of each negative control into account. Again the
+likelihood profiles are a convenient way of capturing the full
+likelihood function. Here we compute the likelihood profile for all
+negative controls (having outcome IDs 1-50) at time t = 50:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nullLookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitNullNonNormalLl.html">fitNullNonNormalLl</a></span><span class="op">(</span><span class="va">negativeControlProfilesLookT50</span><span class="op">)</span></code></pre></div>
-<pre><code>## Detected data following grid distribution</code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nullLookT50</span></code></pre></div>
-<pre><code>## Estimated null distribution
-## 
-##      Estimate
-## Mean   0.3145
-## SD     0.1860</code></pre>
-<p>This shows substantial systematic error in the negative controls.</p>
+<code class="sourceCode R"><span><span class="va">negativeControlProfilesLookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">dataLookT50</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">50</span>, <span class="op">]</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">dataOutcomeIlookT50</span> <span class="op">&lt;-</span> <span class="va">dataLookT50</span><span class="op">[</span><span class="va">dataLookT50</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span>, <span class="op">]</span></span>
+<span>  <span class="va">cyclopsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/createCyclopsData.html" class="external-link">createCyclopsData</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">~</span> <span class="va">exposure</span> , </span>
+<span>    modelType <span class="op">=</span> <span class="st">"cox"</span>, </span>
+<span>    data <span class="op">=</span> <span class="va">dataOutcomeIlookT50</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html" class="external-link">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span></span>
+<span>  <span class="va">llProfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html" class="external-link">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span></span>
+<span>    object <span class="op">=</span> <span class="va">fit</span>,</span>
+<span>    parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,</span>
+<span>    bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="va">negativeControlProfilesLookT50</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">llProfile</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>We can use these profiles to fit the null distribution:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nullLookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitNullNonNormalLl.html">fitNullNonNormalLl</a></span><span class="op">(</span><span class="va">negativeControlProfilesLookT50</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Detected data following grid distribution</span></span></code></pre>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nullLookT50</span></span></code></pre></div>
+<pre><code><span><span class="co">## Estimated null distribution</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##      Estimate</span></span>
+<span><span class="co">## Mean   0.3145</span></span>
+<span><span class="co">## SD     0.1860</span></span></code></pre>
+<p>This shows substantial systematic error in the negative controls,
+with mean and standard deviation away from 0.</p>
 </div>
-<div id="computing-a-calibrated-log-likelihood-ratio" class="section level2">
-<h2 class="hasAnchor">
-<a href="#computing-a-calibrated-log-likelihood-ratio" class="anchor"></a>Computing a calibrated log likelihood ratio</h2>
-<p>Using the fitted null distribution, and the likelihood profile of our outcome of interest, we can compute the empirically calibrated LLR:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">calibratedLlr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrateLlr.html">calibrateLlr</a></span><span class="op">(</span>null <span class="op">=</span> <span class="va">nullLookT50</span>,
-                              likelihoodApproximation <span class="op">=</span> <span class="va">llProfileOutcome51LookT50</span><span class="op">)</span></code></pre></div>
-<pre><code>## Detected data following grid distribution</code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">calibratedLlr</span></code></pre></div>
-<pre><code>## [1] 14.26661</code></pre>
-<p>Which is substantially lower than the uncalibrated LLR we computed earlier (LLR = 43.2221153). We can compare our calibrated LLR to the critical value computed earlier to determine whether there is a signal:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">calibratedLlr</span> <span class="op">&gt;</span> <span class="va">cv</span></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
+<div class="section level3">
+<h3 id="computing-a-calibrated-critical-value">Computing a calibrated critical value<a class="anchor" aria-label="anchor" href="#computing-a-calibrated-critical-value"></a>
+</h3>
+<p>Using the fitted null distribution, we can compute an empirically
+calibrated CV:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">calibratedCv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeCvBinomial.html">computeCvBinomial</a></span><span class="op">(</span></span>
+<span>  groupSizes <span class="op">=</span> <span class="va">outcomesPerLook</span>,</span>
+<span>  z <span class="op">=</span> <span class="va">unexposedTime</span> <span class="op">/</span> <span class="va">exposedTime</span>,</span>
+<span>  minimumEvents <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  nullMean <span class="op">=</span> <span class="va">nullLookT50</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  nullSd <span class="op">=</span> <span class="va">nullLookT50</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Selected alpha: 0.050 (least conservative value below 0.05)</span></span></code></pre>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">calibratedCv</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 16.71318</span></span>
+<span><span class="co">## attr(,"alpha")</span></span>
+<span><span class="co">## [1] 0.049571</span></span></code></pre>
+<p>Which is substantially higher than the uncalibrated CV we computed
+earlier (CV = 2.6893419). We can compare the LLR computed earlier to the
+calibrated critical value to determine whether there is a signal:</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">llr</span> <span class="op">&gt;</span> <span class="va">calibratedCv</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 </div>
-<div id="demonstrating-type-1-error-with-and-without-calibration" class="section level1">
-<h1 class="hasAnchor">
-<a href="#demonstrating-type-1-error-with-and-without-calibration" class="anchor"></a>Demonstrating type 1 error with and without calibration</h1>
-<p>It is always a good idea to compute the type 1 error based on the negative controls, to understand the operating characteristics of your study. Unfortunately, when doing sequential testing we cannot evaluate the overall performance of our surveillance until our final look at the data. Here we compute type 1 error both with and without calibration, comparing it to the nominal type 1 error, to demonstrate why empirical calibration can be important.</p>
-<div id="computing-the-calibrated-and-uncalibrated-log-likelihood-ratios" class="section level2">
-<h2 class="hasAnchor">
-<a href="#computing-the-calibrated-and-uncalibrated-log-likelihood-ratios" class="anchor"></a>Computing the calibrated and uncalibrated log likelihood ratios</h2>
-<p>We re-use the example code provided earlier to compute the calibrated and uncalibrated LLR for each negative control at each look. Note that this code will take some time to complete.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">allLlrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="op">)</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">t</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">lookTime</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  
-  <span class="co"># Compute likelihood profiles for all negative controls:</span>
-  <span class="va">negativeControlProfilesLookTt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>
-  <span class="va">dataLookTt</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="va">t</span>, <span class="op">]</span>
-  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">dataOutcomeIlookTt</span> <span class="op">&lt;-</span> <span class="va">dataLookTt</span><span class="op">[</span><span class="va">dataLookTt</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span>, <span class="op">]</span>
-    <span class="va">cyclopsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/createCyclopsData.html">createCyclopsData</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">~</span> <span class="va">exposure</span> , 
-                                     modelType <span class="op">=</span> <span class="st">"cox"</span>, 
-                                     data <span class="op">=</span> <span class="va">dataOutcomeIlookTt</span><span class="op">)</span>
-    <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span>
-    <span class="va">llProfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>,
-                                                parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,
-                                                bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-    <span class="va">negativeControlProfilesLookTt</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">llProfile</span>
-  <span class="op">}</span>
-  
-  <span class="co"># Fit null distribution:</span>
-  <span class="va">nullLookTt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitNullNonNormalLl.html">fitNullNonNormalLl</a></span><span class="op">(</span><span class="va">negativeControlProfilesLookTt</span><span class="op">)</span>
-
-  <span class="co"># Compute calibrated and uncalibrated LLRs for all negative controls:</span>
-  <span class="va">llrsLookTt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-  <span class="va">calibratedLlrsLookTt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">dataOutcomeIlookTt</span> <span class="op">&lt;-</span> <span class="va">dataLookTt</span><span class="op">[</span><span class="va">dataLookTt</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span>, <span class="op">]</span>
-    <span class="va">cyclopsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/createCyclopsData.html">createCyclopsData</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">~</span> <span class="va">exposure</span> , 
-                                     modelType <span class="op">=</span> <span class="st">"cox"</span>, 
-                                     data <span class="op">=</span> <span class="va">dataOutcomeIlookTt</span><span class="op">)</span>
-    <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span>
-    <span class="va">llProfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>,
-                                                parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,
-                                                bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-    
-    <span class="co"># Calibrated LLR:</span>
-    <span class="va">calibrateLlr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrateLlr.html">calibrateLlr</a></span><span class="op">(</span>null <span class="op">=</span> <span class="va">nullLookTt</span>, 
-                 likelihoodApproximation <span class="op">=</span> <span class="va">llProfile</span><span class="op">)</span>
-    <span class="va">calibratedLlrsLookTt</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">calibrateLlr</span>
-    
-    <span class="co"># Uncalibrated LLR:</span>
-    <span class="va">llNull</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>,
-                                             parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,
-                                             x <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">$</span><span class="va">value</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">return_flag</span> <span class="op">==</span> <span class="st">"ILLCONDITIONED"</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">llr</span> <span class="op">&lt;-</span> <span class="fl">0</span>
-    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-      <span class="va">llr</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">log_likelihood</span> <span class="op">-</span> <span class="va">llNull</span>
-    <span class="op">}</span>
-    <span class="va">llrsLookTt</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">llr</span>
-  <span class="op">}</span>
-  
-  <span class="co"># Store in a data frame:</span>
-  <span class="va">allLlrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">allLlrs</span>,
-                   <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>t <span class="op">=</span> <span class="va">t</span>,
-                              outcomeId <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span>,
-                              llr <span class="op">=</span> <span class="va">llrsLookTt</span>,
-                              calibrateLlr <span class="op">=</span> <span class="va">calibratedLlrsLookTt</span><span class="op">)</span><span class="op">)</span>
-  
-<span class="op">}</span></code></pre></div>
-<p>Here, for clarity we fit the Cox model and compute the likelihood profiles twice, once for fitting the null distribution, and once to compute the LLRs. Of course it would be more efficient to remove this duplication, but it might make the code harder to read.</p>
-</div>
-<div id="computing-critical-values-for-all-negative-controls" class="section level2">
-<h2 class="hasAnchor">
-<a href="#computing-critical-values-for-all-negative-controls" class="anchor"></a>Computing critical values for all negative controls</h2>
-<p>We re-use the code shown earlier to compute the critical value for each negative control:</p>
+<div class="section level2">
+<h2 id="demonstrating-type-1-error-with-and-without-calibration">Demonstrating type 1 error with and without calibration<a class="anchor" aria-label="anchor" href="#demonstrating-type-1-error-with-and-without-calibration"></a>
+</h2>
+<p>It is always a good idea to compute the type 1 error based on the
+negative controls, to understand the operating characteristics of your
+study. Unfortunately, when doing sequential testing we cannot evaluate
+the overall performance of our surveillance until our final look at the
+data. Here we compute type 1 error both with and without calibration,
+comparing it to the nominal type 1 error, to demonstrate why empirical
+calibration can be important.</p>
+<div class="section level3">
+<h3 id="computing-log-likelihood-ratios-and-uncalibrated-and-calibrated-critical-values">Computing log likelihood ratios and (uncalibrated and calibrated)
+critical values<a class="anchor" aria-label="anchor" href="#computing-log-likelihood-ratios-and-uncalibrated-and-calibrated-critical-values"></a>
+</h3>
+<p>We re-use the example code provided earlier to compute the log
+likelihood ratios, uncalibrated critical values and calibrated critical
+values for each negative control at each look. Note that this code will
+take some time to complete.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">dataOutcomeI</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span>, <span class="op">]</span>
-  <span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html">aggregate</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">~</span> <span class="va">lookTime</span>, <span class="va">dataOutcomeI</span>, <span class="va">sum</span><span class="op">)</span>
-  <span class="co"># Need incremental outcomes per look:</span>
-  <span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">outcome</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span><span class="op">(</span><span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">lookTime</span><span class="op">)</span><span class="op">]</span>
-  <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">-</span> <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>
-  
-  <span class="va">exposedTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">exposure</span> <span class="op">==</span> <span class="cn">TRUE</span> <span class="op">&amp;</span> 
-                                         <span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">100</span><span class="op">]</span><span class="op">)</span>
-  <span class="va">unexposedTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">exposure</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">&amp;</span> 
-                                            <span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">100</span><span class="op">]</span><span class="op">)</span>
-  <span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeCvBinomial.html">computeCvBinomial</a></span><span class="op">(</span>groupSizes <span class="op">=</span> <span class="va">outcomesPerLook</span>,
-                          z <span class="op">=</span> <span class="va">unexposedTime</span> <span class="op">/</span> <span class="va">exposedTime</span>,
-                          minimumEvents <span class="op">=</span> <span class="fl">1</span>,
-                          alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
-  <span class="va">cvs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">cv</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">allCvsAndLlrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">t</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">lookTime</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span>  <span class="co"># Compute likelihood profiles and LLR for all negative controls:</span></span>
+<span>  <span class="va">negativeControlProfilesLookTt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">llrsLookTt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">dataLookTt</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="va">t</span>, <span class="op">]</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">dataOutcomeIlookTt</span> <span class="op">&lt;-</span> <span class="va">dataLookTt</span><span class="op">[</span><span class="va">dataLookTt</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span>, <span class="op">]</span></span>
+<span>    <span class="va">cyclopsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/createCyclopsData.html" class="external-link">createCyclopsData</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">~</span> <span class="va">exposure</span>,</span>
+<span>      modelType <span class="op">=</span> <span class="st">"cox"</span>,</span>
+<span>      data <span class="op">=</span> <span class="va">dataOutcomeIlookTt</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html" class="external-link">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span></span>
+<span>    </span>
+<span>    <span class="co"># likelihood profile:</span></span>
+<span>    <span class="va">llProfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html" class="external-link">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span></span>
+<span>      object <span class="op">=</span> <span class="va">fit</span>,</span>
+<span>      parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,</span>
+<span>      bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="va">negativeControlProfilesLookTt</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">llProfile</span></span>
+<span>    </span>
+<span>    <span class="co"># LLR:</span></span>
+<span>    <span class="va">llNull</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html" class="external-link">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span></span>
+<span>      object <span class="op">=</span> <span class="va">fit</span>,</span>
+<span>      parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,</span>
+<span>      x <span class="op">=</span> <span class="fl">0</span></span>
+<span>    <span class="op">)</span><span class="op">$</span><span class="va">value</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">return_flag</span> <span class="op">==</span> <span class="st">"ILLCONDITIONED"</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">llr</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="va">llr</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">log_likelihood</span> <span class="op">-</span> <span class="va">llNull</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="va">llrsLookTt</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">llr</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># Fit null distribution:</span></span>
+<span>  <span class="va">nullLookTt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitNullNonNormalLl.html">fitNullNonNormalLl</a></span><span class="op">(</span><span class="va">negativeControlProfilesLookTt</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Compute calibrated and uncalibrated CV for all negative controls:</span></span>
+<span>  <span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">calibratedCvsLookT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">dataOutcomeI</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span>, <span class="op">]</span></span>
+<span>    <span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">~</span> <span class="va">lookTime</span>, <span class="va">dataOutcomeI</span>, <span class="va">sum</span><span class="op">)</span></span>
+<span>    <span class="co"># Need incremental outcomes per look:</span></span>
+<span>    <span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">outcome</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">lookTime</span><span class="op">)</span><span class="op">]</span></span>
+<span>    <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">-</span> <span class="va">outcomesPerLook</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span></span>
+<span>    </span>
+<span>    <span class="va">exposedTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">exposure</span> <span class="op">==</span> <span class="cn">TRUE</span> <span class="op">&amp;</span></span>
+<span>                                           <span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">100</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="va">unexposedTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">exposure</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">&amp;</span></span>
+<span>                                             <span class="va">dataOutcomeI</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">100</span><span class="op">]</span><span class="op">)</span></span>
+<span>    </span>
+<span>    <span class="co"># Note: uncalibrated CV will be same for every t, but computing in loop </span></span>
+<span>    <span class="co"># over t for clarity of code:</span></span>
+<span>    <span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeCvBinomial.html">computeCvBinomial</a></span><span class="op">(</span></span>
+<span>      groupSizes <span class="op">=</span> <span class="va">outcomesPerLook</span>,</span>
+<span>      z <span class="op">=</span> <span class="va">unexposedTime</span> <span class="op">/</span> <span class="va">exposedTime</span>,</span>
+<span>      minimumEvents <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>      alpha <span class="op">=</span> <span class="fl">0.05</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="va">cvs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">cv</span></span>
+<span>    </span>
+<span>    <span class="va">calibratedCv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeCvBinomial.html">computeCvBinomial</a></span><span class="op">(</span></span>
+<span>      groupSizes <span class="op">=</span> <span class="va">outcomesPerLook</span>,</span>
+<span>      z <span class="op">=</span> <span class="va">unexposedTime</span> <span class="op">/</span> <span class="va">exposedTime</span>,</span>
+<span>      minimumEvents <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>      alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>      nullMean <span class="op">=</span> <span class="va">nullLookTt</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>      nullSd <span class="op">=</span> <span class="va">nullLookTt</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="va">calibratedCvsLookT</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">calibratedCv</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># Store in a data frame:</span></span>
+<span>  <span class="va">allCvsAndLlrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>    <span class="va">allCvsAndLlrs</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      t <span class="op">=</span> <span class="va">t</span>,</span>
+<span>      outcomeId <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span>,</span>
+<span>      llr <span class="op">=</span> <span class="va">llrsLookTt</span>,</span>
+<span>      cv <span class="op">=</span> <span class="va">cvs</span>,</span>
+<span>      calibrateCv <span class="op">=</span> <span class="va">calibratedCvsLookT</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
-<div id="computing-overall-type-1-error" class="section level2">
-<h2 class="hasAnchor">
-<a href="#computing-overall-type-1-error" class="anchor"></a>Computing overall type 1 error</h2>
-<p>We compare the computed LLRs to the computed critical values to determine how often a signal is generated for the negative controls (where the null hypothesis is true):</p>
+<div class="section level3">
+<h3 id="computing-overall-type-1-error">Computing overall type 1 error<a class="anchor" aria-label="anchor" href="#computing-overall-type-1-error"></a>
+</h3>
+<p>We compare the computed LLRs to the computed critical values to
+determine how often a signal is generated for the negative controls
+(where the null hypothesis is true):</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">signals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">calibratedSignals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">)</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">cv</span> <span class="op">&lt;-</span> <span class="va">cvs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
-  <span class="va">signals</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/any.html">any</a></span><span class="op">(</span><span class="va">allLlrs</span><span class="op">$</span><span class="va">llr</span><span class="op">[</span><span class="va">allLlrs</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span><span class="op">]</span> <span class="op">&gt;</span> <span class="va">cv</span><span class="op">)</span>
-  <span class="va">calibratedSignals</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/any.html">any</a></span><span class="op">(</span><span class="va">allLlrs</span><span class="op">$</span><span class="va">calibrateLlr</span><span class="op">[</span><span class="va">allLlrs</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span><span class="op">]</span> <span class="op">&gt;</span> <span class="va">cv</span><span class="op">)</span>
-<span class="op">}</span>
-<span class="co"># Type 1 error when not calibrated (should be 0.05):</span>
-<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">signals</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 0.34</code></pre>
+<code class="sourceCode R"><span><span class="va">signals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">calibratedSignals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">idx</span> <span class="op">&lt;-</span> <span class="va">allCvsAndLlrs</span><span class="op">$</span><span class="va">outcomeId</span> <span class="op">==</span> <span class="va">i</span></span>
+<span>  <span class="va">signals</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">allCvsAndLlrs</span><span class="op">$</span><span class="va">llr</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span> <span class="op">&gt;</span> <span class="va">allCvsAndLlrs</span><span class="op">$</span><span class="va">cv</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">calibratedSignals</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">allCvsAndLlrs</span><span class="op">$</span><span class="va">llr</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span> <span class="op">&gt;</span> <span class="va">allCvsAndLlrs</span><span class="op">$</span><span class="va">calibrateCv</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co"># Type 1 error when not calibrated (should be 0.05):</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">signals</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 0.34</span></span></code></pre>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Type 2 error when calibrated (should be 0.05):</span>
-<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">calibratedSignals</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 0.02</code></pre>
-<p>This shows that type 1 error is much closer to nominal when using empirical calibration.</p>
+<code class="sourceCode R"><span><span class="co"># Type 2 error when calibrated (should be 0.05):</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">calibratedSignals</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 0.04</span></span></code></pre>
+<p>This shows that type 1 error is much closer to nominal when using
+empirical calibration.</p>
 </div>
 </div>
   </div>
@@ -400,11 +531,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Martijn Schuemie, Marc Suchard.</p>
+  <p></p>
+<p>Developed by Martijn Schuemie, Marc Suchard.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>
@@ -412,6 +545,8 @@
 
   
 
+
+  
 
   </body>
 </html>

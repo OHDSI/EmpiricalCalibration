@@ -68,7 +68,7 @@ To install the latest development version directly from GitHub, use:
 ```r
 install.packages("remotes")
 library(remotes)
-install_github("ohdsi/EmpiricalCalibration")
+install_github("ohdsi/EmpiricalCalibration", ref = "develop")
 ```
   
 User Documentation
@@ -76,6 +76,7 @@ User Documentation
 Documentation can be found on the [package website](https://ohdsi.github.io/EmpiricalCalibration/).
 
 PDF versions of the documentation is also available:
+
 * Vignette: [Empirical calibration of p-values](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalPCalibrationVignette.pdf)
 * Vignette: [Empirical calibration of confidence intervals](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalCiCalibrationVignette.pdf)
 * Vignette: [Empirical calibration and MaxSPRT](https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalMaxSprtCalibrationVignette.pdf)

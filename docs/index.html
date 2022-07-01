@@ -28,6 +28,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -40,26 +42,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">3.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="news/index.html">Changelog</a>
-</li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -76,13 +69,16 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://ohdsi.github.io/Hades"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
 <li>
-  <a href="https://github.com/OHDSI/EmpiricalCalibration/">
+  <a href="https://github.com/OHDSI/EmpiricalCalibration/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -100,21 +96,21 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="empiricalcalibration" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#empiricalcalibration" class="anchor"></a>EmpiricalCalibration</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="empiricalcalibration">EmpiricalCalibration<a class="anchor" aria-label="anchor" href="#empiricalcalibration"></a>
+</h1></div>
 
-<p>EmpiricalCalibration is part of <a href="https://ohdsi.github.io/Hades/">HADES</a>.</p>
+<p>EmpiricalCalibration is part of <a href="https://ohdsi.github.io/Hades/" class="external-link">HADES</a>.</p>
 </div>
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
-<p>This R package contains routines for performing empirical calibration of observational study estimates. By using a set of negative control hypotheses we can estimate the empirical null distribution of a particular observational study setup. This empirical null distribution can be used to compute a calibrated p-value, which reflects the probability of observing an estimated effect size when the null hypothesis is true taking both random and systematic error into account, as described in the paper <a href="http://dx.doi.org/10.1002/sim.5925">Interpreting observational studies: why empirical calibration is needed to correct p-values</a>.</p>
-<p>Also supported is empirical calibration of confidence intervals, based on the results for a set of negative and positive controls, as described in the paper <a href="https://doi.org/10.1073/pnas.1708282114">Empirical confidence interval calibration for population-level effect estimation studies in observational healthcare data</a>.</p>
+<div class="section level1">
+<h1 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h1>
+<p>This R package contains routines for performing empirical calibration of observational study estimates. By using a set of negative control hypotheses we can estimate the empirical null distribution of a particular observational study setup. This empirical null distribution can be used to compute a calibrated p-value, which reflects the probability of observing an estimated effect size when the null hypothesis is true taking both random and systematic error into account, as described in the paper <a href="http://dx.doi.org/10.1002/sim.5925" class="external-link">Interpreting observational studies: why empirical calibration is needed to correct p-values</a>.</p>
+<p>Also supported is empirical calibration of confidence intervals, based on the results for a set of negative and positive controls, as described in the paper <a href="https://doi.org/10.1073/pnas.1708282114" class="external-link">Empirical confidence interval calibration for population-level effect estimation studies in observational healthcare data</a>.</p>
 </div>
-<div id="features" class="section level1">
-<h1 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h1>
+<div class="section level1">
+<h1 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h1>
 <ul>
 <li>Estimate the empirical null distribution given the effect estimates of a set of negative controls.</li>
 <li>Estimate the calibrated p-value of a given hypothesis given the estimated empirical null distribution.</li>
@@ -125,10 +121,10 @@
 <li>Contains the data sets from the papers for illustration.</li>
 </ul>
 </div>
-<div id="screenshots-and-examples" class="section level1">
-<h1 class="hasAnchor">
-<a href="#screenshots-and-examples" class="anchor"></a>Screenshots and examples</h1>
-<p><img src="https://github.com/OHDSI/EmpiricalCalibration/raw/master/extras/plot.png" alt="Calibration effect plot" title="Calibration effect plot"></p>
+<div class="section level1">
+<h1 id="screenshots-and-examples">Screenshots and examples<a class="anchor" aria-label="anchor" href="#screenshots-and-examples"></a>
+</h1>
+<p><img src="https://github.com/OHDSI/EmpiricalCalibration/raw/main/extras/plot.png" alt="Calibration effect plot" title="Calibration effect plot"></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(sccs) <span class="co">#Load one of the included data sets</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>negatives <span class="ot">&lt;-</span> sccs[sccs<span class="sc">$</span>groundTruth <span class="sc">==</span> <span class="dv">0</span>,] <span class="co">#Select the negative controls</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>null <span class="ot">&lt;-</span> <span class="fu">fitNull</span>(<span class="at">logRr =</span> negatives<span class="sc">$</span>logRr, <span class="at">seLogRr =</span> negatives<span class="sc">$</span>seLogRr) <span class="co">#Fit the null distribution</span></span>
@@ -145,70 +141,70 @@
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">calibrateP</span>(<span class="at">null =</span> null, <span class="at">logRr =</span> positive<span class="sc">$</span>logRr, <span class="at">seLogRr =</span> positive<span class="sc">$</span>seLogRr) <span class="co">#Compute calibrated p-value</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">0.8390598</span></span></code></pre></div>
 </div>
-<div id="technology" class="section level1">
-<h1 class="hasAnchor">
-<a href="#technology" class="anchor"></a>Technology</h1>
+<div class="section level1">
+<h1 id="technology">Technology<a class="anchor" aria-label="anchor" href="#technology"></a>
+</h1>
 <p>This is a pure R package.</p>
 </div>
-<div id="system-requirements" class="section level1">
-<h1 class="hasAnchor">
-<a href="#system-requirements" class="anchor"></a>System requirements</h1>
+<div class="section level1">
+<h1 id="system-requirements">System requirements<a class="anchor" aria-label="anchor" href="#system-requirements"></a>
+</h1>
 <p>Requires R (version 3.1.0 or newer).</p>
 </div>
-<div id="installation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h1>
+<div class="section level1">
+<h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h1>
 <p>In R, use the following commands to install the latest stable version from CRAN:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"EmpiricalCalibration"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"EmpiricalCalibration"</span><span class="op">)</span></span></code></pre></div>
 <p>To install the latest development version directly from GitHub, use:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org">remotes</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/remotes/man/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"ohdsi/EmpiricalCalibration"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ohdsi/EmpiricalCalibration"</span>, ref <span class="op">=</span> <span class="st">"develop"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="user-documentation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#user-documentation" class="anchor"></a>User Documentation</h1>
-<p>Documentation can be found on the <a href="https://ohdsi.github.io/EmpiricalCalibration/">package website</a>.</p>
+<div class="section level1">
+<h1 id="user-documentation">User Documentation<a class="anchor" aria-label="anchor" href="#user-documentation"></a>
+</h1>
+<p>Documentation can be found on the <a href="https://ohdsi.github.io/EmpiricalCalibration/" class="external-link">package website</a>.</p>
 <p>PDF versions of the documentation is also available:</p>
 <ul>
-<li>Vignette: <a href="https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalPCalibrationVignette.pdf">Empirical calibration of p-values</a>
+<li>Vignette: <a href="https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalPCalibrationVignette.pdf" class="external-link">Empirical calibration of p-values</a>
 </li>
-<li>Vignette: <a href="https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalCiCalibrationVignette.pdf">Empirical calibration of confidence intervals</a>
+<li>Vignette: <a href="https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalCiCalibrationVignette.pdf" class="external-link">Empirical calibration of confidence intervals</a>
 </li>
-<li>Vignette: <a href="https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/inst/doc/EmpiricalMaxSprtCalibrationVignette.pdf">Empirical calibration and MaxSPRT</a>
+<li>Vignette: <a href="https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/inst/doc/EmpiricalMaxSprtCalibrationVignette.pdf" class="external-link">Empirical calibration and MaxSPRT</a>
 </li>
-<li>Package manual: <a href="https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/master/extras/EmpiricalCalibration.pdf">EmpiricalCalibration.pdf</a>
+<li>Package manual: <a href="https://raw.githubusercontent.com/OHDSI/EmpiricalCalibration/main/extras/EmpiricalCalibration.pdf" class="external-link">EmpiricalCalibration.pdf</a>
 </li>
 </ul>
 </div>
-<div id="support" class="section level1">
-<h1 class="hasAnchor">
-<a href="#support" class="anchor"></a>Support</h1>
+<div class="section level1">
+<h1 id="support">Support<a class="anchor" aria-label="anchor" href="#support"></a>
+</h1>
 <ul>
-<li>Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
+<li>Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers" class="external-link">OHDSI Forum</a>
 </li>
-<li>We use the <a href="https://github.com/OHDSI/EmpiricalCalibration/issues">GitHub issue tracker</a> for all bugs/issues/enhancements</li>
+<li>We use the <a href="https://github.com/OHDSI/EmpiricalCalibration/issues" class="external-link">GitHub issue tracker</a> for all bugs/issues/enhancements</li>
 </ul>
 </div>
-<div id="contributing" class="section level1">
-<h1 class="hasAnchor">
-<a href="#contributing" class="anchor"></a>Contributing</h1>
-<p>Read <a href="https://ohdsi.github.io/Hades/contribute.html">here</a> how you can contribute to this package.</p>
+<div class="section level1">
+<h1 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h1>
+<p>Read <a href="https://ohdsi.github.io/Hades/contribute.html" class="external-link">here</a> how you can contribute to this package.</p>
 </div>
-<div id="license" class="section level1">
-<h1 class="hasAnchor">
-<a href="#license" class="anchor"></a>License</h1>
+<div class="section level1">
+<h1 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h1>
 <p>EmpiricalCalibration is licensed under Apache License 2.0</p>
 </div>
-<div id="development" class="section level1">
-<h1 class="hasAnchor">
-<a href="#development" class="anchor"></a>Development</h1>
+<div class="section level1">
+<h1 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
+</h1>
 <p>This package has been developed in RStudio.</p>
-<div id="development-status" class="section level3">
-<h3 class="hasAnchor">
-<a href="#development-status" class="anchor"></a>Development status</h3>
+<div class="section level3">
+<h3 id="development-status">Development status<a class="anchor" aria-label="anchor" href="#development-status"></a>
+</h3>
 <p>This package is ready for use.</p>
 </div>
 </div>
@@ -217,56 +213,60 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=EmpiricalCalibration">https://​cloud.r-project.org/​package=EmpiricalCalibration</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/OHDSI/EmpiricalCalibration/">https://​github.com/​OHDSI/​EmpiricalCalibration/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/OHDSI/EmpiricalCalibration/issues">https://​github.com/​OHDSI/​EmpiricalCalibration/​issues</a>
-</li>
-<li>Ask a question at <br><a href="http://forums.ohdsi.org">http://​forums.ohdsi.org</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=EmpiricalCalibration" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/OHDSI/EmpiricalCalibration/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/OHDSI/EmpiricalCalibration/issues" class="external-link">Report a bug</a></li>
+<li><a href="http://forums.ohdsi.org" class="external-link">Ask a question</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>Apache License 2.0</li>
 </ul>
 </div>
+
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing EmpiricalCalibration</a></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>Martijn Schuemie <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0817-5361" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Marc Suchard <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9818-479X" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html#citation">Citing EmpiricalCalibration</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/OHDSI/EmpiricalCalibration/actions?query=workflow%3AR-CMD-check"><img src="https://github.com/OHDSI/EmpiricalCalibration/workflows/R-CMD-check/badge.svg" alt="Build Status"></a></li>
-<li><a href="https://cran.r-project.org/package=EmpiricalCalibration"><img src="http://www.r-pkg.org/badges/version/EmpiricalCalibration" alt="CRAN_Status_Badge"></a></li>
-<li><a href="https://cran.r-project.org/package=EmpiricalCalibration"><img src="http://cranlogs.r-pkg.org/badges/EmpiricalCalibration" alt="CRAN_Status_Badge"></a></li>
+<li>Martijn Schuemie <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0817-5361" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Marc Suchard <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9818-479X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/OHDSI/EmpiricalCalibration/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/OHDSI/EmpiricalCalibration/workflows/R-CMD-check/badge.svg" alt="Build Status"></a></li>
+<li><a href="https://codecov.io/github/OHDSI/EmpiricalCalibration?branch=main" class="external-link"><img src="https://codecov.io/github/OHDSI/EmpiricalCalibration/coverage.svg?branch=main" alt="codecov.io"></a></li>
+<li><a href="https://cran.r-project.org/package=EmpiricalCalibration" class="external-link"><img src="http://www.r-pkg.org/badges/version/EmpiricalCalibration" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://cran.r-project.org/package=EmpiricalCalibration" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/EmpiricalCalibration" alt="CRAN_Status_Badge"></a></li>
+</ul>
 </div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Martijn Schuemie, Marc Suchard.</p>
+  <p></p>
+<p>Developed by Martijn Schuemie, Marc Suchard.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>
@@ -274,6 +274,8 @@
 
   
 
+
+  
 
   </body>
 </html>
