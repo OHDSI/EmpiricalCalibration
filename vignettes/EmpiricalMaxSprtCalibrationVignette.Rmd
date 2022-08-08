@@ -16,6 +16,9 @@ vignette: >
 library(EmpiricalCalibration)
 allCvsAndLlrs <- readRDS("allCvsAndLlrs.rds")
 set.seed(123)
+
+doEval <- require("Cyclops", quietly = TRUE)
+cv <- NA
 ```
   
 # Introduction
@@ -30,7 +33,7 @@ This vignette demonstrates combining adjusting for sequential testing through Ma
   
 For this vignette we will use simulated data that can be generated using the `simulateMaxSprtData` function
   
-```{r}
+```{r eval=doEval}
 maxSprtSimulationData <- simulateMaxSprtData(
   n = 10000,
   pExposure = 0.5,
@@ -57,7 +60,7 @@ MaxSPRT (Maximum Sequential Probability Ratio Testing) is a well-known procedure
   
 In this case, because we have survival data we will use a Cox proportional hazards model. For any outcome, at any look, we can fit a Cox model using the `Cyclops` package. In this example, we use outcome 51, and the look at t = 50:
   
-```{r warning=FALSE}
+```{r warning=FALSE,eval=doEval}
 library(Cyclops)
 library(survival)
 
@@ -76,14 +79,14 @@ coef(fit)
 For MaxSPRT, we're not interested in the point estimate of the hazard ratio, but rather the LLR. This is the log of the ratio between the maximum likelihood, and the likelihood of the null hypothesis.  The maximum likelihood is already available from the `fit` object:
 
 
-```{r}
+```{r eval=doEval}
 # Maximum log likelihood:
 fit$log_likelihood
 ```
 
 We can use Cyclops to compute the log likelihood of parameter value 0 (hazard ratio = 1):
 
-```{r}
+```{r eval=doEval}
 llNull <- getCyclopsProfileLogLikelihood(
   object = fit,
   parm = "exposureTRUE",
@@ -94,7 +97,7 @@ llNull
 
 And we can compute the LLR by subtracting the two. Note that we use a single-sided test, so we will set LLR to 0 if the point estimate (the maximum likelihood estimate) is below 0. It might also be the case that no maximum likelihood estimate exists, for example because there are zero counts, in which case we also set the LLR to 0:
 
-```{r}
+```{r eval=doEval}
 if (fit$return_flag == "ILLCONDITIONED" || coef(fit) < 0) {
   llr <- 0
 } else {
@@ -107,7 +110,7 @@ llr
 
 The critical value for the LLR is computed based on the total number of looks that are expected to be made, and the expected sample size at each look. Because we have already simulated all looks, we will use the actual sample sizes instead of expected ones. For Cox models it is recommended to use the binomial critical value computation:
 
-```{r}
+```{r eval=doEval}
 outcomesPerLook <- aggregate(outcome ~ lookTime, dataOutcome51, sum)
 # Need incremental outcomes per look:
 outcomesPerLook <- outcomesPerLook$outcome[order(outcomesPerLook$lookTime)]
@@ -128,7 +131,7 @@ cv
 
 By comparing the LLR to the critical value we can determine whether there is a signal:
 
-```{r}
+```{r eval=doEval}
 llr > cv
 ```
 
@@ -138,7 +141,7 @@ llr > cv
 
 For empirical calibration, we'll need more than just the likelihood at the maximum and at the null hypothesis. Instead, we'll need information on the entire likelihood distribution. A convenient way to approximate the likelihood function is the likelihood profile. This profile provides, at various values the hazard ratio, the computed likelihood. The `Cyclops package has a convenient function for computing likelihood profiles:
 
-```{r}
+```{r eval=doEval}
 llProfileOutcome51LookT50 <- getCyclopsProfileLogLikelihood(
   object = fit,
   parm = "exposureTRUE",
@@ -149,7 +152,7 @@ head(llProfileOutcome51LookT50)
 
 Here we've specified that the true hazard ratio is almost certainly in the [0.1, 10] range, so the profile will be restricted to this region. This function uses an adaptive grid, using more grid points if the likelihood shows higher curvature to avoid loss of information. If we want, we could also plot the profile:
 
-```{r}
+```{r eval=doEval}
 library(ggplot2)
 ggplot(llProfileOutcome51LookT50, aes(x = point, y = value)) +
   geom_line()
@@ -161,7 +164,7 @@ Note that the x-axis is the log of the hazard ratio, and the y-axis represents t
 
 We can fit our null distribution as usual, using the point estimates and standard errors of the negative controls as described in the other vignettes, but when counts are low this may lead to biased estimates of the null distribution parameters. Especially for the earlier looks, we can expect counts to be low, and therefore it is better to take the full likelihood distribution of each negative control into account. Again the likelihood profiles are a convenient way of capturing the full likelihood function. Here we compute the likelihood profile for all negative controls (having outcome IDs 1-50) at time t = 50:
 
-```{r}
+```{r eval=doEval}
 negativeControlProfilesLookT50 <- list()
 dataLookT50 <- maxSprtSimulationData[maxSprtSimulationData$lookTime == 50, ]
 for (i in 1:50) {
@@ -183,7 +186,7 @@ for (i in 1:50) {
 
 We can use these profiles to fit the null distribution:
 
-```{r}
+```{r eval=doEval}
 nullLookT50 <- fitNullNonNormalLl(negativeControlProfilesLookT50)
 nullLookT50
 ```
@@ -194,7 +197,7 @@ This shows substantial systematic error in the negative controls, with mean and 
 
 Using the fitted null distribution, we can compute an empirically calibrated CV:
 
-```{r}
+```{r eval=doEval}
 calibratedCv <- computeCvBinomial(
   groupSizes = outcomesPerLook,
   z = unexposedTime / exposedTime,
@@ -208,7 +211,7 @@ calibratedCv
 
 Which is substantially higher than the uncalibrated CV we computed earlier (CV = `r cv`). We can compare the LLR computed earlier to the calibrated critical value to determine whether there is a signal:
 
-```{r}
+```{r eval=doEval}
 llr > calibratedCv
 ```
 
@@ -316,7 +319,7 @@ for (t in unique(maxSprtSimulationData$lookTime)) {
 
 We compare the computed LLRs to the computed critical values to determine how often a signal is generated for the negative controls (where the null hypothesis is true):
 
-```{r}
+```{r eval=doEval}
 signals <- c()
 calibratedSignals <- c()
 for (i in 1:50) {

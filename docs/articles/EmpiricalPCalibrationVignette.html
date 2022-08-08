@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -91,7 +91,7 @@
                         <h4 data-toc-skip class="author">Martijn J.
 Schuemie, Marc A. Suchard</h4>
             
-            <h4 data-toc-skip class="date">2022-07-01</h4>
+            <h4 data-toc-skip class="date">2022-08-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/HEAD/vignettes/EmpiricalPCalibrationVignette.Rmd" class="external-link"><code>vignettes/EmpiricalPCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalPCalibrationVignette.Rmd</code></div>
@@ -277,10 +277,10 @@ purpose:</p>
 <pre><code><span><span class="co">## Estimated null distribution (using MCMC)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##           Estimate lower .95 upper .95</span></span>
-<span><span class="co">## Mean       0.79102   0.67292    0.9058</span></span>
-<span><span class="co">## Precision 11.87546   6.03391   23.3770</span></span>
+<span><span class="co">## Mean       0.79228   0.67137    0.9046</span></span>
+<span><span class="co">## Precision 11.97582   6.13060   23.3987</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Acceptance rate: 0.328966710332897</span></span></code></pre>
+<span><span class="co">## Acceptance rate: 0.326506734932651</span></span></code></pre>
 <p>We see that there is uncertainty around the estimates of the mean and
 precision (= 1/SD^2), as expressed in the 95% credible intervals. This
 uncertainty can be reduced by either increasing the number of negative
@@ -301,8 +301,8 @@ well as the 95% credible interval:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrateP.html">calibrateP</a></span><span class="op">(</span><span class="va">null</span>, <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">logRr</span>, <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">seLogRr</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
-<pre><code><span><span class="co">##           p    lb95ci    ub95ci</span></span>
-<span><span class="co">## 1 0.8357027 0.5442546 0.9925032</span></span></code></pre>
+<pre><code><span><span class="co">##           p    lb95ci   ub95ci</span></span>
+<span><span class="co">## 1 0.8332231 0.5509142 0.992162</span></span></code></pre>
 <p>Note that there is uncertainty around the calibrated p-value as
 expressed in the 95% credible interval.</p>
 <p>We can also visualize the uncertainty in the p-value calibration by

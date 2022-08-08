@@ -1,6 +1,5 @@
 library(testthat)
 library(EmpiricalCalibration)
-library(Sequential)
 
 test_that("check computeCvPoisson boundary conditions", {
   expect_error(computeCvPoisson(c(-1, 2)), "should be positive")
@@ -24,6 +23,7 @@ test_that("check computeCvBinomial boundary conditions", {
 })
 
 test_that("computeCvPoisson has same output as Sequential", {
+  skip_if_not_installed("Sequential")
   # Compare the output of Poisson CV computed using the implementation in this package with output from the implementation in Sequential package
 
   groupSizes <- rep(1, 10)
@@ -41,6 +41,7 @@ test_that("computeCvPoisson has same output as Sequential", {
 })
 
 test_that("computeCvBinomial has same output as Sequential", {
+  skip_if_not_installed("Sequential")
   # Compare the output of Binomial CV computed using the implementation in this package with output from the implementation in Sequential package
 
   groupSizes <- rep(1, 10)

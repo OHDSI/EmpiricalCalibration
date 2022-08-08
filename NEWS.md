@@ -1,3 +1,11 @@
+EmpiricalCalibration 3.1.1
+==========================
+
+Changes.
+
+1. Making sure we pass R check even if suggested packages are unavailable, as required by CRAN.
+
+
 EmpiricalCalibration 3.1.0
 ==========================
 

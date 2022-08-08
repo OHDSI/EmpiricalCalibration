@@ -1,4 +1,4 @@
-This update provides 4 changes and 2 bugfixes (see NEWS).
+This update provides 1 change as required by Prof. Ripley (see NEWS).
 
 ---
 

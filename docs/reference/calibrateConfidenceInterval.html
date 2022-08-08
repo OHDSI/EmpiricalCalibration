@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -115,22 +115,22 @@ percent confidence interval.</p></dd>
 <span class="r-in"><span><span class="va">newData</span> <span class="op">&lt;-</span> <span class="fu"><a href="simulateControls.html">simulateControls</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">15</span>, mean <span class="op">=</span> <span class="fl">0.25</span>, sd <span class="op">=</span> <span class="fl">0.25</span>, trueLogRr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">calibrateConfidenceInterval</span><span class="op">(</span><span class="va">newData</span><span class="op">$</span><span class="va">logRr</span>, <span class="va">newData</span><span class="op">$</span><span class="va">seLogRr</span>, <span class="va">model</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         logRr    logLb95Rr logUb95Rr   seLogRr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.3101451 -0.296757303 0.9079005 0.3073163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   0.4253582 -0.207643628 1.0463047 0.3198907</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   1.3976490  0.847115430 1.9306055 0.2764056</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  -0.1632532 -0.790346373 0.4684435 0.3211258</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   0.7808329  0.200747045 1.3429875 0.2913932</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   1.1439241  0.500236553 1.7699178 0.3239042</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   0.2659664 -0.284050933 0.8073309 0.2784188</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   0.6073182 -0.001248903 1.1979027 0.3059116</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   1.2957840  0.730437372 1.8434968 0.2839489</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 -0.2069522 -0.822001350 0.4140435 0.3153234</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11  0.6701432  0.120635488 1.2016683 0.2757787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12  1.4568242  0.917120789 1.9789867 0.2708891</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13  0.2138665 -0.429216126 0.8510188 0.3265965</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14  0.5343262 -0.040450254 1.0923551 0.2889863</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15  1.2383607  0.698569794 1.7604890 0.2709027</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          logRr   logLb95Rr logUb95Rr   seLogRr</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  -0.24092120 -0.77126055 0.2971410 0.2725564</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   0.51143429 -0.03846127 1.0451666 0.2764408</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   1.67003134  1.18807161 2.1352690 0.2416364</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  -0.08602864 -0.67960195 0.5100201 0.3034806</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   0.35030540 -0.26970635 0.9605728 0.3138525</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   1.83872871  1.32165730 2.3392259 0.2595886</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   0.21130896 -0.39207714 0.8086715 0.3063190</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   0.71051654  0.19815566 1.2056072 0.2570077</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   1.31622428  0.73528736 1.8802476 0.2920871</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  0.16157208 -0.45264809 0.7712743 0.3122308</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  0.18650116 -0.42290293 0.7906453 0.3095843</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  2.00135784  1.50775582 2.4784367 0.2476272</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13  0.03325048 -0.46659467 0.5319551 0.2547368</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14  0.23635225 -0.33009630 0.7956115 0.2871756</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15  1.45765382  0.94959499 1.9489044 0.2549306</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
