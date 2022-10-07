@@ -151,7 +151,7 @@ double gaussianProduct(const double& mu1, const double& mu2, const double& sd1, 
 // [[Rcpp::export]]
 double logLikelihoodNull(const NumericVector& theta, const NumericVector& logRr, const NumericVector& seLogRr) {
   if (theta[1] <= 0) {
-    return(1e100);
+    return(R_PosInf);
   }
   double result(0);
   double sd = 1/sqrt(theta[1]);
@@ -167,7 +167,7 @@ double logLikelihoodNull(const NumericVector& theta, const NumericVector& logRr,
   }
   // if (result == 0 || result > 1e10)
   if (result == 0)
-    result = 1e100;
+    result = R_PosInf;
   return(result);
 }
 

@@ -66,11 +66,15 @@ fitNull <- function(logRr, seLogRr) {
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
   }
-
-  theta <- c(0, 100)
-  fit <- optim(theta, logLikelihoodNull, logRr = logRr, seLogRr = seLogRr)
-  null <- fit$par
-  null[2] <- 1 / sqrt(null[2])
+  if (length(logRr) == 0) {
+    warning("No estimates remaining")
+    null <- c(NA, NA)
+  } else {
+    theta <- c(0, 100)
+    fit <- optim(theta, logLikelihoodNull, logRr = logRr, seLogRr = seLogRr)
+    null <- fit$par
+    null[2] <- 1 / sqrt(null[2])
+  }
   names(null) <- c("mean", "sd")
   class(null) <- "null"
   return(null)
@@ -131,7 +135,7 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
   if (length(logRr) != length(seLogRr)) {
     stop("The logRr and seLogRr arguments must be of equal length")
   }
-
+  
   calibrateOneP <- function(i) {
     if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
       return(NA)
@@ -147,7 +151,7 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
       return(pLowerBound)
     }
   }
-
+  
   calibratedP <- sapply(1:length(logRr), calibrateOneP)
   names(calibratedP) <- NULL
   return(calibratedP)
@@ -264,7 +268,7 @@ fitNullNonNormalLl <- function(likelihoodApproximations) {
       likelihoodApproximations[[i]] <- as.data.frame(likelihoodApproximation)
     }
   }
-
+  
   theta <- c(0, 100)
   fit <- optim(
     par = theta,

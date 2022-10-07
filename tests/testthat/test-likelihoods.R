@@ -28,14 +28,14 @@ test_that("gaussianProduct result is correct", {
 
 # test logLikelihoodNull
 test_that("logLikelihoodNull - negative theta2", {
-  result <- logLikelihoodNull(theta = c(1, -1), logRr = c(1, 2), seLogRr = c(10.2))
-  expect_equal(result, 99999)
+  result <- EmpiricalCalibration:::logLikelihoodNull(theta = c(1, -1), logRr = c(1, 2), seLogRr = c(10.2))
+  expect_equal(result, Inf)
 })
 test_that("logLikelihoodNull - logRr and seLogRr input", {
   expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta = c(1, 2), logRr = c(NaN, 2), seLogRr = c(1, 0.1)), NaN)
   expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta = c(1, 2), logRr = c(1, 2), seLogRr = c(1, NaN)), NaN)
-  expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta = c(1, 2), logRr = c(Inf, 2), seLogRr = c(1, 0.1)), 99999)
-  expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta = c(1, 2), logRr = c(1, 2), seLogRr = c(1, Inf)), 99999)
+  expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta = c(1, 2), logRr = c(Inf, 2), seLogRr = c(1, 0.1)), Inf)
+  expect_equal(EmpiricalCalibration:::logLikelihoodNull(theta = c(1, 2), logRr = c(1, 2), seLogRr = c(1, Inf)), Inf)
 })
 test_that("logLikelihoodNull - correct calculation", {
   sd <- 1e-7
@@ -44,7 +44,7 @@ test_that("logLikelihoodNull - correct calculation", {
 })
 test_that("logLikelihoodNull - result is infinite", {
   result <- logLikelihoodNull(theta = c(1, 0.001), logRr = c(1, 0), seLogRr = c(0.1, 2^1023))
-  expect_equal(result, 99999)
+  expect_equal(result, Inf)
 })
 
 # test logLikelihoodNullMcmc
@@ -68,7 +68,7 @@ test_that("minLogLikelihoodErrorModel - estimateLl function cases", {
   logRr <- c(2)
   seLogRr <- c(0.2)
   trueLogRr <- c(0.25)
-  expect_equal(minLogLikelihoodErrorModel(theta, logRr, seLogRr, trueLogRr), 99999)
+  expect_equal(EmpiricalCalibration:::minLogLikelihoodErrorModel(theta, logRr, seLogRr, trueLogRr), 99999)
   theta <- c(3, 4, 2e-7, 5e-7)
   logRr <- c(2)
   seLogRr <- c(0.2)
