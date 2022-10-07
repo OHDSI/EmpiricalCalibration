@@ -1,3 +1,11 @@
+EmpiricalCalibration 3.1.2
+==========================
+
+Bugfixes
+
+1. Allowing `fitNull()` to work with many estimates (n > 1000).
+
+
 EmpiricalCalibration 3.1.1
 ==========================
 
