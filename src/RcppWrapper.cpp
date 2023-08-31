@@ -160,7 +160,6 @@ double logLikelihoodNull(const NumericVector& theta, const NumericVector& logRr,
       result = result - R::dnorm(theta[0], logRr[i], seLogRr[i], true);
     }
   } else {
-    double x = 0;
     for (unsigned int i = 0; i < logRr.size(); i++) {
       result = result - log(gaussianProduct(logRr[i], theta[0], seLogRr[i], sd));
     }

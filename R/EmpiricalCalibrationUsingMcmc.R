@@ -104,6 +104,9 @@ binarySearchSigma <- function(modeMu,
       break
     }
   }
+  if (i == 10) {
+    return(0)
+  }
   while (H >= L) {
     M <- L + (H - L) / 2
     llM <- -logLikelihoodNullMcmc(c(modeMu, M), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
@@ -116,7 +119,7 @@ binarySearchSigma <- function(modeMu,
     } else {
       return(abs(M - modeSigma))
     }
-    if (M == modeSigma || M == 1500) {
+    if (M == modeSigma) {
       return(0)
     }
   }

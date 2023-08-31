@@ -51,12 +51,12 @@ This function computes a calibrated two-sided p-value as described in Schuemie e
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{null}: Computes the calibrated P-value using asymptotic assumptions.
+\item \code{calibrateP(null)}: Computes the calibrated P-value using asymptotic assumptions.
 
-\item \code{mcmcNull}: Computes the calibrated P-value and 95 percent credible interval using Markov Chain
+\item \code{calibrateP(mcmcNull)}: Computes the calibrated P-value and 95 percent credible interval using Markov Chain
 Monte Carlo (MCMC).
-}}
 
+}}
 \examples{
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
