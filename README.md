@@ -2,7 +2,7 @@ EmpiricalCalibration
 ====================
 
 [![Build Status](https://github.com/OHDSI/EmpiricalCalibration/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/EmpiricalCalibration/actions?query=workflow%3AR-CMD-check)
-[![codecov.io](https://codecov.io/github/OHDSI/EmpiricalCalibration/coverage.svg?branch=main)](https://codecov.io/github/OHDSI/EmpiricalCalibration?branch=main)
+[![codecov.io](https://codecov.io/github/OHDSI/EmpiricalCalibration/coverage.svg?branch=main)](https://app.codecov.io/github/OHDSI/EmpiricalCalibration?branch=main)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 [![CRAN_Status_Badge](http://cranlogs.r-pkg.org/badges/EmpiricalCalibration)](https://cran.r-project.org/package=EmpiricalCalibration)
 
