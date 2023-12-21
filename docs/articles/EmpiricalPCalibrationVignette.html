@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.2</span>
       </span>
     </div>
 
@@ -91,7 +91,7 @@
                         <h4 data-toc-skip class="author">Martijn J.
 Schuemie, Marc A. Suchard</h4>
             
-            <h4 data-toc-skip class="date">2022-08-08</h4>
+            <h4 data-toc-skip class="date">2023-12-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/HEAD/vignettes/EmpiricalPCalibrationVignette.Rmd" class="external-link"><code>vignettes/EmpiricalPCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalPCalibrationVignette.Rmd</code></div>
@@ -220,7 +220,7 @@ together with the negative controls used to estimate that
 distribution:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotCalibrationEffect.html">plotCalibrationEffect</a></span><span class="op">(</span><span class="va">negatives</span><span class="op">$</span><span class="va">logRr</span>,<span class="va">negatives</span><span class="op">$</span><span class="va">seLogRr</span>, null <span class="op">=</span> <span class="va">null</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Removed 1 rows containing missing values (geom_vline).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 1 rows containing missing values (`geom_vline()`).</span></span></code></pre>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>In this graph, the blue dots represent the negative controls. Any
 estimates below the gray dashed lines will have a traditional p-value
@@ -254,7 +254,7 @@ no longer certain we can reject the null hypothesis:</p>
 <span>                      <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">logRr</span>, </span>
 <span>                      <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">seLogRr</span>, </span>
 <span>                      <span class="va">null</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Removed 1 rows containing missing values (geom_vline).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 1 rows containing missing values (`geom_vline()`).</span></span></code></pre>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>In this plot we see that, even though the drug of interest (the
 yellow diamond) has a high relative risk, it is indistinguishable from
@@ -277,10 +277,10 @@ purpose:</p>
 <pre><code><span><span class="co">## Estimated null distribution (using MCMC)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##           Estimate lower .95 upper .95</span></span>
-<span><span class="co">## Mean       0.79228   0.67137    0.9046</span></span>
-<span><span class="co">## Precision 11.97582   6.13060   23.3987</span></span>
+<span><span class="co">## Mean       0.79099   0.67352    0.9035</span></span>
+<span><span class="co">## Precision 11.95022   6.07499   23.0892</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Acceptance rate: 0.326506734932651</span></span></code></pre>
+<span><span class="co">## Acceptance rate: 0.326246737532625</span></span></code></pre>
 <p>We see that there is uncertainty around the estimates of the mean and
 precision (= 1/SD^2), as expressed in the 95% credible intervals. This
 uncertainty can be reduced by either increasing the number of negative
@@ -301,8 +301,8 @@ well as the 95% credible interval:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrateP.html">calibrateP</a></span><span class="op">(</span><span class="va">null</span>, <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">logRr</span>, <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">seLogRr</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
-<pre><code><span><span class="co">##           p    lb95ci   ub95ci</span></span>
-<span><span class="co">## 1 0.8332231 0.5509142 0.992162</span></span></code></pre>
+<pre><code><span><span class="co">##           p    lb95ci    ub95ci</span></span>
+<span><span class="co">## 1 0.8369727 0.5503206 0.9915767</span></span></code></pre>
 <p>Note that there is uncertainty around the calibrated p-value as
 expressed in the 95% credible interval.</p>
 <p>We can also visualize the uncertainty in the p-value calibration by
@@ -315,7 +315,7 @@ plotting the 95% credible interval of the boundary where calibrated p =
 <span>                      <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">seLogRr</span>, </span>
 <span>                      <span class="va">null</span>,</span>
 <span>                      showCis <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Removed 1 rows containing missing values (geom_vline).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 1 rows containing missing values (`geom_vline()`).</span></span></code></pre>
 <p><img src="EmpiricalPCalibrationVignette_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -360,7 +360,7 @@ plotting the 95% credible interval of the boundary where calibrated p =
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

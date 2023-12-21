@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.2</span>
       </span>
     </div>
 
@@ -91,7 +91,7 @@
                         <h4 data-toc-skip class="author">Martijn J.
 Schuemie</h4>
             
-            <h4 data-toc-skip class="date">2022-08-08</h4>
+            <h4 data-toc-skip class="date">2023-12-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/HEAD/vignettes/EmpiricalMaxSprtCalibrationVignette.Rmd" class="external-link"><code>vignettes/EmpiricalMaxSprtCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalMaxSprtCalibrationVignette.Rmd</code></div>
@@ -196,8 +196,12 @@ use outcome 51, and the look at t = 50:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">~</span> <span class="va">exposure</span> , </span>
 <span>  modelType <span class="op">=</span> <span class="st">"cox"</span>, </span>
 <span>  data <span class="op">=</span> <span class="va">dataOutcome51LookT50</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html" class="external-link">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## 'as(&lt;numLike&gt;, "dgeMatrix")' is deprecated.</span></span>
+<span><span class="co">## Use 'as(as(as(., "dMatrix"), "generalMatrix"), "unpackedMatrix")' instead.</span></span>
+<span><span class="co">## See help("Deprecated") and help("Matrix-deprecated").</span></span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html" class="external-link">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## exposureTRUE </span></span>
 <span><span class="co">##     1.829709</span></span></code></pre>
@@ -206,13 +210,13 @@ ratio, but rather the LLR. This is the log of the ratio between the
 maximum likelihood, and the likelihood of the null hypothesis. The
 maximum likelihood is already available from the <code>fit</code>
 object:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Maximum log likelihood:</span></span>
 <span><span class="va">fit</span><span class="op">$</span><span class="va">log_likelihood</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] -1167.396</span></span></code></pre>
 <p>We can use Cyclops to compute the log likelihood of parameter value 0
 (hazard ratio = 1):</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">llNull</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html" class="external-link">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">fit</span>,</span>
 <span>  parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,</span>
@@ -225,7 +229,7 @@ single-sided test, so we will set LLR to 0 if the point estimate (the
 maximum likelihood estimate) is below 0. It might also be the case that
 no maximum likelihood estimate exists, for example because there are
 zero counts, in which case we also set the LLR to 0:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">return_flag</span> <span class="op">==</span> <span class="st">"ILLCONDITIONED"</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">llr</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
@@ -242,7 +246,7 @@ of looks that are expected to be made, and the expected sample size at
 each look. Because we have already simulated all looks, we will use the
 actual sample sizes instead of expected ones. For Cox models it is
 recommended to use the binomial critical value computation:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">outcome</span> <span class="op">~</span> <span class="va">lookTime</span>, <span class="va">dataOutcome51</span>, <span class="va">sum</span><span class="op">)</span></span>
 <span><span class="co"># Need incremental outcomes per look:</span></span>
 <span><span class="va">outcomesPerLook</span> <span class="op">&lt;-</span> <span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">outcome</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">outcomesPerLook</span><span class="op">$</span><span class="va">lookTime</span><span class="op">)</span><span class="op">]</span></span>
@@ -259,14 +263,14 @@ recommended to use the binomial critical value computation:</p>
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Selected alpha: 0.046 (least conservative value below 0.05)</span></span></code></pre>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 2.689342</span></span>
 <span><span class="co">## attr(,"alpha")</span></span>
 <span><span class="co">## [1] 0.04597</span></span></code></pre>
 <p>By comparing the LLR to the critical value we can determine whether
 there is a signal:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">llr</span> <span class="op">&gt;</span> <span class="va">cv</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
@@ -284,14 +288,14 @@ approximate the likelihood function is the likelihood profile. This
 profile provides, at various values the hazard ratio, the computed
 likelihood. The `Cyclops package has a convenient function for computing
 likelihood profiles:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">llProfileOutcome51LookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/getCyclopsProfileLogLikelihood.html" class="external-link">getCyclopsProfileLogLikelihood</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">fit</span>,</span>
 <span>  parm <span class="op">=</span> <span class="st">"exposureTRUE"</span>,</span>
 <span>  bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">llProfileOutcome51LookT50</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 x 2</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
 <span><span class="co">##   point  value</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> -<span style="color: #BB0000;">2.30</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">411.</span></span></span>
@@ -305,7 +309,7 @@ in the [0.1, 10] range, so the profile will be restricted to this
 region. This function uses an adaptive grid, using more grid points if
 the likelihood shows higher curvature to avoid loss of information. If
 we want, we could also plot the profile:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">llProfileOutcome51LookT50</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">point</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -325,7 +329,7 @@ likelihood distribution of each negative control into account. Again the
 likelihood profiles are a convenient way of capturing the full
 likelihood function. Here we compute the likelihood profile for all
 negative controls (having outcome IDs 1-50) at time t = 50:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">negativeControlProfilesLookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">dataLookT50</span> <span class="op">&lt;-</span> <span class="va">maxSprtSimulationData</span><span class="op">[</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">lookTime</span> <span class="op">==</span> <span class="fl">50</span>, <span class="op">]</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
@@ -344,10 +348,10 @@ negative controls (having outcome IDs 1-50) at time t = 50:</p>
 <span>  <span class="va">negativeControlProfilesLookT50</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">llProfile</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>We can use these profiles to fit the null distribution:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nullLookT50</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitNullNonNormalLl.html">fitNullNonNormalLl</a></span><span class="op">(</span><span class="va">negativeControlProfilesLookT50</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Detected data following grid distribution</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nullLookT50</span></span></code></pre></div>
 <pre><code><span><span class="co">## Estimated null distribution</span></span>
 <span><span class="co">## </span></span>
@@ -362,7 +366,7 @@ with mean and standard deviation away from 0.</p>
 </h3>
 <p>Using the fitted null distribution, we can compute an empirically
 calibrated CV:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">calibratedCv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeCvBinomial.html">computeCvBinomial</a></span><span class="op">(</span></span>
 <span>  groupSizes <span class="op">=</span> <span class="va">outcomesPerLook</span>,</span>
 <span>  z <span class="op">=</span> <span class="va">unexposedTime</span> <span class="op">/</span> <span class="va">exposedTime</span>,</span>
@@ -372,7 +376,7 @@ calibrated CV:</p>
 <span>  nullSd <span class="op">=</span> <span class="va">nullLookT50</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Selected alpha: 0.050 (least conservative value below 0.05)</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">calibratedCv</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 16.71318</span></span>
 <span><span class="co">## attr(,"alpha")</span></span>
@@ -380,7 +384,7 @@ calibrated CV:</p>
 <p>Which is substantially higher than the uncalibrated CV we computed
 earlier (CV = 2.6893419). We can compare the LLR computed earlier to the
 calibrated critical value to determine whether there is a signal:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">llr</span> <span class="op">&gt;</span> <span class="va">calibratedCv</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
@@ -403,7 +407,7 @@ critical values<a class="anchor" aria-label="anchor" href="#computing-log-likeli
 likelihood ratios, uncalibrated critical values and calibrated critical
 values for each negative control at each look. Note that this code will
 take some time to complete.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allCvsAndLlrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">t</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">maxSprtSimulationData</span><span class="op">$</span><span class="va">lookTime</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
@@ -499,7 +503,7 @@ take some time to complete.</p>
 <p>We compare the computed LLRs to the computed critical values to
 determine how often a signal is generated for the negative controls
 (where the null hypothesis is true):</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">signals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">calibratedSignals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
@@ -510,7 +514,7 @@ determine how often a signal is generated for the negative controls
 <span><span class="co"># Type 1 error when not calibrated (should be 0.05):</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">signals</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.34</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Type 2 error when calibrated (should be 0.05):</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">calibratedSignals</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.04</span></span></code></pre>
@@ -537,7 +541,7 @@ empirical calibration.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

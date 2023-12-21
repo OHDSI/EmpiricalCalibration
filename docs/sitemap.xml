@@ -28,6 +28,12 @@
     <loc>/pull_request_template.html</loc>
   </url>
   <url>
+    <loc>/reference/EmpiricalCalibration-package.html</loc>
+  </url>
+  <url>
+    <loc>/reference/EmpiricalCalibration.html</loc>
+  </url>
+  <url>
     <loc>/reference/calibrateConfidenceInterval.html</loc>
   </url>
   <url>
@@ -68,12 +74,6 @@
   </url>
   <url>
     <loc>/reference/convertNullToErrorModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/EmpiricalCalibration-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/EmpiricalCalibration.html</loc>
   </url>
   <url>
     <loc>/reference/evaluateCiCalibration.html</loc>

@@ -42,7 +42,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.2</span>
       </span>
     </div>
 
@@ -99,7 +99,7 @@
 <div class="section level1">
 <div class="page-header"><h1 id="empiricalcalibration">EmpiricalCalibration<a class="anchor" aria-label="anchor" href="#empiricalcalibration"></a>
 </h1></div>
-
+<p><a href="https://github.com/OHDSI/EmpiricalCalibration/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/OHDSI/EmpiricalCalibration/workflows/R-CMD-check/badge.svg" alt="Build Status"></a> <a href="https://codecov.io/github/OHDSI/EmpiricalCalibration?branch=main" class="external-link"><img src="https://codecov.io/github/OHDSI/EmpiricalCalibration/coverage.svg?branch=main" alt="codecov.io"></a> <a href="https://cran.r-project.org/package=EmpiricalCalibration" class="external-link"><img src="http://www.r-pkg.org/badges/version/EmpiricalCalibration" alt="CRAN_Status_Badge"></a> <a href="https://cran.r-project.org/package=EmpiricalCalibration" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/EmpiricalCalibration" alt="CRAN_Status_Badge"></a></p>
 <p>EmpiricalCalibration is part of <a href="https://ohdsi.github.io/Hades/" class="external-link">HADES</a>.</p>
 </div>
 <div class="section level1">
@@ -125,21 +125,21 @@
 <h1 id="screenshots-and-examples">Screenshots and examples<a class="anchor" aria-label="anchor" href="#screenshots-and-examples"></a>
 </h1>
 <p><img src="https://github.com/OHDSI/EmpiricalCalibration/raw/main/extras/plot.png" alt="Calibration effect plot" title="Calibration effect plot"></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(sccs) <span class="co">#Load one of the included data sets</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>negatives <span class="ot">&lt;-</span> sccs[sccs<span class="sc">$</span>groundTruth <span class="sc">==</span> <span class="dv">0</span>,] <span class="co">#Select the negative controls</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>null <span class="ot">&lt;-</span> <span class="fu">fitNull</span>(<span class="at">logRr =</span> negatives<span class="sc">$</span>logRr, <span class="at">seLogRr =</span> negatives<span class="sc">$</span>seLogRr) <span class="co">#Fit the null distribution</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>positive <span class="ot">&lt;-</span> sccs[sccs<span class="sc">$</span>groundTruth <span class="sc">==</span> <span class="dv">1</span>,]  <span class="co">#Select the positive control</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Create the plot above:</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plotCalibrationEffect</span>(<span class="at">logRrNegatives =</span> negatives<span class="sc">$</span>logRr,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">seLogRrNegatives =</span> negatives<span class="sc">$</span>seLogRr,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">logRrPositives =</span> positive<span class="sc">$</span>logRr,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">seLogRrPositives =</span> positive<span class="sc">$</span>seLogRr,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                      <span class="at">null =</span> null)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#Compute the calibrated p-value:</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">calibrateP</span>(<span class="at">null =</span> null, <span class="at">logRr =</span> positive<span class="sc">$</span>logRr, <span class="at">seLogRr =</span> positive<span class="sc">$</span>seLogRr) <span class="co">#Compute calibrated p-value</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">0.8390598</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(sccs) <span class="co">#Load one of the included data sets</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>negatives <span class="ot">&lt;-</span> sccs[sccs<span class="sc">$</span>groundTruth <span class="sc">==</span> <span class="dv">0</span>,] <span class="co">#Select the negative controls</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>null <span class="ot">&lt;-</span> <span class="fu">fitNull</span>(<span class="at">logRr =</span> negatives<span class="sc">$</span>logRr, <span class="at">seLogRr =</span> negatives<span class="sc">$</span>seLogRr) <span class="co">#Fit the null distribution</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>positive <span class="ot">&lt;-</span> sccs[sccs<span class="sc">$</span>groundTruth <span class="sc">==</span> <span class="dv">1</span>,]  <span class="co">#Select the positive control</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#Create the plot above:</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">plotCalibrationEffect</span>(<span class="at">logRrNegatives =</span> negatives<span class="sc">$</span>logRr,</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>                      <span class="at">seLogRrNegatives =</span> negatives<span class="sc">$</span>seLogRr,</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>                      <span class="at">logRrPositives =</span> positive<span class="sc">$</span>logRr,</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>                      <span class="at">seLogRrPositives =</span> positive<span class="sc">$</span>seLogRr,</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>                      <span class="at">null =</span> null)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#Compute the calibrated p-value:</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">calibrateP</span>(<span class="at">null =</span> null, <span class="at">logRr =</span> positive<span class="sc">$</span>logRr, <span class="at">seLogRr =</span> positive<span class="sc">$</span>seLogRr) <span class="co">#Compute calibrated p-value</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>[<span class="dv">1</span>] <span class="fl">0.8390598</span></span></code></pre></div>
 </div>
 <div class="section level1">
 <h1 id="technology">Technology<a class="anchor" aria-label="anchor" href="#technology"></a>
@@ -245,15 +245,7 @@
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/OHDSI/EmpiricalCalibration/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/OHDSI/EmpiricalCalibration/workflows/R-CMD-check/badge.svg" alt="Build Status"></a></li>
-<li><a href="https://codecov.io/github/OHDSI/EmpiricalCalibration?branch=main" class="external-link"><img src="https://codecov.io/github/OHDSI/EmpiricalCalibration/coverage.svg?branch=main" alt="codecov.io"></a></li>
-<li><a href="https://cran.r-project.org/package=EmpiricalCalibration" class="external-link"><img src="http://www.r-pkg.org/badges/version/EmpiricalCalibration" alt="CRAN_Status_Badge"></a></li>
-<li><a href="https://cran.r-project.org/package=EmpiricalCalibration" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/EmpiricalCalibration" alt="CRAN_Status_Badge"></a></li>
-</ul>
-</div>
+
 
   </div>
 </div>
@@ -266,7 +258,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

@@ -32,7 +32,7 @@ devtools::spell_check()
 
 # Create manual and vignettes:
 unlink("extras/EmpiricalCalibration.pdf")
-shell("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
+system("R CMD Rd2pdf ./ --output=extras/EmpiricalCalibration.pdf")
 
 rmarkdown::render("vignettes/EmpiricalPCalibrationVignette.Rmd",
                   output_file = "../inst/doc/EmpiricalPCalibrationVignette.pdf",

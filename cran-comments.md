@@ -1,12 +1,12 @@
-This update provides 1 change as required by Prof. Ripley (see NEWS).
+This update provides 2 bugfixes (see NEWS).
 
 ---
 
 ## Test environments
-* Ubuntu 20.03, R 4.2.1
-* Microsoft Windows Server 2019, R 4.2.1
-* MacOS, R 4.2.1
-* Windows 10, R 4.2.1
+* Ubuntu 20.03, R 4.3.2
+* MacOS, R 4.3.2
+* Windows 10, R 4.3.2
+* MacOS, R 4.2.3
 
 ## R CMD check results
 
