@@ -9,3 +9,4 @@ compare_versions
 _pkgdown.yml
 docs
 ReverseDependencyCheckFunctions.R
+^CRAN-SUBMISSION$
