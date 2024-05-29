@@ -414,3 +414,28 @@ fun <- function(x, ncs) {
 x <- seq(0, 1, length.out = 100)
 plot(x, -fun(x, ncs = ncs))
 nlm(fun, 0.6, ncs = ncs)$estimate
+
+# Possible threshold values ------------------------------------------------------------------------
+mu <- 0.0
+sigma <- 0.313
+
+fun <- function(x, mu, sigma) {
+  return(abs(x) * dnorm(x, mu, sigma)) 
+}
+
+integrate(fun, lower = -Inf, upper = Inf, mu = mu, sigma = sigma)
+# 0.2497379 (EASE)
+
+# Crude numeric approach to determine where null cannot be rejected at this EASE:
+x <- log(seq(0.5, 1, by = 0.001))
+se <- EmpiricalCalibration:::logRrtoSE(x, alpha = 0.05, mu, sigma)
+exp(x[max(which(se > 0))])
+
+x <- log(seq(1, 2, by = 0.001))
+se <- EmpiricalCalibration:::logRrtoSE(x, alpha = 0.05, mu, sigma)
+exp(x[min(which(se > 0))])
+# 0.541
+
+ncs <- simulateControls(n = 200, mean = mu, sd = sigma)
+plotCalibrationEffect(ncs$logRr, ncs$seLogRr)
+# 1.847
