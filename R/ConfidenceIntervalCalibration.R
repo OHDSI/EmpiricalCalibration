@@ -73,7 +73,7 @@ fitSystematicErrorModel <- function(logRr,
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
   }
-
+  
   if (legacy) {
     theta <- c(0, 1, -2, 0)
     logLikelihood <- minLogLikelihoodErrorModelLegacy
@@ -83,15 +83,15 @@ fitSystematicErrorModel <- function(logRr,
     logLikelihood <- minLogLikelihoodErrorModel
     parscale <- c(1, 1, 1, 1)
   }
-
+  
   fit <- optim(theta,
-    logLikelihood,
-    logRr = logRr,
-    seLogRr = seLogRr,
-    trueLogRr = trueLogRr,
-    method = "BFGS",
-    hessian = TRUE,
-    control = list(parscale = parscale)
+               logLikelihood,
+               logRr = logRr,
+               seLogRr = seLogRr,
+               trueLogRr = trueLogRr,
+               method = "BFGS",
+               hessian = TRUE,
+               control = list(parscale = parscale)
   )
   model <- fit$par
   if (legacy) {
@@ -162,7 +162,7 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
     }
     return(z + numerator / denominator)
   }
-
+  
   logBound <- function(ciWidth,
                        lb = TRUE,
                        logRr,
@@ -259,48 +259,50 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
       legacy = legacy
     )$root)
   }
-
+  
   legacy <- (names(model)[3] == "logSdIntercept")
-  result <- data.frame(logRr = rep(0, length(logRr)), logLb95Rr = 0, logUb95Rr = 0)
-  for (i in 1:nrow(result)) {
-    if (is.infinite(logRr[i]) || is.na(logRr[i]) || is.infinite(seLogRr[i]) || is.na(seLogRr[i])) {
-      result$logRr[i] <- NA
-      result$logLb95Rr[i] <- NA
-      result$logUb95Rr[i] <- NA
-    } else {
-      result$logRr[i] <- logBound(
-        0,
-        TRUE,
-        logRr[i],
-        seLogRr[i],
-        model[1],
-        model[2],
-        model[3],
-        model[4],
-        legacy
-      )
-      result$logLb95Rr[i] <- logBound(
-        ciWidth,
-        TRUE,
-        logRr[i],
-        seLogRr[i],
-        model[1],
-        model[2],
-        model[3],
-        model[4],
-        legacy
-      )
-      result$logUb95Rr[i] <- logBound(
-        ciWidth,
-        FALSE,
-        logRr[i],
-        seLogRr[i],
-        model[1],
-        model[2],
-        model[3],
-        model[4],
-        legacy
-      )
+  result <- data.frame(logRr = rep(as.numeric(NA), length(logRr)), logLb95Rr = as.numeric(NA), logUb95Rr = as.numeric(NA))
+  if (!is.na(model[1])) {
+    for (i in 1:nrow(result)) {
+      if (is.infinite(logRr[i]) || is.na(logRr[i]) || is.infinite(seLogRr[i]) || is.na(seLogRr[i])) {
+        result$logRr[i] <- NA
+        result$logLb95Rr[i] <- NA
+        result$logUb95Rr[i] <- NA
+      } else {
+        result$logRr[i] <- logBound(
+          0,
+          TRUE,
+          logRr[i],
+          seLogRr[i],
+          model[1],
+          model[2],
+          model[3],
+          model[4],
+          legacy
+        )
+        result$logLb95Rr[i] <- logBound(
+          ciWidth,
+          TRUE,
+          logRr[i],
+          seLogRr[i],
+          model[1],
+          model[2],
+          model[3],
+          model[4],
+          legacy
+        )
+        result$logUb95Rr[i] <- logBound(
+          ciWidth,
+          FALSE,
+          logRr[i],
+          seLogRr[i],
+          model[1],
+          model[2],
+          model[3],
+          model[4],
+          legacy
+        )
+      }
     }
   }
   result$seLogRr <- (result$logLb95Rr - result$logUb95Rr) / (2 * qnorm((1 - ciWidth) / 2))

@@ -148,3 +148,21 @@ test_that("MCMC calibration of p-values returns values close to truth", {
     )
   )
 })
+
+test_that("fitMcmcNull throws no error when all estimates are NA", {
+  null <- fitMcmcNull(logRr = c(NA, NA, NA),
+                      seLogRr = c(NA, NA, NA))
+  print(null)
+  
+  p <- calibrateP(null, 1, 1)
+  expect_true(is.na(p$p))
+  
+  p <- calibrateP(null, 1, 1, pValueOnly = TRUE)
+  expect_true(is.na(p))
+  
+  model <- convertNullToErrorModel(null)
+  expect_true(is.na(model[1]))
+  
+  ci <- calibrateConfidenceInterval(1, 1, model)
+  expect_true(is.na(ci[1]))
+})

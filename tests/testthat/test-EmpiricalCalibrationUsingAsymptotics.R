@@ -125,3 +125,19 @@ test_that("CalibrateP matches computeTraditionalP when mu = sigma = 0", {
     computeTraditionalP(logRr, seLogRr)
   )
 })
+
+test_that("fitNull throws no error when all estimates are NA", {
+  null <- fitNull(logRr = c(NA, NA, NA),
+                      seLogRr = c(NA, NA, NA))
+  print(null)
+  
+  p <- calibrateP(null, 1, 1)
+  expect_true(is.na(p))
+  
+  model <- convertNullToErrorModel(null)
+  expect_true(is.na(model[1]))
+  
+  ci <- calibrateConfidenceInterval(1, 1, model)
+  expect_true(is.na(ci[1]))
+})
+

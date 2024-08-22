@@ -2,7 +2,7 @@ Package: EmpiricalCalibration
 Type: Package
 Title: Routines for Performing Empirical Calibration of Observational Study Estimates
 Version: 3.1.2
-Date: 2023-12-21
+Date: 2024-08-22
 Authors@R: c(
   person("Martijn", "Schuemie", , "schuemie@ohdsi.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0817-5361")),
   person("Marc", "Suchard", role = c("aut"), comment = c(ORCID = "0000-0001-9818-479X"))
@@ -40,5 +40,5 @@ LinkingTo: Rcpp
 NeedsCompilation: yes
 URL: https://ohdsi.github.io/EmpiricalCalibration/, https://github.com/OHDSI/EmpiricalCalibration
 BugReports: https://github.com/OHDSI/EmpiricalCalibration/issues
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Encoding: UTF-8

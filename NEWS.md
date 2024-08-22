@@ -1,3 +1,11 @@
+EmpiricalCalibration 3.1.3
+==========================
+
+Changes
+
+1. `fitNull()` and `fitMcmcNull()`, as well as downstream calibration functions, throw no error when there are no valid negative controls estimates (instead returning NAs).
+
+
 EmpiricalCalibration 3.1.2
 ==========================
 
@@ -11,7 +19,7 @@ Bugfixes
 EmpiricalCalibration 3.1.1
 ==========================
 
-Changes.
+Changes
 
 1. Making sure we pass R check even if suggested packages are unavailable, as required by CRAN.
 

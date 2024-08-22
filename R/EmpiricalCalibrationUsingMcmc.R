@@ -19,7 +19,7 @@
 proposalFunction <- function(param, scale) {
   dim <- length(param)
   draw <- rnorm(dim, mean = param, sd = scale)
-
+  
   # Precision cannot be negative:
   draw[2] <- abs(draw[2])
   # draw[2] <- max(0, draw[2])
@@ -31,18 +31,18 @@ runMetropolisMcmc <- function(startValue, iterations, scale, logRr, seLogRr) {
   chain <- array(dim = c(iterations + 1, dim))
   logLik <- array(dim = c(iterations + 1, 1))
   acc <- array(dim = c(iterations + 1, 1))
-
+  
   logLik[1] <- -logLikelihoodNullMcmc(startValue, logRr, seLogRr)
   chain[1, ] <- c(startValue)
   acc[1] <- 1
-
+  
   for (i in 1:iterations) {
     # print(paste('itr =', i))
     proposal <- proposalFunction(chain[i, ], scale = scale)
     newLogLik <- tryCatch(-logLikelihoodNullMcmc(proposal, logRr, seLogRr), error = function(e) {
       -1e+10
     })
-
+    
     # print(paste(paste(proposal, collapse = ","), newLogLik))
     prob <- exp(newLogLik - logLik[i])
     if (runif(1) < prob) {
@@ -177,22 +177,27 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
   }
-  fit <- optim(c(0, 100), logLikelihoodNullMcmc, logRr = logRr, seLogRr = seLogRr)
-
-  # Profile likelihood for roughly correct scale:
-  scale <- binarySearchMu(fit$par[1],
-    fit$par[2],
-    logRrNegatives = logRr,
-    seLogRrNegatives = seLogRr
-  )
-  scale <- c(scale, binarySearchSigma(fit$par[1],
-    fit$par[2],
-    logRrNegatives = logRr,
-    seLogRrNegatives = seLogRr
-  ))
-
-  # writeLines(paste('Scale:', paste(scale,collapse=',')))
-  mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr)
+  if (length(logRr) == 0) {
+    warning("No valid estimates left. Returning undefined null distribution")
+    mcmc <- list(chain = matrix(c(NA,NA), nrow = 1, ncol = 2))
+  } else {
+    fit <- optim(c(0, 100), logLikelihoodNullMcmc, logRr = logRr, seLogRr = seLogRr)
+    
+    # Profile likelihood for roughly correct scale:
+    scale <- binarySearchMu(fit$par[1],
+                            fit$par[2],
+                            logRrNegatives = logRr,
+                            seLogRrNegatives = seLogRr
+    )
+    scale <- c(scale, binarySearchSigma(fit$par[1],
+                                        fit$par[2],
+                                        logRrNegatives = logRr,
+                                        seLogRrNegatives = seLogRr
+    ))
+    
+    # writeLines(paste('Scale:', paste(scale,collapse=',')))
+    mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr)
+  }
   result <- c(median(mcmc$chain[, 1]), median(mcmc$chain[, 2]))
   attr(result, "mcmc") <- mcmc
   class(result) <- "mcmcNull"
@@ -202,20 +207,25 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
 #' @export
 print.mcmcNull <- function(x, ...) {
   writeLines("Estimated null distribution (using MCMC)\n")
-  mcmc <- attr(x, "mcmc")
-  lb95Mean <- quantile(mcmc$chain[, 1], 0.025)
-  ub95Mean <- quantile(mcmc$chain[, 1], 0.975)
-  lb95Precision <- quantile(mcmc$chain[, 2], 0.025)
-  ub95Precision <- quantile(mcmc$chain[, 2], 0.975)
-  output <- data.frame(
-    Estimate = c(x[1], x[2]),
-    lb95 = c(lb95Mean, lb95Precision),
-    ub95 = c(ub95Mean, ub95Precision)
-  )
-  colnames(output) <- c("Estimate", "lower .95", "upper .95")
-  rownames(output) <- c("Mean", "Precision")
-  printCoefmat(output)
-  writeLines(paste("\nAcceptance rate:", mean(mcmc$acc)))
+  if (is.na(x[1])) {
+    writeLines("Undefined")
+  } else {
+    
+    mcmc <- attr(x, "mcmc")
+    lb95Mean <- quantile(mcmc$chain[, 1], 0.025)
+    ub95Mean <- quantile(mcmc$chain[, 1], 0.975)
+    lb95Precision <- quantile(mcmc$chain[, 2], 0.025)
+    ub95Precision <- quantile(mcmc$chain[, 2], 0.975)
+    output <- data.frame(
+      Estimate = c(x[1], x[2]),
+      lb95 = c(lb95Mean, lb95Precision),
+      ub95 = c(ub95Mean, ub95Precision)
+    )
+    colnames(output) <- c("Estimate", "lower .95", "upper .95")
+    rownames(output) <- c("Mean", "Precision")
+    printCoefmat(output)
+    writeLines(paste("\nAcceptance rate:", mean(mcmc$acc)))
+  }
 }
 
 #' @describeIn
@@ -228,27 +238,29 @@ print.mcmcNull <- function(x, ...) {
 #' @export
 calibrateP.mcmcNull <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, pValueOnly, ...) {
   mcmc <- attr(null, "mcmc")
-  adjustedP <- data.frame(p = rep(1, length(logRr)), lb95ci = 0, ub95ci = 0)
-  for (i in 1:length(logRr)) {
-    if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
-      adjustedP$p[i] <- NA
-      adjustedP$lb95ci[i] <- NA
-      adjustedP$ub95ci[i] <- NA
-    } else {
-      pUpperBound <- pnorm((mcmc$chain[, 1] - logRr[i]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-      pLowerBound <- pnorm((logRr[i] - mcmc$chain[, 1]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-      if (twoSided) {
-        p <- pUpperBound
-        p[pLowerBound < p] <- pLowerBound[pLowerBound < p]
-        p <- p * 2
-      } else if (upper) {
-        p <- pUpperBound
+  adjustedP <- data.frame(p = rep(as.numeric(NA), length(logRr)), lb95ci = as.numeric(NA), ub95ci = as.numeric(NA))
+  if (!is.na(null[1])) {
+    for (i in 1:length(logRr)) {
+      if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
+        adjustedP$p[i] <- NA
+        adjustedP$lb95ci[i] <- NA
+        adjustedP$ub95ci[i] <- NA
       } else {
-        p <- pLowerBound
+        pUpperBound <- pnorm((mcmc$chain[, 1] - logRr[i]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+        pLowerBound <- pnorm((logRr[i] - mcmc$chain[, 1]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+        if (twoSided) {
+          p <- pUpperBound
+          p[pLowerBound < p] <- pLowerBound[pLowerBound < p]
+          p <- p * 2
+        } else if (upper) {
+          p <- pUpperBound
+        } else {
+          p <- pLowerBound
+        }
+        adjustedP$p[i] <- quantile(p, 0.5)
+        adjustedP$lb95ci[i] <- quantile(p, 0.025)
+        adjustedP$ub95ci[i] <- quantile(p, 0.975)
       }
-      adjustedP$p[i] <- quantile(p, 0.5)
-      adjustedP$lb95ci[i] <- quantile(p, 0.025)
-      adjustedP$ub95ci[i] <- quantile(p, 0.975)
     }
   }
   if (missing(pValueOnly) || pValueOnly == FALSE) {
