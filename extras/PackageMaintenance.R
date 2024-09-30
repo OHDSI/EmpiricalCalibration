@@ -61,6 +61,6 @@ OhdsiRTools::fixHadesLogo()
 # Release package:
 devtools::check_win_devel()
 
-devtools::check_rhub()
+rhub::rc_submit(platforms = "atlas")
 
 devtools::release()
