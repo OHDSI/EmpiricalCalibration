@@ -1,9 +1,8 @@
-pandoc: 3.1.1
-pkgdown: 2.0.7
+pandoc: '3.2'
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   EmpiricalCiCalibrationVignette: EmpiricalCiCalibrationVignette.html
   EmpiricalMaxSprtCalibrationVignette: EmpiricalMaxSprtCalibrationVignette.html
   EmpiricalPCalibrationVignette: EmpiricalPCalibrationVignette.html
-last_built: 2023-12-21T13:07Z
-
+last_built: 2024-09-30T04:27Z
