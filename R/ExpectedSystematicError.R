@@ -66,15 +66,23 @@ computeExpectedAbsoluteSystematicError.null <- function(null, alpha = 0.05) {
 
 #' @export
 computeExpectedAbsoluteSystematicError.mcmcNull <- function(null, alpha = 0.05) {
-  chain <- attr(null, "mcmc")$chain
-  dist <- apply(chain, 1, function(x) closedFormIntegeralAbsolute(x[1], 1 / sqrt(x[2])))
-  result <- quantile(dist, c(0.5, alpha / 2, 1 - (alpha / 2)))
-  result <- data.frame(
-    ease = result[1],
-    ciLb = result[2],
-    ciUb = result[3]
-  )
-  row.names(result) <- NULL
+  if (is.na(null[1])) {
+    result <- data.frame(
+      ease = as.numeric(NA),
+      ciLb = as.numeric(NA),
+      ciUb = as.numeric(NA)
+    )
+  } else {
+    chain <- attr(null, "mcmc")$chain
+    dist <- apply(chain, 1, function(x) closedFormIntegeralAbsolute(x[1], 1 / sqrt(x[2])))
+    result <- quantile(dist, c(0.5, alpha / 2, 1 - (alpha / 2)))
+    result <- data.frame(
+      ease = result[1],
+      ciLb = result[2],
+      ciUb = result[3]
+    )
+    row.names(result) <- NULL
+  }
   return(result)
 }
 
@@ -142,7 +150,7 @@ compareEase <- function(logRr1, seLogRr1, logRr2, seLogRr2, alpha = 0.05, sample
   if (length(unique(c(length(logRr1), length(seLogRr1), length(logRr2), length(seLogRr2)))) != 1) {
     stop("Arguments logRr1, seLogRr1, logRr2, and seLogRr2 should be of equal length.")
   }
-
+  
   ease1 <- computeEaseBoostrap(logRr = logRr1, seLogRr = seLogRr1, alpha = alpha, sampleSize = sampleSize)
   ease2 <- computeEaseBoostrap(logRr = logRr2, seLogRr = seLogRr2, alpha = alpha, sampleSize = sampleSize)
   delta <- ease1$ease - ease2$ease

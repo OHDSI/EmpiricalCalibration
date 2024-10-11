@@ -165,4 +165,7 @@ test_that("fitMcmcNull throws no error when all estimates are NA", {
   
   ci <- calibrateConfidenceInterval(1, 1, model)
   expect_true(is.na(ci[1]))
+  
+  ease <- computeExpectedAbsoluteSystematicError(null)
+  expect_true(is.na(ease$ease))
 })
