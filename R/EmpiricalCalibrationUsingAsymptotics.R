@@ -70,7 +70,7 @@ fitNull <- function(logRr, seLogRr) {
     warning("No estimates remaining")
     null <- c(NA, NA)
   } else {
-    theta <- c(0, 100)
+    theta <- c(0, 1)
     fit <- optim(theta, logLikelihoodNull, logRr = logRr, seLogRr = seLogRr)
     null <- fit$par
     null[2] <- 1 / sqrt(null[2])
@@ -269,7 +269,7 @@ fitNullNonNormalLl <- function(likelihoodApproximations) {
     }
   }
   
-  theta <- c(0, 100)
+  theta <- c(0, 1)
   fit <- optim(
     par = theta,
     fn = logLikelihoodNullNonNormalLl,

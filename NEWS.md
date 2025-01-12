@@ -1,3 +1,11 @@
+EmpiricalCalibration 3.1.4
+==========================
+
+Bugfixes
+
+1. Changed initial parameter values when fitting null distribution using asymptotics, avoid errors in some edge cases.
+
+
 EmpiricalCalibration 3.1.3
 ==========================
 
