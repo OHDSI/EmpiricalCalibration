@@ -181,7 +181,7 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
     warning("No valid estimates left. Returning undefined null distribution")
     mcmc <- list(chain = matrix(c(NA,NA), nrow = 1, ncol = 2))
   } else {
-    fit <- optim(c(0, 100), logLikelihoodNullMcmc, logRr = logRr, seLogRr = seLogRr)
+    fit <- optim(c(0, 1), logLikelihoodNullMcmc, logRr = logRr, seLogRr = seLogRr)
     
     # Profile likelihood for roughly correct scale:
     scale <- binarySearchMu(fit$par[1],
