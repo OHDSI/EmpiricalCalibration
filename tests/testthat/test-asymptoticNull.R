@@ -24,6 +24,11 @@ test_that("fitNull argument requirements", {
   expect_warning(fitNull(negatives$logRr, seLogRr),
     regexp = ".*NA standard error.*"
   )
+  
+  logRr <- c(101)
+  expect_warning(fitNull(logRr, negatives$seLogRr),
+                 regexp = ".*extreme logRr.*"
+  )
 })
 
 test_that("fitNull output", {
