@@ -8,7 +8,7 @@ Changes
 
 Bugfixes
 
-1. Changed initial parameter values when fitting null distribution using asymptotics, avoid errors in some edge cases.
+1. Changed initial parameter values when fitting null distribution using asymptotics and MCMC, avoid errors in some edge cases.
 
 
 EmpiricalCalibration 3.1.3

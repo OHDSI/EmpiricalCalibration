@@ -1,11 +1,11 @@
-This update provides 1 change (see NEWS).
+This update provides 1 change and 1 fix (see NEWS).
 
 ---
 
 ## Test environments
-* Ubuntu 20.03, R 4.4.1
-* MacOS, R 4.4,1
-* Windows 10, R 4.4.1
+* Ubuntu 20.03, R 4.4.2
+* MacOS, R 4.4,2
+* Windows 10, R 4.4.2
 * MacOS, R 4.4.1
 
 ## R CMD check results

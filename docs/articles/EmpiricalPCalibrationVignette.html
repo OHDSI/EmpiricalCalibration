@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">EmpiricalCalibration</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.4</span>
       </span>
     </div>
 
@@ -90,7 +90,7 @@
                         <h4 data-toc-skip class="author">Martijn J.
 Schuemie, Marc A. Suchard</h4>
             
-            <h4 data-toc-skip class="date">2024-09-30</h4>
+            <h4 data-toc-skip class="date">2025-02-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/EmpiricalCalibration/blob/HEAD/vignettes/EmpiricalPCalibrationVignette.Rmd" class="external-link"><code>vignettes/EmpiricalPCalibrationVignette.Rmd</code></a></small>
       <div class="hidden name"><code>EmpiricalPCalibrationVignette.Rmd</code></div>
@@ -188,8 +188,8 @@ which we have found to give good performance in the past.</p>
 <pre><code><span><span class="co">## Estimated null distribution</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##      Estimate</span></span>
-<span><span class="co">## Mean   0.7920</span></span>
-<span><span class="co">## SD     0.2835</span></span></code></pre>
+<span><span class="co">## Mean   0.7922</span></span>
+<span><span class="co">## SD     0.2834</span></span></code></pre>
 <p>We see that the mean of our distribution is greater than 0,
 indicating the analysis is positively biased. We also see the standard
 deviation is greater than 0.25, indicating there is considerable
@@ -239,7 +239,7 @@ calibrated p-value for our drug of interest:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrateP.html">calibrateP</a></span><span class="op">(</span><span class="va">null</span>, <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">logRr</span>, <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">seLogRr</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 0.839405</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.8389142</span></span></code></pre>
 <p>In this case, the calibrated p-value is 0.84, meaning we have very
 little confidence we can reject the null hypothesis.</p>
 </div>
@@ -278,10 +278,10 @@ purpose:</p>
 <pre><code><span><span class="co">## Estimated null distribution (using MCMC)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##           Estimate lower .95 upper .95</span></span>
-<span><span class="co">## Mean       0.79140   0.66974    0.9053</span></span>
-<span><span class="co">## Precision 11.91267   6.04624   23.2171</span></span>
+<span><span class="co">## Mean       0.79260   0.67357    0.9052</span></span>
+<span><span class="co">## Precision 11.82262   6.03631   23.4220</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Acceptance rate: 0.3259967400326</span></span></code></pre>
+<span><span class="co">## Acceptance rate: 0.326836731632685</span></span></code></pre>
 <p>We see that there is uncertainty around the estimates of the mean and
 precision (= 1/SD^2), as expressed in the 95% credible intervals. This
 uncertainty can be reduced by either increasing the number of negative
@@ -302,8 +302,8 @@ well as the 95% credible interval:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrateP.html">calibrateP</a></span><span class="op">(</span><span class="va">null</span>, <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">logRr</span>, <span class="va">drugOfInterest</span><span class="op">$</span><span class="va">seLogRr</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
-<pre><code><span><span class="co">##           p    lb95ci  ub95ci</span></span>
-<span><span class="co">## 1 0.8359202 0.5466381 0.99161</span></span></code></pre>
+<pre><code><span><span class="co">##           p    lb95ci   ub95ci</span></span>
+<span><span class="co">## 1 0.8335035 0.5474084 0.991208</span></span></code></pre>
 <p>Note that there is uncertainty around the calibrated p-value as
 expressed in the 95% credible interval.</p>
 <p>We can also visualize the uncertainty in the p-value calibration by
