@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Martijn Schuemie \email{schuemie@ohdsi.org} (\href{https://orcid.org/0000-0002-0817-5361}{ORCID})
   \item Marc Suchard (\href{https://orcid.org/0000-0001-9818-479X}{ORCID})
 }
 

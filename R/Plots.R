@@ -183,7 +183,7 @@ plotCalibrationEffect <- function(logRrNegatives,
     stop("yLimits must be a vector of length 2")
   }
 
-  x <- exp(seq(log(xLimits[1]), log(xLimits[2]), by = 0.01))
+  x <- exp(seq(log(xLimits[1]), log(xLimits[2]), length.out = 400))
   if (is(null, "null")) {
     y <- logRrtoSE(log(x), alpha, null[1], null[2])
   } else {
