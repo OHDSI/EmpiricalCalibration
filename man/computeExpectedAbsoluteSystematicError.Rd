@@ -23,6 +23,9 @@ distribution is equal to its mean (mu), and is insensitive to the spread of the 
 
 Taking the absolute value of the expected systematic error we can express both mean and spread of the
 estimated null distribution.
+
+Note that the expected absolute systematic error is expressed on the scale of the estimates used to fit the
+null (for example log relative risk or risk difference), so values are not comparable across scales.
 }
 \examples{
 data(sccs)

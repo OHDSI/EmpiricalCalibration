@@ -5,22 +5,29 @@
 \title{Evaluate confidence interval calibration}
 \usage{
 evaluateCiCalibration(
-  logRr,
-  seLogRr,
-  trueLogRr,
-  strata = as.factor(trueLogRr),
-  crossValidationGroup = 1:length(logRr),
-  legacy = FALSE
+  estimate,
+  se,
+  trueEffect,
+  scale = "log relative risk",
+  strata = as.factor(trueEffect),
+  crossValidationGroup = 1:length(estimate),
+  legacy = FALSE,
+  logRr = NULL,
+  seLogRr = NULL,
+  trueLogRr = NULL
 )
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale.}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale
+these are log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the
-standard error = (log(<lower bound 95 percent confidence interval>) -
-log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative
+risk scale often the standard error = (log(<lower bound 95 percent
+confidence interval>) - log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
 
-\item{trueLogRr}{The true log relative risk.}
+\item{trueEffect}{The true effect (on the same scale as \code{estimate}).}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
 
 \item{strata}{Variable used to stratify the plot. Set \code{strata = NULL} for no
 stratification.}
@@ -32,12 +39,21 @@ derived from that negative control.}
 
 \item{legacy}{If true, a legacy error model will be fitted, meaning standard
 deviation is linear on the log scale. If false, standard deviation
-is assumed to be simply linear.}
+is assumed to be simply linear. The legacy model is not supported for the
+risk difference scale.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} with \code{scale = "log relative risk"} instead.}
+
+\item{trueLogRr}{DEPRECATED. Use \code{trueEffect} with \code{scale = "log relative risk"} instead.}
 }
 \value{
 A data frame specifying the coverage per strata (usually true effect size) for a wide range of widths
 of the confidence interval. The result also includes the fraction of estimates that was below and above
-the confidence interval.
+the confidence interval. The \code{trueEffect} column holds the true effect per stratum: the relative risk
+(exponentiated true log relative risk) for \code{scale = "log relative risk"}, and the true risk difference for
+\code{scale = "risk difference"}. For backwards compatibility the deprecated column \code{trueRr} holds the same values.
 }
 \description{
 \code{evaluateCiCalibration} performs a leave-one-out cross-validation to evaluate the calibration
@@ -49,7 +65,7 @@ effect is computed by fitting a null using all other controls.
 }
 \examples{
 \dontrun{
-data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-eval <- evaluateCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
+data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+eval <- evaluateCiCalibration(data$estimate, data$se, data$trueEffect)
 }
 }

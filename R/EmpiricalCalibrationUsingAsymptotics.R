@@ -26,10 +26,13 @@
 #' et al (2014).
 #'
 #'
-#' @param logRr     A numeric vector of effect estimates on the log scale
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025)
+#' @param estimate  A numeric vector of effect estimates. On the log relative risk scale these are
+#'                  log relative risks.
+#' @param se        The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                  often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                  log(<effect estimate>))/qnorm(0.025)
+#' @param logRr     DEPRECATED. Use `estimate` instead.
+#' @param seLogRr   DEPRECATED. Use `se` instead.
 #'
 #' @return
 #' An object containing the parameters of the null distribution.
@@ -45,38 +48,43 @@
 #' empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 #'
 #' @export
-fitNull <- function(logRr, seLogRr) {
-  if (any(is.infinite(seLogRr))) {
+fitNull <- function(estimate, se, logRr = NULL, seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+  }
+  if (any(is.infinite(se))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
-    logRr <- logRr[!is.infinite(seLogRr)]
-    seLogRr <- seLogRr[!is.infinite(seLogRr)]
+    estimate <- estimate[!is.infinite(se)]
+    se <- se[!is.infinite(se)]
   }
-  if (any(is.infinite(logRr))) {
-    warning("Estimate(s) with infinite logRr detected. Removing before fitting null distribution")
-    seLogRr <- seLogRr[!is.infinite(logRr)]
-    logRr <- logRr[!is.infinite(logRr)]
+  if (any(is.infinite(estimate))) {
+    warning("Estimate(s) with infinite estimate detected. Removing before fitting null distribution")
+    se <- se[!is.infinite(estimate)]
+    estimate <- estimate[!is.infinite(estimate)]
   }
-  if (any(is.na(seLogRr))) {
+  if (any(is.na(se))) {
     warning("Estimate(s) with NA standard error detected. Removing before fitting null distribution")
-    logRr <- logRr[!is.na(seLogRr)]
-    seLogRr <- seLogRr[!is.na(seLogRr)]
+    estimate <- estimate[!is.na(se)]
+    se <- se[!is.na(se)]
   }
-  if (any(is.na(logRr))) {
-    warning("Estimate(s) with NA logRr detected. Removing before fitting null distribution")
-    seLogRr <- seLogRr[!is.na(logRr)]
-    logRr <- logRr[!is.na(logRr)]
+  if (any(is.na(estimate))) {
+    warning("Estimate(s) with NA estimate detected. Removing before fitting null distribution")
+    se <- se[!is.na(estimate)]
+    estimate <- estimate[!is.na(estimate)]
   }
-  if (any(abs(logRr) > log(100))) {
-    warning("Estimate(s) with extreme logRr detected: abs(logRr) > log(100). Removing before fitting null distribution")
-    seLogRr <- seLogRr[abs(logRr) <= log(100)]
-    logRr <- logRr[abs(logRr) <= log(100)]
+  if (any(abs(estimate) > log(100))) {
+    warning("Extreme estimate(s) detected: abs(estimate) > log(100). Removing before fitting null distribution")
+    se <- se[abs(estimate) <= log(100)]
+    estimate <- estimate[abs(estimate) <= log(100)]
   }
-  if (length(logRr) == 0) {
+  if (length(estimate) == 0) {
     warning("No estimates remaining")
     null <- c(NA, NA)
   } else {
     theta <- c(0, 1)
-    fit <- optim(theta, logLikelihoodNull, logRr = logRr, seLogRr = seLogRr)
+    fit <- optim(theta, logLikelihoodNull, logRr = estimate, seLogRr = se)
     null <- fit$par
     null[2] <- 1 / sqrt(null[2])
   }
@@ -102,15 +110,18 @@ print.null <- function(x, ...) {
 #' @details
 #' This function computes a calibrated two-sided p-value as described in Schuemie et al (2014).
 #'
-#' @param logRr     A numeric vector of one or more effect estimates on the log scale
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025)
+#' @param estimate  A numeric vector of one or more effect estimates, on the same scale as used when
+#'                  fitting the null (for example log relative risks).
+#' @param se        The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                  often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                  log(<effect estimate>))/qnorm(0.025)
 #' @param null      An object of class `null` created using the `fitNull` function or an
 #'                  object of class `mcmcNull` created using the `fitMcmcNull` function.
 #' @param twoSided  Compute two-sided (TRUE) or one-sided (FALSE) p-value?
 #' @param upper     If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?
 #' @param ...       Any additional parameters (currently none).
+#' @param logRr     DEPRECATED. Use `estimate` instead.
+#' @param seLogRr   DEPRECATED. Use `se` instead.
 #'
 #' @return
 #' The calibrated p-value.
@@ -127,7 +138,7 @@ print.null <- function(x, ...) {
 #' empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
 #'
 #' @export
-calibrateP <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...) {
+calibrateP <- function(null, estimate, se, twoSided = TRUE, upper = TRUE, ..., logRr = NULL, seLogRr = NULL) {
   UseMethod("calibrateP")
 }
 
@@ -136,18 +147,23 @@ calibrateP <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...)
 #' calibrateP Computes the calibrated P-value using asymptotic assumptions.
 #'
 #' @export
-calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...) {
-  if (length(logRr) != length(seLogRr)) {
-    stop("The logRr and seLogRr arguments must be of equal length")
+calibrateP.null <- function(null, estimate, se, twoSided = TRUE, upper = TRUE, ..., logRr = NULL, seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+  }
+  if (length(estimate) != length(se)) {
+    stop("The estimate and se arguments must be of equal length")
   }
   
   calibrateOneP <- function(i) {
-    if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
+    if (is.na(estimate[i]) || is.infinite(estimate[i]) || is.na(se[i]) || is.infinite(se[i])) {
       return(NA)
     } else {
-      pUpperBound <- pnorm((null[1] - logRr[i]) / sqrt(null[2]^2 + seLogRr[i]^2))
+      pUpperBound <- pnorm((null[1] - estimate[i]) / sqrt(null[2]^2 + se[i]^2))
     }
-    pLowerBound <- pnorm((logRr[i] - null[1]) / sqrt(null[2]^2 + seLogRr[i]^2))
+    pLowerBound <- pnorm((estimate[i] - null[1]) / sqrt(null[2]^2 + se[i]^2))
     if (twoSided) {
       return(2 * min(pUpperBound, pLowerBound))
     } else if (upper) {
@@ -157,7 +173,7 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
     }
   }
   
-  calibratedP <- sapply(1:length(logRr), calibrateOneP)
+  calibratedP <- sapply(1:length(estimate), calibrateOneP)
   names(calibratedP) <- NULL
   return(calibratedP)
 }
@@ -165,15 +181,17 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
 #' Compute the (traditional) p-value
 #'
 #' @description
-#' `computeTraditionalP` computes the traditional two-sided p-value based on the log of the
-#' relative risk and the standard error of the log of the relative risk.
+#' `computeTraditionalP` computes the traditional two-sided p-value based on the effect estimate
+#' (for example the log of the relative risk) and its standard error.
 #'
-#' @param logRr     A numeric vector of one or more effect estimates on the log scale
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025)
+#' @param estimate  A numeric vector of one or more effect estimates (for example log relative risks).
+#' @param se        The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                  often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                  log(<effect estimate>))/qnorm(0.025)
 #' @param twoSided  Compute two-sided (TRUE) or one-sided (FALSE) p-value?
 #' @param upper     If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?
+#' @param logRr     DEPRECATED. Use `estimate` instead.
+#' @param seLogRr   DEPRECATED. Use `se` instead.
 #'
 #' @return
 #' The (traditional) p-value.
@@ -184,8 +202,13 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
 #' computeTraditionalP(positive$logRr, positive$seLogRr)
 #'
 #' @export
-computeTraditionalP <- function(logRr, seLogRr, twoSided = TRUE, upper = TRUE) {
-  z <- logRr / seLogRr
+computeTraditionalP <- function(estimate, se, twoSided = TRUE, upper = TRUE, logRr = NULL, seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+  }
+  z <- estimate / se
   pUpperBound <- 1 - pnorm(z)
   pLowerBound <- pnorm(z)
   if (twoSided) {
@@ -207,9 +230,17 @@ computeTraditionalP <- function(logRr, seLogRr, twoSided = TRUE, upper = TRUE) {
 #' This function fits a Gaussian function to the negative control estimates, using non-normal
 #' approximations of the per-negative control log likelihood.
 #'
+#' Note: for non-normal approximations the optimization starts at a null with mean 0 and standard deviation 1, and
+#' is not rescaled, so these may not be reliable for estimates on a scale with very small standard errors, such as
+#' risk differences.
 #'
 #' @param likelihoodApproximations Either a data frame containing normal, skew-normal, or custom parametric likelihood
-#'                                 approximations, or a list of (adaptive) grid likelihood profiles.
+#'                                 approximations, or a list of (adaptive) grid likelihood profiles. Normal
+#'                                 approximations are identified by the `estimate` and `se` columns (or the
+#'                                 deprecated `logRr` and `seLogRr` columns).
+#' @param scale                    The scale of the effect estimates. Can be `"log relative risk"` or
+#'                                 `"risk difference"`. Currently only used when the approximations are
+#'                                 normal (see details).
 #'
 #' @return
 #' An object containing the parameters of the null distribution.
@@ -221,11 +252,15 @@ computeTraditionalP <- function(logRr, seLogRr, twoSided = TRUE, upper = TRUE) {
 #' null
 #'
 #' @export
-fitNullNonNormalLl <- function(likelihoodApproximations) {
+fitNullNonNormalLl <- function(likelihoodApproximations, scale = "log relative risk") {
   if (is.data.frame(likelihoodApproximations)) {
-    if ("logRr" %in% colnames(likelihoodApproximations)) {
+    likelihoodApproximations <- renameLegacyNormalColumns(likelihoodApproximations)
+    if ("estimate" %in% colnames(likelihoodApproximations)) {
       message("Detected data following normal distribution")
-      return(fitNull(logRr = likelihoodApproximations$logRr, seLogRr = likelihoodApproximations$seLogRr))
+      return(fitNull(
+        estimate = likelihoodApproximations$estimate,
+        se = likelihoodApproximations$se
+      ))
     } else if ("gamma" %in% colnames(likelihoodApproximations)) {
       message("Detected data following custom parameric distribution")
       type <- "custom"

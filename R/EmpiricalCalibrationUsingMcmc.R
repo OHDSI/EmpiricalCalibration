@@ -137,15 +137,18 @@ binarySearchSigma <- function(modeMu,
 #' This is an experimental function for computing the 95 percent credible interval of a calibrated
 #' p-value using Markov-Chain Monte Carlo (MCMC).
 #'
-#' @param logRr     A numeric vector of effect estimates on the log scale
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025)
+#' @param estimate  A numeric vector of effect estimates. On the log relative risk scale these are
+#'                  log relative risks.
+#' @param se        The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                  often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                  log(<effect estimate>))/qnorm(0.025)
 #' @param iter      Number of iterations of the MCMC.
+#' @param logRr     DEPRECATED. Use `estimate` instead.
+#' @param seLogRr   DEPRECATED. Use `se`  instead.
 #'
 #' @return
-#' An object of type `mcmcNull` containing the mean and standard deviation (both on the log
-#' scale) of the null distribution, as well as the MCMC trace.
+#' An object of type `mcmcNull` containing the mean and precision (on the scale of the estimates) of the
+#' null distribution, as well as the MCMC trace.
 #'
 #' @examples
 #' \dontrun{
@@ -158,55 +161,62 @@ binarySearchSigma <- function(modeMu,
 #' calibrateP(null, positive$logRr, positive$seLogRr)
 #' }
 #' @export
-fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
-  if (any(is.infinite(seLogRr))) {
+fitMcmcNull <- function(estimate,
+                        se,
+                        iter = 100000,
+                        logRr = NULL,
+                        seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+  }
+  if (any(is.infinite(se))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
-    logRr <- logRr[!is.infinite(seLogRr)]
-    seLogRr <- seLogRr[!is.infinite(seLogRr)]
+    estimate <- estimate[!is.infinite(se)]
+    se <- se[!is.infinite(se)]
   }
-  if (any(is.infinite(logRr))) {
-    warning("Estimate(s) with infinite logRr detected. Removing before fitting null distribution")
-    seLogRr <- seLogRr[!is.infinite(logRr)]
-    logRr <- logRr[!is.infinite(logRr)]
+  if (any(is.infinite(estimate))) {
+    warning("Estimate(s) with infinite estimate detected. Removing before fitting null distribution")
+    se <- se[!is.infinite(estimate)]
+    estimate <- estimate[!is.infinite(estimate)]
   }
-  if (any(is.na(seLogRr))) {
+  if (any(is.na(se))) {
     warning("Estimate(s) with NA standard error detected. Removing before fitting null distribution")
-    logRr <- logRr[!is.na(seLogRr)]
-    seLogRr <- seLogRr[!is.na(seLogRr)]
+    estimate <- estimate[!is.na(se)]
+    se <- se[!is.na(se)]
   }
-  if (any(is.na(logRr))) {
-    warning("Estimate(s) with NA logRr detected. Removing before fitting null distribution")
-    seLogRr <- seLogRr[!is.na(logRr)]
-    logRr <- logRr[!is.na(logRr)]
+  if (any(is.na(estimate))) {
+    warning("Estimate(s) with NA estimate detected. Removing before fitting null distribution")
+    se <- se[!is.na(estimate)]
+    estimate <- estimate[!is.na(estimate)]
   }
-  if (any(abs(logRr) > log(100))) {
-    warning("Estimate(s) with extreme logRr detected: abs(logRr) > log(100). Removing before fitting null distribution")
-    seLogRr <- seLogRr[abs(logRr) <= log(100)]
-    logRr <- logRr[abs(logRr) <= log(100)]
+  if (any(abs(estimate) > log(100))) {
+    warning("Extreme estimate(s) detected: abs(estimate) > log(100). Removing before fitting null distribution")
+    se <- se[abs(estimate) <= log(100)]
+    estimate <- estimate[abs(estimate) <= log(100)]
   }
-  if (length(logRr) == 0) {
+  if (length(estimate) == 0) {
     warning("No valid estimates left. Returning undefined null distribution")
     mcmc <- list(chain = matrix(c(NA,NA), nrow = 1, ncol = 2))
   } else {
-    priorScale <-  1/median(seLogRr, na.rm = TRUE)^2
-    
-    
-    fit <- optim(c(0, 1), logLikelihoodNullMcmc, logRr = logRr, seLogRr = seLogRr, priorScale = priorScale)
+    priorScale <-  1/median(se, na.rm = TRUE)^2
+
+    fit <- optim(c(0, 1), logLikelihoodNullMcmc, logRr = estimate, seLogRr = se, priorScale = priorScale)
     
     # Profile likelihood for roughly correct scale:
-    scale <- binarySearchMu(fit$par[1],
-                            fit$par[2],
-                            logRrNegatives = logRr,
-                            seLogRrNegatives = seLogRr,
-                            priorScale = priorScale)
-    scale <- c(scale, binarySearchSigma(fit$par[1],
-                                        fit$par[2],
-                                        logRrNegatives = logRr,
-                                        seLogRrNegatives = seLogRr,
-                                        priorScale = priorScale))
+    proposalScale <- binarySearchMu(fit$par[1],
+                                    fit$par[2],
+                                    logRrNegatives = estimate,
+                                    seLogRrNegatives = se,
+                                    priorScale = priorScale)
+    proposalScale <- c(proposalScale, binarySearchSigma(fit$par[1],
+                                                        fit$par[2],
+                                                        logRrNegatives = estimate,
+                                                        seLogRrNegatives = se,
+                                                        priorScale = priorScale))
     
-    # writeLines(paste('Scale:', paste(scale,collapse=',')))
-    mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr, priorScale)
+    mcmc <- runMetropolisMcmc(fit$par, iterations = iter, proposalScale, estimate, se, priorScale)
   }
   result <- c(median(mcmc$chain[, 1]), median(mcmc$chain[, 2]))
   attr(result, "mcmc") <- mcmc
@@ -246,18 +256,31 @@ print.mcmcNull <- function(x, ...) {
 #'                     interval.
 #'
 #' @export
-calibrateP.mcmcNull <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, pValueOnly, ...) {
+calibrateP.mcmcNull <- function(null,
+                                estimate,
+                                se,
+                                twoSided = TRUE,
+                                upper = TRUE,
+                                pValueOnly,
+                                ...,
+                                logRr = NULL,
+                                seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+  }
   mcmc <- attr(null, "mcmc")
-  adjustedP <- data.frame(p = rep(as.numeric(NA), length(logRr)), lb95ci = as.numeric(NA), ub95ci = as.numeric(NA))
+  adjustedP <- data.frame(p = rep(as.numeric(NA), length(estimate)), lb95ci = as.numeric(NA), ub95ci = as.numeric(NA))
   if (!is.na(null[1])) {
-    for (i in 1:length(logRr)) {
-      if (is.na(logRr[i]) || is.infinite(logRr[i]) || is.na(seLogRr[i]) || is.infinite(seLogRr[i])) {
+    for (i in 1:length(estimate)) {
+      if (is.na(estimate[i]) || is.infinite(estimate[i]) || is.na(se[i]) || is.infinite(se[i])) {
         adjustedP$p[i] <- NA
         adjustedP$lb95ci[i] <- NA
         adjustedP$ub95ci[i] <- NA
       } else {
-        pUpperBound <- pnorm((mcmc$chain[, 1] - logRr[i]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
-        pLowerBound <- pnorm((logRr[i] - mcmc$chain[, 1]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + seLogRr[i]^2))
+        pUpperBound <- pnorm((mcmc$chain[, 1] - estimate[i]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + se[i]^2))
+        pLowerBound <- pnorm((estimate[i] - mcmc$chain[, 1]) / sqrt((1 / sqrt(mcmc$chain[, 2]))^2 + se[i]^2))
         if (twoSided) {
           p <- pUpperBound
           p[pLowerBound < p] <- pLowerBound[pLowerBound < p]

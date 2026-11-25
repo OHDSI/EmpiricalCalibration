@@ -5,7 +5,15 @@ This major version introduces the ability to handle absolute effect estimates. S
 
 1. The `fitMcmcNull()` function now automatically estimates the scale of the prior on the precision. 
 
-2. Changing `logRr` and `seLogRr` to `estimate` and `se` throughout, with a `scale` argument where needed. Supported scales are "log relative risk" and "risk difference". The old arguments are deprecated.
+2. Changing `logRr` and `seLogRr` to `estimate` and `se` throughout, with a `scale` argument where needed. Supported scales are "log relative risk" and "risk difference". The old arguments are deprecated. Legacy `logRr` and `seLogRr` columns are still accepted as input.
+
+3. `simulateControls()` and `calibrateConfidenceInterval()` now return `estimate`, `se` (and `trueEffect`, `lb`, `ub`) columns, in addition to the old columns. `evaluateCiCalibration()` returns a `trueEffect` column (and still `trueRr`).
+
+4. Removing extreme estimates (relative risk < 0.01 or > 100) is only done on the log relative risk scale.
+
+5. Fitting functions internally rescale risk differences for numerical stability. Results are reported on the original scale.
+
+6. `scale` is inserted right after the data arguments, which changes the positional order of later arguments in several functions (e.g. `plotCalibration()`, `plotForest()`, `fitMcmcNull()`).
 
 
 

@@ -5,20 +5,26 @@
 \title{Create a calibration plot}
 \usage{
 plotCalibration(
-  logRr,
-  seLogRr,
+  estimate,
+  se,
+  scale = "log relative risk",
   useMcmc = FALSE,
   legendPosition = "right",
   title,
-  fileName = NULL
+  fileName = NULL,
+  logRr = NULL,
+  seLogRr = NULL
 )
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale these
+are log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the
-standard error = (log(<lower bound 95 percent confidence interval>) -
-log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk
+scale often the standard error = (log(<lower bound 95 percent confidence
+interval>) - log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
 
 \item{useMcmc}{Use MCMC to estimate the calibrated P-value?}
 
@@ -30,6 +36,10 @@ log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See
 the function \code{ggsave} in the ggplot2 package for supported file
 formats.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} with \code{scale = "log relative risk"} instead.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.

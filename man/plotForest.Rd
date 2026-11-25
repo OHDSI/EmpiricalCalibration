@@ -5,29 +5,40 @@
 \title{Create a forest plot}
 \usage{
 plotForest(
-  logRr,
-  seLogRr,
+  estimate,
+  se,
   names,
-  xLabel = "Relative risk",
+  scale = "log relative risk",
+  xLabel = NULL,
   title,
-  fileName = NULL
+  fileName = NULL,
+  logRr = NULL,
+  seLogRr = NULL
 )
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale these are
+log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025)}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
 
 \item{names}{A vector containing the names of the drugs or outcomes}
 
-\item{xLabel}{The label on the x-axis: the name of the effect estimate}
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
+
+\item{xLabel}{The label on the x-axis: the name of the effect estimate. Defaults to
+"Relative risk" or "Risk difference", depending on the scale.}
 
 \item{title}{Optional: the main title for the plot}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
 function \code{ggsave} in the ggplot2 package for supported file formats.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} with \code{scale = "log relative risk"} instead.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -36,8 +47,10 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 \code{plotForest} creates a forest plot of effect size estimates.
 }
 \details{
-Creates a forest plot of effect size estimates (ratios). Estimates that are significantly different
-from 1 (alpha = 0.05) are marked in orange, others are marked in blue.
+Creates a forest plot of effect size estimates. For the log relative risk scale the estimates are shown as
+ratios on a log axis, and estimates that are significantly different from 1 (alpha = 0.05) are marked in
+orange, others are marked in blue. For the risk difference scale estimates are shown on a linear axis, and
+estimates that are significantly different from 0 are marked in orange.
 }
 \examples{
 data(sccs)

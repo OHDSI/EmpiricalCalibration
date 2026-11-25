@@ -4,20 +4,25 @@
 \alias{fitMcmcNull}
 \title{Fit the null distribution using MCMC}
 \usage{
-fitMcmcNull(logRr, seLogRr, iter = 1e+05)
+fitMcmcNull(estimate, se, iter = 1e+05, logRr = NULL, seLogRr = NULL)
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale these are
+log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025)}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
 
 \item{iter}{Number of iterations of the MCMC.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se}  instead.}
 }
 \value{
-An object of type \code{mcmcNull} containing the mean and standard deviation (both on the log
-scale) of the null distribution, as well as the MCMC trace.
+An object of type \code{mcmcNull} containing the mean and precision (on the scale of the estimates) of the
+null distribution, as well as the MCMC trace.
 }
 \description{
 \code{fitNull} fits the null distribution to a set of negative controls using Markov Chain Monte

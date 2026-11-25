@@ -7,35 +7,60 @@
 \alias{calibrateP.mcmcNull}
 \title{Calibrate the p-value}
 \usage{
-calibrateP(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...)
+calibrateP(
+  null,
+  estimate,
+  se,
+  twoSided = TRUE,
+  upper = TRUE,
+  ...,
+  logRr = NULL,
+  seLogRr = NULL
+)
 
-\method{calibrateP}{null}(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE, ...)
+\method{calibrateP}{null}(
+  null,
+  estimate,
+  se,
+  twoSided = TRUE,
+  upper = TRUE,
+  ...,
+  logRr = NULL,
+  seLogRr = NULL
+)
 
 \method{calibrateP}{mcmcNull}(
   null,
-  logRr,
-  seLogRr,
+  estimate,
+  se,
   twoSided = TRUE,
   upper = TRUE,
   pValueOnly,
-  ...
+  ...,
+  logRr = NULL,
+  seLogRr = NULL
 )
 }
 \arguments{
 \item{null}{An object of class \code{null} created using the \code{fitNull} function or an
 object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.}
 
-\item{logRr}{A numeric vector of one or more effect estimates on the log scale}
+\item{estimate}{A numeric vector of one or more effect estimates, on the same scale as used when
+fitting the null (for example log relative risks).}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025)}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
 
 \item{twoSided}{Compute two-sided (TRUE) or one-sided (FALSE) p-value?}
 
 \item{upper}{If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?}
 
 \item{...}{Any additional parameters (currently none).}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} instead.}
 
 \item{pValueOnly}{If true, will return only the calibrated P-value itself, not the credible
 interval.}

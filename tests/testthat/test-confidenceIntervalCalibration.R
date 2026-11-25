@@ -28,7 +28,7 @@ test_that("fitSystematicErrorModel requirements", {
       seLogRr   = seLogRr,
       trueLogRr = trueLogRr
     ),
-    regexp = ".*infinite logRr"
+    regexp = ".*infinite estimate"
   )
 
   # seLogRr is NA
@@ -52,7 +52,7 @@ test_that("fitSystematicErrorModel requirements", {
       seLogRr   = seLogRr,
       trueLogRr = trueLogRr
     ),
-    regexp = ".*NA logRr.*"
+    regexp = ".*NA estimate.*"
   )
 
   controls <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))

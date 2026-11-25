@@ -11,7 +11,9 @@ calibrateLlr(null, likelihoodApproximation, twoSided = FALSE, upper = TRUE)
 object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.}
 
 \item{likelihoodApproximation}{Either a data frame containing normal, skew-normal, or custom parametric likelihood
-approximations, or a list of (adaptive) grid likelihood profiles.}
+approximations, or a list of (adaptive) grid likelihood profiles. Normal
+approximations are identified by the \code{estimate} and \code{se} columns (or the
+deprecated \code{logRr} and \code{seLogRr} columns).}
 
 \item{twoSided}{Compute two-sided (TRUE) or one-sided (FALSE) p-value?}
 

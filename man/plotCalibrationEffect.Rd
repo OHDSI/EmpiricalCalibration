@@ -61,7 +61,7 @@ formats.}
 
 \item{logRrNegatives}{DEPRECATED. Use \code{estimateNegatives} with \code{scale = "log relative risk"} instead.}
 
-\item{seLogRrNegatives}{DEPRECATED. Use \code{seNegatives} with \code{scale = "log relative risk"} instead..}
+\item{seLogRrNegatives}{DEPRECATED. Use \code{seNegatives} with \code{scale = "log relative risk"} instead.}
 
 \item{logRrPositives}{DEPRECATED. Use \code{estimatePositives} with \code{scale = "log relative risk"} instead.}
 

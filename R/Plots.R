@@ -22,17 +22,24 @@
 #' `plotForest` creates a forest plot of effect size estimates.
 #'
 #' @details
-#' Creates a forest plot of effect size estimates (ratios). Estimates that are significantly different
-#' from 1 (alpha = 0.05) are marked in orange, others are marked in blue.
+#' Creates a forest plot of effect size estimates. For the log relative risk scale the estimates are shown as
+#' ratios on a log axis, and estimates that are significantly different from 1 (alpha = 0.05) are marked in
+#' orange, others are marked in blue. For the risk difference scale estimates are shown on a linear axis, and
+#' estimates that are significantly different from 0 are marked in orange.
 #'
 #'
-#' @param logRr      A numeric vector of effect estimates on the log scale
-#' @param seLogRr    The standard error of the log of the effect estimates. Hint: often the standard
-#'                   error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                   estimate>))/qnorm(0.025)
+#' @param estimate   A numeric vector of effect estimates. On the log relative risk scale these are
+#'                   log relative risks.
+#' @param se         The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                   often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                   log(<effect estimate>))/qnorm(0.025)
 #' @param names      A vector containing the names of the drugs or outcomes
-#' @param xLabel     The label on the x-axis: the name of the effect estimate
+#' @template Scale
+#' @param xLabel     The label on the x-axis: the name of the effect estimate. Defaults to
+#'                   "Relative risk" or "Risk difference", depending on the scale.
 #' @param title      Optional: the main title for the plot
+#' @param logRr      DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr    DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the `ggsave` function to save to file.
@@ -45,38 +52,73 @@
 #' plotForest(negatives$logRr, negatives$seLogRr, negatives$drugName)
 #'
 #' @export
-plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", title, fileName = NULL) {
-  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+plotForest <- function(estimate,
+                       se,
+                       names,
+                       scale = "log relative risk",
+                       xLabel = NULL,
+                       title,
+                       fileName = NULL,
+                       logRr = NULL,
+                       seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  checkmate::assertString(xLabel, null.ok = TRUE)
+  if (is.null(xLabel)) {
+    xLabel <- if (scale == LOG_RELATIVE_RISK) "Relative risk" else "Risk difference"
+  }
   theme <- ggplot2::element_text(colour = "#000000", size = 6)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 5, hjust = 1)
   col <- c(rgb(0, 0, 0.8, alpha = 1), rgb(0.8, 0.4, 0, alpha = 1))
   colFill <- c(rgb(0, 0, 1, alpha = 0.5), rgb(1, 0.4, 0, alpha = 0.5))
   data <- data.frame(
     DRUG_NAME = as.factor(names),
-    logRr = logRr,
-    logLb95Rr = logRr + qnorm(0.025) *
-      seLogRr, logUb95Rr = logRr + qnorm(0.975) * seLogRr
+    estimate = estimate,
+    lb95 = estimate + qnorm(0.025) * se,
+    ub95 = estimate + qnorm(0.975) * se
   )
-  data$significant <- data$logLb95Rr > 0 | data$logUb95Rr < 0
+  data$significant <- data$lb95 > 0 | data$ub95 < 0
   data$DRUG_NAME <- factor(data$DRUG_NAME, levels = rev(levels(data$DRUG_NAME)))
+  if (scale == LOG_RELATIVE_RISK) {
+    breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+    labels <- breaks
+    nullValue <- 1
+    data$estimate <- exp(data$estimate)
+    data$lb95 <- exp(data$lb95)
+    data$ub95 <- exp(data$ub95)
+    yScale <- ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = labels)
+    limits <- c(0.25, 10)
+  } else {
+    nullValue <- 0
+    yScale <- ggplot2::scale_y_continuous(xLabel)
+    limits <- NULL
+  }
   plot <- ggplot2::ggplot(
     data,
     ggplot2::aes(
       x = .data$DRUG_NAME,
-      y = exp(.data$logRr),
-      ymin = exp(.data$logLb95Rr),
-      ymax = exp(.data$logUb95Rr),
+      y = .data$estimate,
+      ymin = .data$lb95,
+      ymax = .data$ub95,
       colour = .data$significant,
       fill = .data$significant
     )
-  ) +
-    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
-    ggplot2::geom_hline(yintercept = 1, size = 0.5) +
+  )
+  if (scale == LOG_RELATIVE_RISK) {
+    plot <- plot + ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2)
+  }
+  plot <- plot +
+    ggplot2::geom_hline(yintercept = nullValue, size = 0.5) +
     ggplot2::geom_pointrange(shape = 23) +
     ggplot2::scale_colour_manual(values = col) +
     ggplot2::scale_fill_manual(values = colFill) +
-    ggplot2::coord_flip(ylim = c(0.25, 10)) +
-    ggplot2::scale_y_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) +
+    ggplot2::coord_flip(ylim = limits) +
+    yScale +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
@@ -96,7 +138,7 @@ plotForest <- function(logRr, seLogRr, names, xLabel = "Relative risk", title, f
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
-    ggplot2::ggsave(fileName, plot, width = 5, height = 2.5 + length(logRr) * 0.8, dpi = 400)
+    ggplot2::ggsave(fileName, plot, width = 5, height = 2.5 + length(estimate) * 0.8, dpi = 400)
   }
   return(plot)
 }
@@ -139,7 +181,7 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' @param xLimits            Vector of length 2 for limits of the plot x axis - defaults to 0.25, 10
 #' @param yLimits            Vector of length 2 for size limits of the y axis - defaults to 0, 1.5
 #' @param logRrNegatives     DEPRECATED. Use `estimateNegatives` with `scale = "log relative risk"` instead.
-#' @param seLogRrNegatives   DEPRECATED. Use `seNegatives` with `scale = "log relative risk"` instead..
+#' @param seLogRrNegatives   DEPRECATED. Use `seNegatives` with `scale = "log relative risk"` instead.
 #' @param logRrPositives     DEPRECATED. Use `estimatePositives` with `scale = "log relative risk"` instead.
 #' @param seLogRrPositives   DEPRECATED. Use `sePositives` with `scale = "log relative risk"` instead.
 #'
@@ -171,6 +213,17 @@ plotCalibrationEffect <- function(estimateNegatives,
                                   seLogRrNegatives = NULL,
                                   logRrPositives = NULL,
                                   seLogRrPositives = NULL) {
+  if (!is.null(logRrNegatives)) {
+    warnDeprecatedArguments(
+      c("logRrNegatives", "seLogRrNegatives", "logRrPositives", "seLogRrPositives"),
+      c("estimateNegatives", "seNegatives", "estimatePositives", "sePositives")
+    )
+    estimateNegatives <- logRrNegatives
+    seNegatives <- seLogRrNegatives
+    estimatePositives <- logRrPositives
+    sePositives <- seLogRrPositives
+    scale <- LOG_RELATIVE_RISK
+  }
   errorMessages <- checkmate::makeAssertCollection()
   checkmate::assertNumeric(estimateNegatives, min.len = 1, add = errorMessages)
   checkmate::assertNumeric(seNegatives, min.len = 1, lower = 0, add = errorMessages)
@@ -186,20 +239,7 @@ plotCalibrationEffect <- function(estimateNegatives,
   checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
   checkmate::assertNumeric(xLimits, len = 2, null.ok = TRUE, add = errorMessages)
   checkmate::assertNumeric(yLimits, len = 2, null.ok = TRUE, lower = 0, add = errorMessages)
-  checkmate::assertNumeric(logRrNegatives, min.len = 1, null.ok = TRUE, add = errorMessages)
-  checkmate::assertNumeric(seLogRrNegatives, min.len = 1, lower = 0, null.ok = TRUE, add = errorMessages)
-  checkmate::assertNumeric(logRrPositives, min.len = 1, null.ok = TRUE, add = errorMessages)
-  checkmate::assertNumeric(seLogRrPositives, min.len = 1, lower = 0, null.ok = TRUE, add = errorMessages)
   checkmate::reportAssertions(collection = errorMessages)
-  if (!is.null(logRrNegatives)) {
-    warning("The logRrNegatives etc. arguments are deprecated.",
-            "Use `estimateNegatives` etc. with `scale = \"log relative risk\"` instead.")
-    estimateNegatives <- logRrNegatives
-    seNegatives <- seLogRrNegatives
-    estimatePositives <- logRrPositives
-    sePositives <- seLogRrPositives
-    scale = "log relative risk"
-  }
   if (is.null(null)) {
     if (showCis) {
       null <- fitMcmcNull(estimateNegatives, seNegatives)
@@ -303,7 +343,14 @@ plotCalibrationEffect <- function(estimateNegatives,
       )
     }
     dummy <- data.frame(text = label)
-    plot <- plot + ggplot2::geom_label(x = log10(0.26), y = 1.49, hjust = "left", vjust = "top", alpha = 0.9, ggplot2::aes(label = .data$text), data = dummy, size = 3.5)
+    if (scale == LOG_RELATIVE_RISK) {
+      labelX <- log10(0.26)
+      labelY <- 1.49
+    } else {
+      labelX <- xLimits[1] + 0.02 * (xLimits[2] - xLimits[1])
+      labelY <- yLimits[2] * 0.99
+    }
+    plot <- plot + ggplot2::geom_label(x = labelX, y = labelY, hjust = "left", vjust = "top", alpha = 0.9, ggplot2::aes(label = .data$text), data = dummy, size = 3.5)
   }
   
   plot <- plot +
@@ -349,7 +396,7 @@ plotCalibrationEffect <- function(estimateNegatives,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
     )
-  if (!missing(estimatePositives)) {
+  if (!is.null(estimatePositives)) {
     plot <- plot + ggplot2::geom_point(
       shape = 23,
       ggplot2::aes(x = .data$x, y = .data$y),
@@ -392,10 +439,12 @@ checkWithinLimits <- function(limits, values, label) {
 #' approximate the diagonal. The plot shows both theoretical (traditional) and empirically calibrated
 #' p-values.
 #'
-#' @param logRr            A numeric vector of effect estimates on the log scale
-#' @param seLogRr          The standard error of the log of the effect estimates. Hint: often the
-#'                         standard error = (log(<lower bound 95 percent confidence interval>) -
-#'                         log(<effect estimate>))/qnorm(0.025)
+#' @param estimate         A numeric vector of effect estimates. On the log relative risk scale these
+#'                         are log relative risks.
+#' @param se               The standard error of the effect estimates. Hint: on the log relative risk
+#'                         scale often the standard error = (log(<lower bound 95 percent confidence
+#'                         interval>) - log(<effect estimate>))/qnorm(0.025)
+#' @template Scale
 #' @param useMcmc          Use MCMC to estimate the calibrated P-value?
 #' @param legendPosition   Where should the legend be positioned? ("none", "left", "right", "bottom",
 #'                         "top")
@@ -403,6 +452,8 @@ checkWithinLimits <- function(limits, values, label) {
 #' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
 #'                         the function `ggsave` in the ggplot2 package for supported file
 #'                         formats.
+#' @param logRr            DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr          DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the `ggsave` function to save to file.
@@ -413,35 +464,45 @@ checkWithinLimits <- function(limits, values, label) {
 #' plotCalibration(negatives$logRr, negatives$seLogRr)
 #'
 #' @export
-plotCalibration <- function(logRr,
-                            seLogRr,
+plotCalibration <- function(estimate,
+                            se,
+                            scale = "log relative risk",
                             useMcmc = FALSE,
                             legendPosition = "right",
                             title,
-                            fileName = NULL) {
-  if (any(is.infinite(seLogRr))) {
+                            fileName = NULL,
+                            logRr = NULL,
+                            seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  if (any(is.infinite(se))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
-    logRr <- logRr[!is.infinite(seLogRr)]
-    seLogRr <- seLogRr[!is.infinite(seLogRr)]
+    estimate <- estimate[!is.infinite(se)]
+    se <- se[!is.infinite(se)]
   }
-  if (any(is.infinite(logRr))) {
-    warning("Estimate(s) with infinite logRr detected. Removing before fitting null distribution")
-    seLogRr <- seLogRr[!is.infinite(logRr)]
-    logRr <- logRr[!is.infinite(logRr)]
+  if (any(is.infinite(estimate))) {
+    warning("Estimate(s) with infinite estimate detected. Removing before fitting null distribution")
+    se <- se[!is.infinite(estimate)]
+    estimate <- estimate[!is.infinite(estimate)]
   }
-  if (any(is.na(seLogRr))) {
+  if (any(is.na(se))) {
     warning("Estimate(s) with NA standard error detected. Removing before fitting null distribution")
-    logRr <- logRr[!is.na(seLogRr)]
-    seLogRr <- seLogRr[!is.na(seLogRr)]
+    estimate <- estimate[!is.na(se)]
+    se <- se[!is.na(se)]
   }
-  if (any(is.na(logRr))) {
-    warning("Estimate(s) with NA logRr detected. Removing before fitting null distribution")
-    seLogRr <- seLogRr[!is.na(logRr)]
-    logRr <- logRr[!is.na(logRr)]
+  if (any(is.na(estimate))) {
+    warning("Estimate(s) with NA estimate detected. Removing before fitting null distribution")
+    se <- se[!is.na(estimate)]
+    estimate <- estimate[!is.na(estimate)]
   }
   
-  data <- data.frame(logRr = logRr, SE = seLogRr)
-  data$Z <- data$logRr / data$SE
+  data <- data.frame(estimate = estimate, SE = se)
+  data$Z <- data$estimate / data$SE
   data$P <- 2 * pmin(pnorm(data$Z), 1 - pnorm(data$Z)) # 2-sided p-value
   data$Y <- sapply(data$P, function(x) {
     sum(data$P < x) / nrow(data)
@@ -451,11 +512,11 @@ plotCalibration <- function(logRr,
   for (i in 1:nrow(data)) {
     dataLeaveOneOut <- data[seq(1, nrow(data)) != i, ]
     if (useMcmc) {
-      null <- fitMcmcNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)
+      null <- fitMcmcNull(dataLeaveOneOut$estimate, dataLeaveOneOut$SE)
     } else {
-      null <- fitNull(dataLeaveOneOut$logRr, dataLeaveOneOut$SE)
+      null <- fitNull(dataLeaveOneOut$estimate, dataLeaveOneOut$SE)
     }
-    data$calibratedP[i] <- calibrateP(null, data$logRr[i], data$SE[i], pValueOnly = TRUE)
+    data$calibratedP[i] <- calibrateP(null, data$estimate[i], data$SE[i], pValueOnly = TRUE)
   }
   data <- data[!is.na(data$calibratedP), ]
   data$AdjustedY <- sapply(data$calibratedP, function(x) {
@@ -534,19 +595,21 @@ plotCalibration <- function(logRr,
 #' approximate the diagonal. The plot shows the coverage for both theoretical (traditional) and
 #' empirically calibrated confidence intervals.
 #'
-#' @param logRr                  A numeric vector of effect estimates on the log scale.
-#' @param seLogRr                The standard error of the log of the effect estimates. Hint: often the
-#'                               standard error = (log(<lower bound 95 percent confidence interval>) -
-#'                               log(<effect estimate>))/qnorm(0.025).
-#' @param trueLogRr              The true log relative risk.
+#' @param estimate               A numeric vector of effect estimates. On the log relative risk scale
+#'                               these are log relative risks.
+#' @param se                     The standard error of the effect estimates. Hint: on the log relative
+#'                               risk scale often the standard error = (log(<lower bound 95 percent
+#'                               confidence interval>) - log(<effect estimate>))/qnorm(0.025).
+#' @param trueEffect             The true effect (on the same scale as `estimate`).
+#' @template Scale
 #' @param strata                 Variable used to stratify the plot. Set `strata = NULL` for no
 #'                               stratification.
 #' @param legacy                 If true, a legacy error model will be fitted, meaning standard
 #'                               deviation is linear on the log scale. If false, standard deviation
 #'                               is assumed to be simply linear.
 #' @param evaluation             A data frame as generated by the [evaluateCiCalibration()]
-#'                               function. If provided, the logRr, seLogRr, trueLogRr, strata, and legacy
-#'                               arguments will be ignored.
+#'                               function. If provided, the estimate, se, trueEffect, scale, strata, and
+#'                               legacy arguments will be ignored.
 #' @param crossValidationGroup   What should be the unit for the cross-validation? By default the unit
 #'                               is a single control, but a different grouping can be provided, for
 #'                               example linking a negative control to synthetic positive controls
@@ -557,31 +620,45 @@ plotCalibration <- function(logRr,
 #' @param fileName               Name of the file where the plot should be saved, for example
 #'                               'plot.png'. See the function `ggsave` in the ggplot2 package for
 #'                               supported file formats.
+#' @param logRr                  DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr                DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
+#' @param trueLogRr              DEPRECATED. Use `trueEffect` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' \dontrun{
-#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' plotCiCalibration(data$logRr, data$seLogRr, data$trueLogRr)
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' plotCiCalibration(data$estimate, data$se, data$trueEffect)
 #' }
 #' @export
-plotCiCalibration <- function(logRr,
-                              seLogRr,
-                              trueLogRr,
-                              strata = as.factor(trueLogRr),
-                              crossValidationGroup = 1:length(logRr),
+plotCiCalibration <- function(estimate,
+                              se,
+                              trueEffect,
+                              scale = "log relative risk",
+                              strata = as.factor(trueEffect),
+                              crossValidationGroup = 1:length(estimate),
                               legacy = FALSE,
                               evaluation,
                               legendPosition = "top",
                               title,
-                              fileName = NULL) {
+                              fileName = NULL,
+                              logRr = NULL,
+                              seLogRr = NULL,
+                              trueLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr", "trueLogRr"), c("estimate", "se", "trueEffect"))
+    estimate <- logRr
+    se <- seLogRr
+    trueEffect <- trueLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
   if (missing(evaluation) || is.null(evaluation)) {
     evaluation <- evaluateCiCalibration(
-      logRr = logRr,
-      seLogRr = seLogRr,
-      trueLogRr = trueLogRr,
+      estimate = estimate,
+      se = se,
+      trueEffect = trueEffect,
       strata = strata,
       crossValidationGroup = crossValidationGroup,
       legacy = legacy
@@ -614,7 +691,7 @@ plotCiCalibration <- function(logRr,
     ggplot2::scale_linetype_manual(values = c("solid", "twodash")) +
     ggplot2::scale_x_continuous("Width of CI", limits = c(0, 1), breaks = c(breaks, 0.95), labels = c("0", ".25", ".50", ".75", "", ".95")) +
     ggplot2::scale_y_continuous("Coverage", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
-    ggplot2::facet_grid(. ~ trueRr) +
+    ggplot2::facet_grid(. ~ trueEffect) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
@@ -631,7 +708,7 @@ plotCiCalibration <- function(logRr,
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
-    width <- 1 + 2 * length(levels(evaluation$trueRr))
+    width <- 1 + 2 * length(levels(evaluation$trueEffect))
     ggplot2::ggsave(fileName, plot, width = width, height = 3.5, dpi = 400)
   }
   return(plot)
@@ -643,69 +720,104 @@ plotCiCalibration <- function(logRr,
 #' Plot true and observed values, for example from a simulation study.
 #'
 #' @details
-#' Creates a forest plot of effect size estimates (ratios). Estimates that are significantly different
-#' from the true value (alpha = 0.05) are marked in orange, others are marked in blue.
+#' Creates a forest plot of effect size estimates. Estimates that are significantly different
+#' from the true value (alpha = 0.05) are marked in orange, others are marked in blue. For the log relative
+#' risk scale the estimates are shown as ratios on a log axis, for the risk difference scale on a linear axis.
 #'
-#' @param logRr       A numeric vector of effect estimates on the log scale.
-#' @param seLogRr     The standard error of the log of the effect estimates. Hint: often the standard
-#'                    error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                    estimate>))/qnorm(0.025).
-#' @param trueLogRr   A vector of the true effect sizes.
-#' @param xLabel      The label on the x-axis: the name of the effect estimate.
+#' @param estimate    A numeric vector of effect estimates. On the log relative risk scale these are
+#'                    log relative risks.
+#' @param se          The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                    often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                    log(<effect estimate>))/qnorm(0.025).
+#' @param trueEffect  A vector of the true effect sizes (on the same scale as `estimate`).
+#' @template Scale
+#' @param xLabel      The label on the x-axis: the name of the effect estimate. Defaults to
+#'                    "Relative risk" or "Risk difference", depending on the scale.
 #' @param title       Optional: the main title for the plot
 #' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
 #'                    function `ggsave` in the ggplot2 package for supported file formats.
+#' @param logRr       DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr     DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
+#' @param trueLogRr   DEPRECATED. Use `trueEffect` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
-#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' plotTrueAndObserved(data$estimate, data$se, data$trueEffect)
 #'
 #' @export
-plotTrueAndObserved <- function(logRr,
-                                seLogRr,
-                                trueLogRr,
-                                xLabel = "Relative risk",
+plotTrueAndObserved <- function(estimate,
+                                se,
+                                trueEffect,
+                                scale = "log relative risk",
+                                xLabel = NULL,
                                 title,
-                                fileName = NULL) {
-  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+                                fileName = NULL,
+                                logRr = NULL,
+                                seLogRr = NULL,
+                                trueLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr", "trueLogRr"), c("estimate", "se", "trueEffect"))
+    estimate <- logRr
+    se <- seLogRr
+    trueEffect <- trueLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  checkmate::assertString(xLabel, null.ok = TRUE)
+  if (is.null(xLabel)) {
+    xLabel <- if (scale == LOG_RELATIVE_RISK) "Relative risk" else "Risk difference"
+  }
   theme <- ggplot2::element_text(colour = "#000000", size = 6)
   col <- c(rgb(0, 0, 0.8, alpha = 1), rgb(0.8, 0.4, 0, alpha = 1))
   colFill <- c(rgb(0, 0, 1, alpha = 0.5), rgb(1, 0.4, 0, alpha = 0.5))
   data <- data.frame(
-    logRr = logRr,
-    logLb95Rr = logRr + qnorm(0.025) * seLogRr,
-    logUb95Rr = logRr + qnorm(0.975) * seLogRr,
-    trueLogRr = trueLogRr,
-    trueRr = round(exp(trueLogRr), 2)
+    estimate = estimate,
+    lb95 = estimate + qnorm(0.025) * se,
+    ub95 = estimate + qnorm(0.975) * se,
+    trueEffect = trueEffect
   )
-  data$significant <- data$logLb95Rr > data$trueLogRr | data$logUb95Rr < data$trueLogRr
-  data <- data[order(data$trueLogRr, data$logRr), ]
+  data$significant <- data$lb95 > data$trueEffect | data$ub95 < data$trueEffect
+  data <- data[order(data$trueEffect, data$estimate), ]
   data$order <- 1:nrow(data)
-  coverage <- aggregate(!significant ~ trueRr, data = data, mean)
-  names(coverage)[2] <- "coverage"
+  if (scale == LOG_RELATIVE_RISK) {
+    breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+    data$trueEffectLabel <- round(exp(data$trueEffect), 2)
+    data$estimate <- exp(data$estimate)
+    data$lb95 <- exp(data$lb95)
+    data$ub95 <- exp(data$ub95)
+    xScale <- ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks)
+    xLimits <- ggplot2::coord_cartesian(xlim = c(0.25, 10))
+  } else {
+    data$trueEffectLabel <- signif(data$trueEffect, 3)
+    xScale <- ggplot2::scale_x_continuous(xLabel)
+    xLimits <- ggplot2::coord_cartesian()
+  }
   plot <- ggplot2::ggplot(
     data,
     ggplot2::aes(
-      x = exp(.data$logRr),
+      x = .data$estimate,
       y = .data$order,
-      xmin = exp(.data$logLb95Rr),
-      xmax = exp(.data$logUb95Rr),
+      xmin = .data$lb95,
+      xmax = .data$ub95,
       colour = .data$significant,
       fill = .data$significant
     )
-  ) +
-    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
-    ggplot2::geom_errorbarh(ggplot2::aes(xmax = .data$trueRr, xmin = .data$trueRr), height = 1, color = rgb(0, 0, 0), size = 1) +
+  )
+  if (scale == LOG_RELATIVE_RISK) {
+    plot <- plot + ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2)
+  }
+  plot <- plot +
+    ggplot2::geom_errorbarh(ggplot2::aes(xmax = .data$trueEffectLabel, xmin = .data$trueEffectLabel), height = 1, color = rgb(0, 0, 0), size = 1) +
     ggplot2::geom_errorbarh(height = 0) +
     ggplot2::geom_point(shape = 21, size = 1.5) +
     ggplot2::scale_colour_manual(values = col) +
     ggplot2::scale_fill_manual(values = colFill) +
-    ggplot2::coord_cartesian(xlim = c(0.25, 10)) +
-    ggplot2::scale_x_continuous(xLabel, trans = "log10", breaks = breaks, labels = breaks) +
-    ggplot2::facet_grid(trueRr ~ ., scales = "free_y", space = "free") +
+    xLimits +
+    xScale +
+    ggplot2::facet_grid(trueEffectLabel ~ ., scales = "free_y", space = "free") +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
@@ -782,19 +894,21 @@ plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
 #' effect is computed by fitting a null using all other controls. The plot shows the coverage for
 #' both theoretical (traditional) and empirically calibrated confidence intervals.
 #'
-#' @param logRr                  A numeric vector of effect estimates on the log scale.
-#' @param seLogRr                The standard error of the log of the effect estimates. Hint: often the
-#'                               standard error = (log(<lower bound 95 percent confidence interval>) -
-#'                               log(<effect estimate>))/qnorm(0.025).
-#' @param trueLogRr              The true log relative risk.
+#' @param estimate               A numeric vector of effect estimates. On the log relative risk scale
+#'                               these are log relative risks.
+#' @param se                     The standard error of the effect estimates. Hint: on the log relative
+#'                               risk scale often the standard error = (log(<lower bound 95 percent
+#'                               confidence interval>) - log(<effect estimate>))/qnorm(0.025).
+#' @param trueEffect             The true effect (on the same scale as `estimate`).
+#' @template Scale
 #' @param strata                 Variable used to stratify the plot. Set `strata = NULL` for no
 #'                               stratification.
 #' @param legacy                 If true, a legacy error model will be fitted, meaning standard
 #'                               deviation is linear on the log scale. If false, standard deviation
 #'                               is assumed to be simply linear.
 #' @param evaluation             A data frame as generated by the [evaluateCiCalibration()]
-#'                               function. If provided, the logRr, seLogRr, trueLogRr, strata, and legacy
-#'                               arguments will be ignored.
+#'                               function. If provided, the estimate, se, trueEffect, scale, strata, and
+#'                               legacy arguments will be ignored.
 #' @param crossValidationGroup   What should be the unit for the cross-validation? By default the unit
 #'                               is a single control, but a different grouping can be provided, for
 #'                               example linking a negative control to synthetic positive controls
@@ -805,31 +919,45 @@ plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
 #' @param fileName               Name of the file where the plot should be saved, for example
 #'                               'plot.png'. See the function `ggsave` in the ggplot2 package for
 #'                               supported file formats.
+#' @param logRr                  DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr                DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
+#' @param trueLogRr              DEPRECATED. Use `trueEffect` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' \dontrun{
-#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' plotCiCoverage(data$logRr, data$seLogRr, data$trueLogRr)
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' plotCiCoverage(data$estimate, data$se, data$trueEffect)
 #' }
 #' @export
-plotCiCoverage <- function(logRr,
-                           seLogRr,
-                           trueLogRr,
-                           strata = as.factor(trueLogRr),
-                           crossValidationGroup = 1:length(logRr),
+plotCiCoverage <- function(estimate,
+                           se,
+                           trueEffect,
+                           scale = "log relative risk",
+                           strata = as.factor(trueEffect),
+                           crossValidationGroup = 1:length(estimate),
                            legacy = FALSE,
                            evaluation,
                            legendPosition = "top",
                            title,
-                           fileName = NULL) {
+                           fileName = NULL,
+                           logRr = NULL,
+                           seLogRr = NULL,
+                           trueLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr", "trueLogRr"), c("estimate", "se", "trueEffect"))
+    estimate <- logRr
+    se <- seLogRr
+    trueEffect <- trueLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
   if (missing(evaluation) || is.null(evaluation)) {
     evaluation <- evaluateCiCalibration(
-      logRr = logRr,
-      seLogRr = seLogRr,
-      trueLogRr = trueLogRr,
+      estimate = estimate,
+      se = se,
+      trueEffect = trueEffect,
       strata = strata,
       crossValidationGroup = crossValidationGroup,
       legacy = legacy
@@ -837,7 +965,7 @@ plotCiCoverage <- function(logRr,
   }
   evaluation$label <- factor(evaluation$label, levels = rev(c("Below confidence interval", "Within confidence interval", "Above confidence interval")))
   evaluation$`Confidence interval calculation` <- factor(evaluation$`Confidence interval calculation`, levels = rev(c("Calibrated", "Uncalibrated")))
-  evaluation$trueRr <- paste0("True effect size = ", evaluation$trueRr)
+  evaluation$trueEffect <- paste0("True effect size = ", evaluation$trueEffect)
   breaks <- c(0, 0.25, 0.5, 0.75, 1)
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
@@ -865,7 +993,7 @@ plotCiCoverage <- function(logRr,
     ggplot2::scale_fill_manual(values = c(rgb(0.8, 0, 0), rgb(0.75, 0.75, 0.75), rgb(0, 0, 0.8))) +
     ggplot2::scale_x_continuous("Width of the confidence interval", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
     ggplot2::scale_y_continuous("Fraction", limits = c(0, 1), breaks = breaks, labels = c("0", ".25", ".50", ".75", "1")) +
-    ggplot2::facet_grid(`Confidence interval calculation` ~ trueRr) +
+    ggplot2::facet_grid(`Confidence interval calculation` ~ trueEffect) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_blank(),
@@ -885,7 +1013,7 @@ plotCiCoverage <- function(logRr,
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
-    width <- 1 + 1.8 * length(levels(as.factor(evaluation$trueRr)))
+    width <- 1 + 1.8 * length(levels(as.factor(evaluation$trueEffect)))
     ggplot2::ggsave(fileName, plot, width = width, height = 5, dpi = 400)
   }
   return(plot)
@@ -898,56 +1026,109 @@ plotCiCoverage <- function(logRr,
 #'
 #' @details
 #' Creates a plot with the true effect size on the x-axis, and the mean plus and minus the standard
-#' deviation shown on the y-axis. Also shown are simple error models fitted at each true relative
-#' risk in the input.
+#' deviation shown on the y-axis. Also shown are simple error models fitted at each true effect
+#' size in the input. For the log relative risk scale both axes show relative risks on a log scale, for the
+#' risk difference scale both axes are linear.
 #'
-#' @param logRr                  A numeric vector of effect estimates on the log scale.
-#' @param seLogRr                The standard error of the log of the effect estimates. Hint: often the
-#'                               standard error = (log(<lower bound 95 percent confidence interval>) -
-#'                               log(<effect estimate>))/qnorm(0.025).
-#' @param trueLogRr              The true log relative risk.
+#' @param estimate               A numeric vector of effect estimates. On the log relative risk scale
+#'                               these are log relative risks.
+#' @param se                     The standard error of the effect estimates. Hint: on the log relative
+#'                               risk scale often the standard error = (log(<lower bound 95 percent
+#'                               confidence interval>) - log(<effect estimate>))/qnorm(0.025).
+#' @param trueEffect             The true effect (on the same scale as `estimate`).
+#' @template Scale
 #' @param legacy                 If true, a legacy error model will be fitted, meaning standard
 #'                               deviation is linear on the log scale. If false, standard deviation
-#'                               is assumed to be simply linear.
+#'                               is assumed to be simply linear. The legacy model is not supported for the
+#'                               risk difference scale.
 #' @param title              Optional: the main title for the plot
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function `ggsave` in the ggplot2 package for supported file
 #'                           formats.
+#' @param logRr              DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr            DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
+#' @param trueLogRr          DEPRECATED. Use `trueEffect` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
-#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' plotErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' plotErrorModel(data$estimate, data$se, data$trueEffect)
 #' @export
-plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, legacy = FALSE, fileName = NULL) {
+plotErrorModel <- function(estimate,
+                           se,
+                           trueEffect,
+                           scale = "log relative risk",
+                           title,
+                           legacy = FALSE,
+                           fileName = NULL,
+                           logRr = NULL,
+                           seLogRr = NULL,
+                           trueLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr", "trueLogRr"), c("estimate", "se", "trueEffect"))
+    estimate <- logRr
+    se <- seLogRr
+    trueEffect <- trueLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
   model <- fitSystematicErrorModel(
-    logRr = logRr,
-    seLogRr = seLogRr,
-    trueLogRr = trueLogRr,
+    estimate = estimate,
+    se = se,
+    trueEffect = trueEffect,
     legacy = legacy
   )
-  fitSimpleModel <- function(selectedTrueLogRr) {
-    idx <- trueLogRr == selectedTrueLogRr
-    return(fitNull(logRr[idx], seLogRr[idx]))
+  fitSimpleModel <- function(selectedTrueEffect) {
+    idx <- trueEffect == selectedTrueEffect
+    return(fitNull(estimate[idx], se[idx]))
   }
-  simpleModels <- as.data.frame(t(sapply(unique(trueLogRr), fitSimpleModel)))
-  simpleModels$trueRr <- exp(unique(trueLogRr))
-  simpleModels$y <- exp(simpleModels$mean)
-  simpleModels$ymin <- exp(simpleModels$mean - simpleModels$sd)
-  simpleModels$ymax <- exp(simpleModels$mean + simpleModels$sd)
-  
-  
-  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
-  x <- exp(seq(log(0.25), log(10), by = 0.01))
-  y <- exp(model[1] + model[2] * log(x))
-  if (legacy) {
-    ymin <- exp(log(y) - exp(model[3] + model[4] * log(x)))
-    ymax <- exp(log(y) + exp(model[3] + model[4] * log(x)))
+  simpleModels <- as.data.frame(t(sapply(unique(trueEffect), fitSimpleModel)))
+  if (scale == LOG_RELATIVE_RISK) {
+    simpleModels$trueEffect <- exp(unique(trueEffect))
+    simpleModels$y <- exp(simpleModels$mean)
+    simpleModels$ymin <- exp(simpleModels$mean - simpleModels$sd)
+    simpleModels$ymax <- exp(simpleModels$mean + simpleModels$sd)
+    
+    breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+    x <- exp(seq(log(0.25), log(10), by = 0.01))
+    y <- exp(model[1] + model[2] * log(x))
+    if (legacy) {
+      ymin <- exp(log(y) - exp(model[3] + model[4] * log(x)))
+      ymax <- exp(log(y) + exp(model[3] + model[4] * log(x)))
+    } else {
+      ymin <- exp(log(y) - (model[3] + model[4] * abs(log(x))))
+      ymax <- exp(log(y) + (model[3] + model[4] * abs(log(x))))
+    }
+    xScale <- ggplot2::scale_x_continuous("True effect size", trans = "log10", breaks = breaks, labels = breaks)
+    yScale <- ggplot2::scale_y_continuous("Systematic error mean (plus and minus one SD)",
+                                          trans = "log10",
+                                          breaks = breaks,
+                                          labels = breaks
+    )
+    limits <- ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0.25, 10))
+    nullValue <- 1
+    errorBarWidth <- 0.1
   } else {
-    ymin <- exp(log(y) - (model[3] + model[4] * abs(log(x))))
-    ymax <- exp(log(y) + (model[3] + model[4] * abs(log(x))))
+    simpleModels$trueEffect <- unique(trueEffect)
+    simpleModels$y <- simpleModels$mean
+    simpleModels$ymin <- simpleModels$mean - simpleModels$sd
+    simpleModels$ymax <- simpleModels$mean + simpleModels$sd
+    
+    maxAbsEffect <- max(abs(trueEffect), na.rm = TRUE)
+    if (maxAbsEffect == 0) {
+      maxAbsEffect <- max(abs(estimate), na.rm = TRUE)
+    }
+    x <- seq(-maxAbsEffect * 1.25, maxAbsEffect * 1.25, length.out = 200)
+    y <- model[1] + model[2] * x
+    ymin <- y - (model[3] + model[4] * abs(x))
+    ymax <- y + (model[3] + model[4] * abs(x))
+    xScale <- ggplot2::scale_x_continuous("True effect size")
+    yScale <- ggplot2::scale_y_continuous("Systematic error mean (plus and minus one SD)")
+    limits <- ggplot2::coord_cartesian()
+    nullValue <- 0
+    errorBarWidth <- 0.05 * (max(x) - min(x))
   }
   data <- data.frame(x = x, y = y, ymin = ymin, ymax = ymax)
   plot <- ggplot2::ggplot(
@@ -958,25 +1139,21 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, legacy = FALSE, fil
       ymin = .data$ymin,
       ymax = .data$ymax
     )
-  ) +
-    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
-    ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
-    ggplot2::geom_vline(xintercept = 1, size = 1) +
-    ggplot2::geom_hline(yintercept = 1, size = 1) +
+  )
+  if (scale == LOG_RELATIVE_RISK) {
+    plot <- plot +
+      ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2) +
+      ggplot2::geom_hline(yintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.2)
+  }
+  plot <- plot +
+    ggplot2::geom_vline(xintercept = nullValue, size = 1) +
+    ggplot2::geom_hline(yintercept = nullValue, size = 1) +
     ggplot2::geom_ribbon(fill = rgb(0, 0, 0.8), alpha = 0.3) +
     ggplot2::geom_line(color = rgb(0, 0, 0.8)) +
-    ggplot2::geom_errorbar(ggplot2::aes(x = .data$trueRr), width = 0.1, size = 1, color = rgb(0, 0, 0.8), data = simpleModels) +
-    ggplot2::scale_x_continuous("True effect size",
-                                trans = "log10",
-                                breaks = breaks,
-                                labels = breaks
-    ) +
-    ggplot2::scale_y_continuous("Systematic error mean (plus and minus one SD)",
-                                trans = "log10",
-                                breaks = breaks,
-                                labels = breaks
-    ) +
-    ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0.25, 10)) +
+    ggplot2::geom_errorbar(ggplot2::aes(x = .data$trueEffect), width = errorBarWidth, size = 1, color = rgb(0, 0, 0.8), data = simpleModels) +
+    xScale +
+    yScale +
+    limits +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
@@ -994,31 +1171,50 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, legacy = FALSE, fil
   return(plot)
 }
 
-plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives) {
+plotIsobars <- function(null, alpha, xLabel = "Relative risk", sePositives, scale = LOG_RELATIVE_RISK, maxSe = 1) {
   if (is(null, "mcmcNull")) {
     null <- c(null[1], 1 / sqrt(null[2]))
   }
-  x <- exp(seq(log(0.25), log(10), by = 0.01))
-  y <- sapply(x, FUN = function(x) abs(log(x)) / qnorm(1 - alpha / 2))
+  if (scale == LOG_RELATIVE_RISK) {
+    x <- exp(seq(log(0.25), log(10), by = 0.01))
+    y <- sapply(x, FUN = function(x) abs(log(x)) / qnorm(1 - alpha / 2))
+    xOnEstimateScale <- log(x)
+    nullOnPlotScale <- exp(null[1])
+    breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
+    breakLabels <- breaks
+    xTrans <- "log10"
+    xLimits <- c(0.25, 10)
+    nullValue <- 1
+  } else {
+    xRange <- max(abs(null[1]) + 4 * null[2], maxSe * qnorm(1 - alpha / 2) * 1.25)
+    x <- seq(-xRange, xRange, length.out = 400)
+    y <- abs(x) / qnorm(1 - alpha / 2)
+    xOnEstimateScale <- x
+    nullOnPlotScale <- null[1]
+    breaks <- ggplot2::waiver()
+    breakLabels <- ggplot2::waiver()
+    xTrans <- "identity"
+    xLimits <- c(-xRange, xRange)
+    nullValue <- 0
+  }
   thresholds <- c(0.05, 0.25, 0.5, 0.75)
   isoBars <- lapply(thresholds, function(threshold) {
     data.frame(
       x = x,
-      y = logRrtoSE(log(x), threshold, null[1], null[2]),
+      y = logRrtoSE(xOnEstimateScale, threshold, null[1], null[2]),
       ymax = y,
       threshold = threshold
     )
   })
-  breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
   plot <- ggplot2::ggplot(
     data.frame(x, y),
     ggplot2::aes(x = .data$x, y = .data$y)
   ) +
-    ggplot2::geom_vline(xintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
-    ggplot2::geom_hline(yintercept = 0:4 / 4, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
-    ggplot2::geom_vline(xintercept = 1, size = 1) +
+    ggplot2::geom_vline(xintercept = if (scale == LOG_RELATIVE_RISK) breaks else 0, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
+    ggplot2::geom_hline(yintercept = maxSe * 0:4 / 4, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
+    ggplot2::geom_vline(xintercept = nullValue, size = 1) +
     ggplot2::geom_line(
       colour = rgb(0, 0, 0),
       linetype = "dashed",
@@ -1026,12 +1222,12 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
       alpha = 0.5
     ) +
     ggplot2::scale_x_continuous(xLabel,
-                                trans = "log10",
+                                trans = xTrans,
                                 breaks = breaks,
-                                labels = breaks
+                                labels = breakLabels
     ) +
     ggplot2::scale_y_continuous("Standard Error") +
-    ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0, 1)) +
+    ggplot2::coord_cartesian(xlim = xLimits, ylim = c(0, maxSe)) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
@@ -1045,14 +1241,14 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
       legend.position = "none"
     )
   for (isoBar in isoBars) {
-    isoBarLeft <- isoBar[isoBar$x < exp(null[1]), ]
-    isoBarRight <- isoBar[isoBar$x > exp(null[1]), ]
+    isoBarLeft <- isoBar[isoBar$x < nullOnPlotScale, ]
+    isoBarRight <- isoBar[isoBar$x > nullOnPlotScale, ]
     labelData <- data.frame(
       x = c(
-        isoBarLeft$x[which.min(abs(isoBarLeft$y - 0.625))],
-        isoBarRight$x[which.min(abs(isoBarRight$y - 0.625))]
+        isoBarLeft$x[which.min(abs(isoBarLeft$y - 0.625 * maxSe))],
+        isoBarRight$x[which.min(abs(isoBarRight$y - 0.625 * maxSe))]
       ),
-      y = 0.625,
+      y = 0.625 * maxSe,
       label = paste0(100 * isoBar$threshold[1], "%")
     )
     plot <- plot + ggplot2::geom_ribbon(ggplot2::aes(
@@ -1076,8 +1272,8 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
                          data = labelData
       )
   }
-  if (!missing(seLogRrPositives)) {
-    plot <- plot + ggplot2::geom_hline(yintercept = seLogRrPositives)
+  if (!missing(sePositives)) {
+    plot <- plot + ggplot2::geom_hline(yintercept = sePositives)
   }
   return(plot)
 }
@@ -1096,23 +1292,26 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
 #' If standard errors are provided for non-negative estimates these will be plotted on the red line as
 #' yellow diamonds.
 #'
-#' @param logRrNegatives     A numeric vector of effect estimates of the negative controls on the log
-#'                           scale.
-#' @param seLogRrNegatives   The standard error of the log of the effect estimates of the negative
-#'                           controls.
-#' @param seLogRrPositives   The standard error of the log of the effect estimates of the positive
-#'                           controls.
+#' @param estimateNegatives  A numeric vector of effect estimates of the negative controls. On the log
+#'                           relative risk scale these are log relative risks.
+#' @param seNegatives        The standard error of the effect estimates of the negative controls.
+#' @param sePositives        The standard error of the effect estimates of the positive controls.
+#' @template Scale
 #' @param alpha              The alpha (nominal type 1 error) to be used.
 #' @param null               An object representing the fitted null distribution as created by the
 #'                           `fitNull` function. If not provided, a null will be fitted before
 #'                           plotting.
 #' @param xLabel             If showing effect sizes, what label should be used for the effect size axis?
+#'                           Defaults to "Relative risk" or "Risk difference", depending on the scale.
 #' @param title              Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the expected type 1 error.
 #' @param showEffectSizes    Show the expected effect sizes alongside the expected type 1 error?
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
 #'                           See the function `ggsave` in the ggplot2 package for supported file
 #'                           formats.
+#' @param logRrNegatives     DEPRECATED. Use `estimateNegatives` with `scale = "log relative risk"` instead.
+#' @param seLogRrNegatives   DEPRECATED. Use `seNegatives` with `scale = "log relative risk"` instead.
+#' @param seLogRrPositives   DEPRECATED. Use `sePositives` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the `ggsave` function to save to file.
@@ -1124,28 +1323,54 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
 #' plotExpectedType1Error(negatives$logRr, negatives$seLogRr, positive$seLogRr)
 #'
 #' @export
-plotExpectedType1Error <- function(logRrNegatives,
-                                   seLogRrNegatives,
-                                   seLogRrPositives,
+plotExpectedType1Error <- function(estimateNegatives,
+                                   seNegatives,
+                                   sePositives,
+                                   scale = "log relative risk",
                                    alpha = 0.05,
                                    null = NULL,
-                                   xLabel = "Relative risk",
+                                   xLabel = NULL,
                                    title,
                                    showCis = FALSE,
                                    showEffectSizes = FALSE,
-                                   fileName = NULL) {
+                                   fileName = NULL,
+                                   logRrNegatives = NULL,
+                                   seLogRrNegatives = NULL,
+                                   seLogRrPositives = NULL) {
+  if (!is.null(logRrNegatives)) {
+    warnDeprecatedArguments(
+      c("logRrNegatives", "seLogRrNegatives", "seLogRrPositives"),
+      c("estimateNegatives", "seNegatives", "sePositives")
+    )
+    estimateNegatives <- logRrNegatives
+    seNegatives <- seLogRrNegatives
+    if (!is.null(seLogRrPositives)) {
+      sePositives <- seLogRrPositives
+    }
+    scale <- LOG_RELATIVE_RISK
+  }
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  checkmate::assertString(xLabel, null.ok = TRUE)
+  if (is.null(xLabel)) {
+    xLabel <- if (scale == LOG_RELATIVE_RISK) "Relative risk" else "Risk difference"
+  }
   if (is.null(null)) {
     if (showCis) {
-      null <- fitMcmcNull(logRrNegatives, seLogRrNegatives)
+      null <- fitMcmcNull(estimateNegatives, seNegatives)
     } else {
-      null <- fitNull(logRrNegatives, seLogRrNegatives)
+      null <- fitNull(estimateNegatives, seNegatives)
     }
   }
   if (showCis && !is(null, "mcmcNull")) {
     stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
   }
   
-  se <- (0:100) / 100
+  if (scale == LOG_RELATIVE_RISK) {
+    maxSe <- 1
+  } else {
+    maxSe <- max(c(quantile(seNegatives, 0.9, na.rm = TRUE), if (!missing(sePositives)) sePositives), na.rm = TRUE) * 1.25
+  }
+  se <- maxSe * (0:100) / 100
   if (is(null, "mcmcNull")) {
     computeExpected <- function(se, chain) {
       mean <- chain[, 1]
@@ -1166,13 +1391,15 @@ plotExpectedType1Error <- function(logRrNegatives,
       pnorm(qnorm(alpha / 2, 0, se), mean, sd, lower.tail = TRUE)
   } 
   breaks <- 0:4 / 4
+  seBreaks <- maxSe * breaks
+  seLabels <- if (scale == LOG_RELATIVE_RISK) breaks else signif(seBreaks, 3)
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
   plot <- ggplot2::ggplot(
     data.frame(se, type1Error),
     ggplot2::aes(x = .data$se, y = .data$type1Error)
   ) +
-    ggplot2::geom_vline(xintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
+    ggplot2::geom_vline(xintercept = seBreaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
     ggplot2::geom_hline(yintercept = breaks, colour = rgb(0, 0, 0), lty = 1, size = 0.5, alpha = 0.2) +
     ggplot2::geom_hline(
       yintercept = alpha,
@@ -1205,15 +1432,15 @@ plotExpectedType1Error <- function(logRrNegatives,
   plot <- plot + ggplot2::geom_label(
     label = paste("alpha ==", alpha),
     data = data.frame(
-      se = 0.875 + showEffectSizes * 0.125,
+      se = maxSe * (0.875 + showEffectSizes * 0.125),
       type1Error = alpha + showEffectSizes * 0.04
     ),
     parse = TRUE
   ) +
     ggplot2::scale_x_continuous("Standard error",
-                                limits = c(0, 1),
-                                breaks = breaks,
-                                labels = breaks
+                                limits = c(0, maxSe),
+                                breaks = seBreaks,
+                                labels = seLabels
     ) +
     ggplot2::scale_y_continuous("Expected type 1 error",
                                 limits = c(0, 1),
@@ -1233,12 +1460,12 @@ plotExpectedType1Error <- function(logRrNegatives,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
     )
-  if (!missing(seLogRrPositives)) {
-    yPos <- sapply(seLogRrPositives, FUN = function(x) {
+  if (!missing(sePositives)) {
+    yPos <- sapply(sePositives, FUN = function(x) {
       type1Error[which.min(abs(x - se))]
     })
     posData <- data.frame(
-      x = seLogRrPositives,
+      x = sePositives,
       y = yPos
     )
     plot <- plot + ggplot2::geom_vline(ggplot2::aes(xintercept = .data$x),
@@ -1259,7 +1486,11 @@ plotExpectedType1Error <- function(logRrNegatives,
       axis.text.y = ggplot2::element_blank(),
       axis.title.y = ggplot2::element_blank()
     )
-    plot2 <- plotIsobars(null = null, alpha = alpha, xLabel = xLabel, seLogRrPositives = seLogRrPositives)
+    plot2 <- if (missing(sePositives)) {
+      plotIsobars(null = null, alpha = alpha, xLabel = xLabel, scale = scale, maxSe = maxSe)
+    } else {
+      plotIsobars(null = null, alpha = alpha, xLabel = xLabel, sePositives = sePositives, scale = scale, maxSe = maxSe)
+    }
     plots <- list(plot2, plot)
     grobs <- heights <- list()
     for (i in 1:length(plots)) {
@@ -1297,43 +1528,66 @@ plotExpectedType1Error <- function(logRrNegatives,
 #' dashed line indicated estimates that are statistically significant different from the true effect size (p < 0.05).
 #' The orange area indicates estimates with calibrated p < 0.05.
 #'
-#' @param logRr       A numeric vector of effect estimates on the log scale.
-#' @param seLogRr     The standard error of the log of the effect estimates. Hint: often the standard
-#'                    error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                    estimate>))/qnorm(0.025).
-#' @param trueLogRr   A vector of the true effect sizes.
+#' @param estimate    A numeric vector of effect estimates. On the log relative risk scale these are
+#'                    log relative risks.
+#' @param se          The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                    often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                    log(<effect estimate>))/qnorm(0.025).
+#' @param trueEffect  A vector of the true effect sizes (on the same scale as `estimate`).
+#' @template Scale
 #' @param legacy      If true, a legacy error model will be fitted, meaning standard
 #'                    deviation is linear on the log scale. If false, standard deviation
-#'                    is assumed to be simply linear.
+#'                    is assumed to be simply linear. The legacy model is not supported for the
+#'                    risk difference scale.
 #' @param model       The fitted systematic error model. If not provided, it will be fitted on the
 #'                    provided data.
-#' @param xLabel      The label on the x-axis: the name of the effect estimate.
+#' @param xLabel      The label on the x-axis: the name of the effect estimate. Defaults to
+#'                    "Relative risk" or "Risk difference", depending on the scale.
 #' @param title       Optional: the main title for the plot
 #' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
 #'                    function `ggsave` in the ggplot2 package for supported file formats.
+#' @param logRr       DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr     DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
+#' @param trueLogRr   DEPRECATED. Use `trueEffect` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
-#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' plotCiCalibrationEffect(data$logRr, data$seLogRr, data$trueLogRr)
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' plotCiCalibrationEffect(data$estimate, data$se, data$trueEffect)
 #'
 #' @export
-plotCiCalibrationEffect <- function(logRr,
-                                    seLogRr,
-                                    trueLogRr,
+plotCiCalibrationEffect <- function(estimate,
+                                    se,
+                                    trueEffect,
+                                    scale = "log relative risk",
                                     legacy = FALSE,
                                     model = NULL,
-                                    xLabel = "Relative risk",
+                                    xLabel = NULL,
                                     title,
-                                    fileName = NULL) {
+                                    fileName = NULL,
+                                    logRr = NULL,
+                                    seLogRr = NULL,
+                                    trueLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr", "trueLogRr"), c("estimate", "se", "trueEffect"))
+    estimate <- logRr
+    se <- seLogRr
+    trueEffect <- trueLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  checkmate::assertString(xLabel, null.ok = TRUE)
+  if (is.null(xLabel)) {
+    xLabel <- if (scale == LOG_RELATIVE_RISK) "Relative risk" else "Risk difference"
+  }
   alpha <- 0.05
   if (is.null(model)) {
     model <- fitSystematicErrorModel(
-      logRr = logRr,
-      seLogRr = seLogRr,
-      trueLogRr = trueLogRr,
+      estimate = estimate,
+      se = se,
+      trueEffect = trueEffect,
       estimateCovarianceMatrix = FALSE,
       legacy = legacy
     )
@@ -1341,68 +1595,89 @@ plotCiCalibrationEffect <- function(logRr,
     legacy <- (names(model)[3] == "logSdIntercept")
   }
   d <- data.frame(
-    logRr = logRr,
-    seLogRr = seLogRr,
-    trueLogRr = trueLogRr,
-    trueRr = exp(trueLogRr),
-    logCi95lb = logRr + qnorm(0.025) * seLogRr,
-    logCi95ub = logRr + qnorm(0.975) * seLogRr
+    estimate = estimate,
+    se = se,
+    trueEffect = trueEffect,
+    ci95lb = estimate + qnorm(0.025) * se,
+    ci95ub = estimate + qnorm(0.975) * se
   )
-  d <- d[!is.na(d$logRr), ]
-  d <- d[!is.na(d$seLogRr), ]
+  # Label for the true effect on the scale used for display:
+  if (scale == LOG_RELATIVE_RISK) {
+    d$trueEffectLabel <- exp(trueEffect)
+  } else {
+    d$trueEffectLabel <- signif(trueEffect, 3)
+  }
+  d <- d[!is.na(d$estimate), ]
+  d <- d[!is.na(d$se), ]
   if (nrow(d) == 0) {
     return(NULL)
   }
-  d$Group <- as.factor(d$trueRr)
-  d$Significant <- d$logCi95lb > d$trueLogRr | d$logCi95ub < d$trueLogRr
+  d$Group <- as.factor(d$trueEffectLabel)
+  d$Significant <- d$ci95lb > d$trueEffect | d$ci95ub < d$trueEffect
   
-  temp1 <- aggregate(Significant ~ trueRr, data = d, length)
-  temp2 <- aggregate(Significant ~ trueRr, data = d, mean)
+  temp1 <- aggregate(Significant ~ trueEffect + trueEffectLabel, data = d, length)
+  temp2 <- aggregate(Significant ~ trueEffect + trueEffectLabel, data = d, mean)
   temp1$nLabel <- paste0(formatC(temp1$Significant, big.mark = ","), " estimates")
   temp1$Significant <- NULL
   temp2$meanLabel <- paste0(
     formatC(100 * (1 - temp2$Significant), digits = 1, format = "f"),
     "% of CIs includes ",
-    temp2$trueRr
+    temp2$trueEffectLabel
   )
   temp2$Significant <- NULL
   dd <- merge(temp1, temp2)
   
-  breaks <- c(0.1, 0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
   
-  d$Group <- paste("True", tolower(xLabel), "=", d$trueRr)
-  dd$Group <- paste("True", tolower(xLabel), "=", dd$trueRr)
+  d$Group <- paste("True", tolower(xLabel), "=", d$trueEffectLabel)
+  dd$Group <- paste("True", tolower(xLabel), "=", dd$trueEffectLabel)
   
-  x <- seq(log(0.1), log(10), by = 0.01)
+  if (scale == LOG_RELATIVE_RISK) {
+    breaks <- c(0.1, 0.25, 0.5, 1, 2, 4, 6, 8, 10)
+    xLimits <- log(c(0.1, 10))
+    xBreaks <- log(breaks)
+    xLabels <- breaks
+    maxSe <- 1
+  } else {
+    maxAbs <- max(abs(c(d$estimate, d$trueEffect)), na.rm = TRUE) * 1.25
+    xLimits <- c(-maxAbs, maxAbs)
+    xBreaks <- ggplot2::waiver()
+    xLabels <- ggplot2::waiver()
+    maxSe <- max(d$se, na.rm = TRUE) * 1.1
+  }
+  
+  x <- seq(xLimits[1], xLimits[2], length.out = 500)
   calBounds <- data.frame()
   for (i in 1:nrow(dd)) {
-    mu <- model[1] + model[2] * log(dd$trueRr[i])
+    mu <- model[1] + model[2] * dd$trueEffect[i]
     if (legacy) {
-      sigma <- exp(model[3] + model[4] * log(dd$trueRr[i]))
+      sigma <- exp(model[3] + model[4] * dd$trueEffect[i])
     } else {
-      sigma <- model[3] + model[4] * abs(log(dd$trueRr[i]))
+      sigma <- model[3] + model[4] * abs(dd$trueEffect[i])
     }
     calBounds <- rbind(
       calBounds,
       data.frame(
-        logRr = x,
-        seLogRr = logRrtoSE(x, alpha, mu, sigma),
+        estimate = x,
+        se = logRrtoSE(x, alpha, mu, sigma),
         Group = dd$Group[i]
       )
     )
   }
-  plot <- ggplot2::ggplot(d, ggplot2::aes(x = .data$logRr, y = .data$seLogRr)) +
-    ggplot2::geom_vline(xintercept = log(breaks), colour = "#AAAAAA", lty = 1, size = 0.5) +
+  plot <- ggplot2::ggplot(d, ggplot2::aes(x = .data$estimate, y = .data$se))
+  if (scale == LOG_RELATIVE_RISK) {
+    plot <- plot + ggplot2::geom_vline(xintercept = xBreaks, colour = "#AAAAAA", lty = 1, size = 0.5)
+  }
+  plot <- plot +
     ggplot2::geom_area(
       fill = rgb(1, 0.5, 0, alpha = 0.5),
       color = rgb(1, 0.5, 0),
       size = 1,
       alpha = 0.5, data = calBounds
     ) +
-    ggplot2::geom_abline(ggplot2::aes(intercept = (-log(.data$trueRr)) / qnorm(0.025), slope = 1 / qnorm(0.025)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
-    ggplot2::geom_abline(ggplot2::aes(intercept = (-log(.data$trueRr)) / qnorm(0.975), slope = 1 / qnorm(0.975)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
+    ggplot2::geom_abline(ggplot2::aes(intercept = (-.data$trueEffect) / qnorm(0.025), slope = 1 / qnorm(0.025)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
+    ggplot2::geom_abline(ggplot2::aes(intercept = (-.data$trueEffect) / qnorm(0.975), slope = 1 / qnorm(0.975)), colour = rgb(0, 0, 0), linetype = "dashed", size = 1, alpha = 0.5, data = dd) +
     ggplot2::geom_point(
       shape = 16,
       size = 2,
@@ -1410,11 +1685,11 @@ plotCiCalibrationEffect <- function(logRr,
       color = rgb(0, 0, 0.8)
     ) +
     ggplot2::geom_hline(yintercept = 0) +
-    ggplot2::geom_label(x = log(0.15), y = 0.95, alpha = 1, hjust = "left", ggplot2::aes(label = .data$nLabel), size = 3.5, data = dd) +
-    ggplot2::geom_label(x = log(0.15), y = 0.8, alpha = 1, hjust = "left", ggplot2::aes(label = .data$meanLabel), size = 3.5, data = dd) +
-    ggplot2::scale_x_continuous(xLabel, limits = log(c(0.1, 10)), breaks = log(breaks), labels = breaks) +
+    ggplot2::geom_label(x = xLimits[1] + 0.025 * (xLimits[2] - xLimits[1]), y = 0.95 * maxSe, alpha = 1, hjust = "left", ggplot2::aes(label = .data$nLabel), size = 3.5, data = dd) +
+    ggplot2::geom_label(x = xLimits[1] + 0.025 * (xLimits[2] - xLimits[1]), y = 0.8 * maxSe, alpha = 1, hjust = "left", ggplot2::aes(label = .data$meanLabel), size = 3.5, data = dd) +
+    ggplot2::scale_x_continuous(xLabel, limits = xLimits, breaks = xBreaks, labels = xLabels) +
     ggplot2::scale_y_continuous("Standard Error") +
-    ggplot2::coord_cartesian(ylim = c(0, 1)) +
+    ggplot2::coord_cartesian(ylim = c(0, maxSe)) +
     ggplot2::facet_grid(. ~ Group) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),

@@ -4,24 +4,40 @@
 \alias{computeTraditionalCi}
 \title{Compute the (traditional) confidence interval}
 \usage{
-computeTraditionalCi(logRr, seLogRr, ciWidth = 0.95)
+computeTraditionalCi(
+  estimate,
+  se,
+  ciWidth = 0.95,
+  scale = "log relative risk",
+  logRr = NULL,
+  seLogRr = NULL
+)
 }
 \arguments{
-\item{logRr}{A numeric vector of one or more effect estimates on the log scale}
+\item{estimate}{A numeric vector of one or more effect estimates. On the log relative risk scale these
+are log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025)}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
 
 \item{ciWidth}{The width of the confidence interval. Typically this would be .95, for the 95
 percent confidence interval.}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} with \code{scale = "log relative risk"} instead.}
 }
 \value{
-The point estimate and confidence interval
+The point estimate and confidence interval, in a data frame with columns \code{rr}, \code{lb}, and \code{ub} (all
+exponentiated, so on the relative risk scale) when \code{scale = "log relative risk"}, or columns \code{estimate}, \code{lb},
+and \code{ub} when \code{scale = "risk difference"}.
 }
 \description{
-\code{computeTraditionalCi} computes the traditional confidence interval based on the log of the
-relative risk and the standard error of the log of the relative risk.
+\code{computeTraditionalCi} computes the traditional confidence interval based on the effect estimate
+(for example the log of the relative risk) and its standard error.
 }
 \examples{
 data(sccs)

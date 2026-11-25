@@ -4,25 +4,36 @@
 \alias{computeTraditionalP}
 \title{Compute the (traditional) p-value}
 \usage{
-computeTraditionalP(logRr, seLogRr, twoSided = TRUE, upper = TRUE)
+computeTraditionalP(
+  estimate,
+  se,
+  twoSided = TRUE,
+  upper = TRUE,
+  logRr = NULL,
+  seLogRr = NULL
+)
 }
 \arguments{
-\item{logRr}{A numeric vector of one or more effect estimates on the log scale}
+\item{estimate}{A numeric vector of one or more effect estimates (for example log relative risks).}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025)}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
 
 \item{twoSided}{Compute two-sided (TRUE) or one-sided (FALSE) p-value?}
 
 \item{upper}{If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} instead.}
 }
 \value{
 The (traditional) p-value.
 }
 \description{
-\code{computeTraditionalP} computes the traditional two-sided p-value based on the log of the
-relative risk and the standard error of the log of the relative risk.
+\code{computeTraditionalP} computes the traditional two-sided p-value based on the effect estimate
+(for example the log of the relative risk) and its standard error.
 }
 \examples{
 data(sccs)

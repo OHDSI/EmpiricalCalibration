@@ -5,29 +5,43 @@
 \title{Plot true and observed values}
 \usage{
 plotTrueAndObserved(
-  logRr,
-  seLogRr,
-  trueLogRr,
-  xLabel = "Relative risk",
+  estimate,
+  se,
+  trueEffect,
+  scale = "log relative risk",
+  xLabel = NULL,
   title,
-  fileName = NULL
+  fileName = NULL,
+  logRr = NULL,
+  seLogRr = NULL,
+  trueLogRr = NULL
 )
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale.}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale these are
+log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025).}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
 
-\item{trueLogRr}{A vector of the true effect sizes.}
+\item{trueEffect}{A vector of the true effect sizes (on the same scale as \code{estimate}).}
 
-\item{xLabel}{The label on the x-axis: the name of the effect estimate.}
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
+
+\item{xLabel}{The label on the x-axis: the name of the effect estimate. Defaults to
+"Relative risk" or "Risk difference", depending on the scale.}
 
 \item{title}{Optional: the main title for the plot}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
 function \code{ggsave} in the ggplot2 package for supported file formats.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} with \code{scale = "log relative risk"} instead.}
+
+\item{trueLogRr}{DEPRECATED. Use \code{trueEffect} with \code{scale = "log relative risk"} instead.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -36,11 +50,12 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 Plot true and observed values, for example from a simulation study.
 }
 \details{
-Creates a forest plot of effect size estimates (ratios). Estimates that are significantly different
-from the true value (alpha = 0.05) are marked in orange, others are marked in blue.
+Creates a forest plot of effect size estimates. Estimates that are significantly different
+from the true value (alpha = 0.05) are marked in orange, others are marked in blue. For the log relative
+risk scale the estimates are shown as ratios on a log axis, for the risk difference scale on a linear axis.
 }
 \examples{
-data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
+data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+plotTrueAndObserved(data$estimate, data$se, data$trueEffect)
 
 }

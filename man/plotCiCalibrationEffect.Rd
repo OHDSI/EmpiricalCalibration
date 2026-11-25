@@ -5,38 +5,53 @@
 \title{Plot the effect of the CI calibration}
 \usage{
 plotCiCalibrationEffect(
-  logRr,
-  seLogRr,
-  trueLogRr,
+  estimate,
+  se,
+  trueEffect,
+  scale = "log relative risk",
   legacy = FALSE,
   model = NULL,
-  xLabel = "Relative risk",
+  xLabel = NULL,
   title,
-  fileName = NULL
+  fileName = NULL,
+  logRr = NULL,
+  seLogRr = NULL,
+  trueLogRr = NULL
 )
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale.}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale these are
+log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025).}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
 
-\item{trueLogRr}{A vector of the true effect sizes.}
+\item{trueEffect}{A vector of the true effect sizes (on the same scale as \code{estimate}).}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
 
 \item{legacy}{If true, a legacy error model will be fitted, meaning standard
 deviation is linear on the log scale. If false, standard deviation
-is assumed to be simply linear.}
+is assumed to be simply linear. The legacy model is not supported for the
+risk difference scale.}
 
 \item{model}{The fitted systematic error model. If not provided, it will be fitted on the
 provided data.}
 
-\item{xLabel}{The label on the x-axis: the name of the effect estimate.}
+\item{xLabel}{The label on the x-axis: the name of the effect estimate. Defaults to
+"Relative risk" or "Risk difference", depending on the scale.}
 
 \item{title}{Optional: the main title for the plot}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'. See the
 function \code{ggsave} in the ggplot2 package for supported file formats.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} with \code{scale = "log relative risk"} instead.}
+
+\item{trueLogRr}{DEPRECATED. Use \code{trueEffect} with \code{scale = "log relative risk"} instead.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -48,7 +63,7 @@ dashed line indicated estimates that are statistically significant different fro
 The orange area indicates estimates with calibrated p < 0.05.
 }
 \examples{
-data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-plotCiCalibrationEffect(data$logRr, data$seLogRr, data$trueLogRr)
+data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+plotCiCalibrationEffect(data$estimate, data$se, data$trueEffect)
 
 }

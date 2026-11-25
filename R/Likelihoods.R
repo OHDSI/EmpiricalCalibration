@@ -118,7 +118,7 @@ logLikelihoodNullNonNormalLl <- function(theta, llApproximationFunction, likelih
 }
 
 normalLlApproximaton <- function(x, parameters) {
-  dnorm(x, mean = parameters$logRr, sd = parameters$seLogRr, log = TRUE)
+  dnorm(x, mean = parameters$estimate, sd = parameters$se, log = TRUE)
 }
 
 customLlApproximation <- function(x, parameters) {

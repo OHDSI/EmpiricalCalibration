@@ -30,7 +30,7 @@ test_that("evaluateCiCalibration requirements", {
       seLogRr   = seLogRr,
       trueLogRr = trueLogRr
     ),
-    regexp = ".*infinite logRr.*"
+    regexp = ".*infinite estimate.*"
   )
 
   # Infinite seLogRr
@@ -56,7 +56,7 @@ test_that("evaluateCiCalibration requirements", {
       seLogRr   = seLogRr,
       trueLogRr = trueLogRr
     ),
-    regexp = ".*NA logRr.*"
+    regexp = ".*NA estimate.*"
   )
 
   # seLogRr is NA

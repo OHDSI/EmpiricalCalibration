@@ -5,28 +5,39 @@
 \title{Fit a systematic error model}
 \usage{
 fitSystematicErrorModel(
-  logRr,
-  seLogRr,
-  trueLogRr,
+  estimate,
+  se,
+  trueEffect,
   estimateCovarianceMatrix = FALSE,
-  legacy = FALSE
+  legacy = FALSE,
+  logRr = NULL,
+  seLogRr = NULL,
+  trueLogRr = NULL
 )
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale.}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale
+these are log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often
-the standard error = (log(<lower bound 95 percent confidence
-interval>) - log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative
+risk scale often the standard error = (log(<lower bound 95 percent
+confidence interval>) - log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
 
-\item{trueLogRr}{A vector of the true effect sizes.}
+\item{trueEffect}{A vector of the true effect sizes (on the same scale as \code{estimate}).}
 
 \item{estimateCovarianceMatrix}{Should a covariance matrix be computed? If so, confidence
 intervals for the model parameters will be available.}
 
 \item{legacy}{If true, a legacy error model will be fitted, meaning standard
 deviation is linear on the log scale. If false, standard deviation
-is assumed to be simply linear.}
+is assumed to be simply linear. The legacy model is not supported for the
+risk difference scale.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} instead.}
+
+\item{trueLogRr}{DEPRECATED. Use \code{trueEffect} instead.}
 }
 \value{
 An object of type \code{systematicErrorModel}.
@@ -41,8 +52,8 @@ distributions are assumed to be linear with respect to the true effect size, and
 therefore represented by an intercept and a slope.
 }
 \examples{
-controls <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-model <- fitSystematicErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr)
+controls <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+model <- fitSystematicErrorModel(controls$estimate, controls$se, controls$trueEffect)
 model
 
 }

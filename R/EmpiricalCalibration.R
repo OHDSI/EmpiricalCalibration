@@ -30,3 +30,21 @@ NULL
 
 LOG_RELATIVE_RISK <- "log relative risk"
 RISK_DIFFERENCE <- "risk difference"
+
+warnDeprecatedArguments <- function(oldNames, newNames) {
+  warning(
+    "The ", paste0("`", oldNames, "`", collapse = ", "), " argument(s) are deprecated. ",
+    "Use ", paste0("`", newNames, "`", collapse = ", "), " instead.",
+    call. = FALSE
+  )
+}
+
+renameLegacyNormalColumns <- function(data) {
+  if ("logRr" %in% colnames(data) && !"estimate" %in% colnames(data)) {
+    colnames(data)[colnames(data) == "logRr"] <- "estimate"
+  }
+  if ("seLogRr" %in% colnames(data) && !"se" %in% colnames(data)) {
+    colnames(data)[colnames(data) == "seLogRr"] <- "se"
+  }
+  return(data)
+}

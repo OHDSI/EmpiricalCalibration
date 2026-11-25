@@ -22,26 +22,47 @@
 #' Generate point estimates given known true effect sizes and standard errors
 #'
 #' @param n           Number of controls to simulate.
-#' @param mean        The mean of the error distribution (on the log RR scale).
-#' @param sd          The standard deviation of the error distribution (on the log RR scale).
-#' @param seLogRr     The standard error of the log of the relative risk. This is recycled for the
+#' @param mean        The mean of the error distribution (on the scale of the effect estimates).
+#' @param sd          The standard deviation of the error distribution (on the scale of the effect estimates).
+#' @param se          The standard error of the effect estimates. This is recycled for the
 #'                    controls. The default is to sample these from a uniform distribution.
-#' @param trueLogRr   The true relative risk (on the log scale) used to generate these controls.  This
-#'                    is recycled for the controls.
+#' @param trueEffect  The true effect (on the scale of the effect estimates, for example the log relative risk)
+#'                    used to generate these controls. This is recycled for the controls.
+#' @param seLogRr     DEPRECATED. Use `se` instead.
+#' @param trueLogRr   DEPRECATED. Use `trueEffect` instead.
+#'
+#' @return
+#' A data frame with columns `estimate`, `se`, and `trueEffect`. For backwards compatibility the data frame also
+#' contains the deprecated columns `logRr`, `seLogRr`, and `trueLogRr` with identical values.
 #'
 #' @examples
-#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' plotTrueAndObserved(data$estimate, data$se, data$trueEffect)
 #'
 #' @export
 simulateControls <- function(n = 50,
                              mean = 0,
                              sd = 0.1,
-                             seLogRr = runif(n, min = 0.01, max = 0.2),
-                             trueLogRr = 0) {
+                             se = runif(n, min = 0.01, max = 0.2),
+                             trueEffect = 0,
+                             seLogRr = NULL,
+                             trueLogRr = NULL) {
+  if (!is.null(seLogRr) || !is.null(trueLogRr)) {
+    warnDeprecatedArguments(c("seLogRr", "trueLogRr")[c(!is.null(seLogRr), !is.null(trueLogRr))],
+                            c("se", "trueEffect")[c(!is.null(seLogRr), !is.null(trueLogRr))])
+    if (!is.null(seLogRr)) {
+      se <- seLogRr
+    }
+    if (!is.null(trueLogRr)) {
+      trueEffect <- trueLogRr
+    }
+  }
   theta <- rnorm(n, mean = mean, sd = sd)
-  logRr <- rnorm(n, mean = trueLogRr + theta, sd = seLogRr)
-  data <- data.frame(logRr = logRr, seLogRr = seLogRr, trueLogRr = trueLogRr)
+  estimate <- rnorm(n, mean = trueEffect + theta, sd = se)
+  data <- data.frame(estimate = estimate, se = se, trueEffect = trueEffect)
+  data$logRr <- data$estimate
+  data$seLogRr <- data$se
+  data$trueLogRr <- data$trueEffect
   return(data)
 }
 

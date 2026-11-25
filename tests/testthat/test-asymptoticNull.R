@@ -7,7 +7,7 @@ negatives <- sccs[sccs$groundTruth == 0, ]
 test_that("fitNull argument requirements", {
   logRr <- c(Inf)
   expect_warning(fitNull(logRr, negatives$seLogRr),
-    regexp = ".*infinite logRr.*"
+    regexp = ".*infinite estimate.*"
   )
 
   seLogRr <- c(Inf)
@@ -17,7 +17,7 @@ test_that("fitNull argument requirements", {
 
   logRr <- c(NA)
   expect_warning(fitNull(logRr, negatives$seLogRr),
-    regexp = ".*NA logRr.*"
+    regexp = ".*NA estimate.*"
   )
 
   seLogRr <- c(NA)
@@ -27,7 +27,7 @@ test_that("fitNull argument requirements", {
   
   logRr <- c(101)
   expect_warning(fitNull(logRr, negatives$seLogRr),
-                 regexp = ".*extreme logRr.*"
+                 regexp = "Extreme estimate*"
   )
 })
 

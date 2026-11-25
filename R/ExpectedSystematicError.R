@@ -34,6 +34,9 @@ closedFormIntegeralAbsolute <- function(mu, sigma) {
 #' Taking the absolute value of the expected systematic error we can express both mean and spread of the
 #' estimated null distribution.
 #'
+#' Note that the expected absolute systematic error is expressed on the scale of the estimates used to fit the
+#' null (for example log relative risk or risk difference), so values are not comparable across scales.
+#'
 #' @param null      An object of class `null` created using the `fitNull` function or an
 #'                  object of class `mcmcNull` created using the `fitMcmcNull` function.
 #' @param alpha     The expected type I error for computing the credible interval.
@@ -86,10 +89,10 @@ computeExpectedAbsoluteSystematicError.mcmcNull <- function(null, alpha = 0.05) 
   return(result)
 }
 
-computeEaseBoostrap <- function(logRr, seLogRr, alpha, sampleSize) {
+computeEaseBoostrap <- function(estimate, se, alpha, sampleSize) {
   boostrap <- function(i) {
-    idx <- sample.int(length(logRr), length(logRr), replace = TRUE)
-    null <- fitNull(logRr[idx], seLogRr[idx])
+    idx <- sample.int(length(estimate), length(estimate), replace = TRUE)
+    null <- fitNull(estimate[idx], se[idx])
     return(computeExpectedAbsoluteSystematicError(null))
   }
   sample <- sapply(1:sampleSize, boostrap)
@@ -108,15 +111,19 @@ computeEaseBoostrap <- function(logRr, seLogRr, alpha, sampleSize) {
 #' @details
 #' Compare the expected absolute systematic error (EASE) of two sets of estimates for the same set of negative controls.
 #'
-#' Important: the two sets of estimates (logRr1 + seLogRr1 and logRr2 + seLogRr2) should be in identical order, so that for
+#' Important: the two sets of estimates (estimate1 + se1 and estimate2 + se2) should be in identical order, so that for
 #' example the first item in each vector corresponds to the same negative control.
 #'
-#' @param logRr1     A numeric vector of effect estimates generated using the first method on the log scale.
-#' @param seLogRr1   The standard error of the log of the effect estimates generated using the first method.
-#' @param logRr2     A numeric vector of effect estimates generated using the second method on the log scale.
-#' @param seLogRr2   The standard error of the log of the effect estimates generated using the second method.
+#' @param estimate1  A numeric vector of effect estimates generated using the first method (for example log relative risks).
+#' @param se1        The standard error of the effect estimates generated using the first method.
+#' @param estimate2  A numeric vector of effect estimates generated using the second method (on the same scale as `estimate1`).
+#' @param se2        The standard error of the effect estimates generated using the second method.
 #' @param alpha      The expected type I error for computing confidence intervals and p-values.
 #' @param sampleSize The number of samples in the bootstraps.
+#' @param logRr1     DEPRECATED. Use `estimate1` instead.
+#' @param seLogRr1   DEPRECATED. Use `se1` instead.
+#' @param logRr2     DEPRECATED. Use `estimate2` instead.
+#' @param seLogRr2   DEPRECATED. Use `se2` instead.
 #'
 #' @examples
 #' # Simulate results of first method:
@@ -124,13 +131,13 @@ computeEaseBoostrap <- function(logRr, seLogRr, alpha, sampleSize) {
 #'
 #' # Simulate second method to be more biased:
 #' ncs2 <- ncs1
-#' ncs2$logRr <- ncs2$logRr + rnorm(nrow(ncs2), mean = 0.1, sd = 0.1)
+#' ncs2$estimate <- ncs2$estimate + rnorm(nrow(ncs2), mean = 0.1, sd = 0.1)
 #'
 #' delta <- compareEase(
-#'   logRr1 = ncs1$logRr,
-#'   seLogRr1 = ncs1$seLogRr,
-#'   logRr2 = ncs2$logRr,
-#'   seLogRr2 = ncs2$seLogRr
+#'   estimate1 = ncs1$estimate,
+#'   se1 = ncs1$se,
+#'   estimate2 = ncs2$estimate,
+#'   se2 = ncs2$se
 #' )
 #' delta
 #' attr(delta, "ease1")
@@ -146,25 +153,42 @@ computeEaseBoostrap <- function(logRr, seLogRr, alpha, sampleSize) {
 #' interval. The approach used here will more closely align with the computation of the difference in EASE.
 #'
 #' @export
-compareEase <- function(logRr1, seLogRr1, logRr2, seLogRr2, alpha = 0.05, sampleSize = 1000) {
-  if (length(unique(c(length(logRr1), length(seLogRr1), length(logRr2), length(seLogRr2)))) != 1) {
-    stop("Arguments logRr1, seLogRr1, logRr2, and seLogRr2 should be of equal length.")
+compareEase <- function(estimate1,
+                        se1,
+                        estimate2,
+                        se2,
+                        alpha = 0.05,
+                        sampleSize = 1000,
+                        logRr1 = NULL,
+                        seLogRr1 = NULL,
+                        logRr2 = NULL,
+                        seLogRr2 = NULL) {
+  if (!is.null(logRr1)) {
+    warnDeprecatedArguments(c("logRr1", "seLogRr1", "logRr2", "seLogRr2"), c("estimate1", "se1", "estimate2", "se2"))
+    estimate1 <- logRr1
+    se1 <- seLogRr1
+    estimate2 <- logRr2
+    se2 <- seLogRr2
+  }
+  if (length(unique(c(length(estimate1), length(se1), length(estimate2), length(se2)))) != 1) {
+    stop("Arguments estimate1, se1, estimate2, and se2 should be of equal length.")
   }
   
-  ease1 <- computeEaseBoostrap(logRr = logRr1, seLogRr = seLogRr1, alpha = alpha, sampleSize = sampleSize)
-  ease2 <- computeEaseBoostrap(logRr = logRr2, seLogRr = seLogRr2, alpha = alpha, sampleSize = sampleSize)
+  ease1 <- computeEaseBoostrap(estimate = estimate1, se = se1, alpha = alpha, sampleSize = sampleSize)
+  ease2 <- computeEaseBoostrap(estimate = estimate2, se = se2, alpha = alpha, sampleSize = sampleSize)
   delta <- ease1$ease - ease2$ease
   sampleDeltaEase <- function(i) {
-    idx <- sample.int(length(logRr1), length(logRr1), replace = TRUE)
-    null1 <- fitNull(logRr1[idx], seLogRr1[idx])
+    idx <- sample.int(length(estimate1), length(estimate1), replace = TRUE)
+    null1 <- fitNull(estimate1[idx], se1[idx],)
     ease1 <- computeExpectedAbsoluteSystematicError(null1)
-    null2 <- fitNull(logRr2[idx], seLogRr2[idx])
+    null2 <- fitNull(estimate2[idx], se2[idx])
     ease2 <- computeExpectedAbsoluteSystematicError(null2)
     return(ease1 - ease2)
   }
   sample <- sapply(1:sampleSize, sampleDeltaEase)
   deltaCi <- quantile(sample, c(0.025, 0.975))
-  epsilon <- 0.0001
+  # Tolerance is in units of the estimates, so needs to follow the magnitude of the standard errors:
+  epsilon <- 0.0001 
   if (delta > 0) {
     deltaP <- mean(sample < epsilon)
   } else {

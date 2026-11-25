@@ -5,27 +5,31 @@
 \title{Plot the expected type 1 error as a function of standard error}
 \usage{
 plotExpectedType1Error(
-  logRrNegatives,
-  seLogRrNegatives,
-  seLogRrPositives,
+  estimateNegatives,
+  seNegatives,
+  sePositives,
+  scale = "log relative risk",
   alpha = 0.05,
   null = NULL,
-  xLabel = "Relative risk",
+  xLabel = NULL,
   title,
   showCis = FALSE,
   showEffectSizes = FALSE,
-  fileName = NULL
+  fileName = NULL,
+  logRrNegatives = NULL,
+  seLogRrNegatives = NULL,
+  seLogRrPositives = NULL
 )
 }
 \arguments{
-\item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log
-scale.}
+\item{estimateNegatives}{A numeric vector of effect estimates of the negative controls. On the log
+relative risk scale these are log relative risks.}
 
-\item{seLogRrNegatives}{The standard error of the log of the effect estimates of the negative
-controls.}
+\item{seNegatives}{The standard error of the effect estimates of the negative controls.}
 
-\item{seLogRrPositives}{The standard error of the log of the effect estimates of the positive
-controls.}
+\item{sePositives}{The standard error of the effect estimates of the positive controls.}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
 
 \item{alpha}{The alpha (nominal type 1 error) to be used.}
 
@@ -33,7 +37,8 @@ controls.}
 \code{fitNull} function. If not provided, a null will be fitted before
 plotting.}
 
-\item{xLabel}{If showing effect sizes, what label should be used for the effect size axis?}
+\item{xLabel}{If showing effect sizes, what label should be used for the effect size axis?
+Defaults to "Relative risk" or "Risk difference", depending on the scale.}
 
 \item{title}{Optional: the main title for the plot}
 
@@ -44,6 +49,12 @@ plotting.}
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'.
 See the function \code{ggsave} in the ggplot2 package for supported file
 formats.}
+
+\item{logRrNegatives}{DEPRECATED. Use \code{estimateNegatives} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRrNegatives}{DEPRECATED. Use \code{seNegatives} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRrPositives}{DEPRECATED. Use \code{sePositives} with \code{scale = "log relative risk"} instead.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.

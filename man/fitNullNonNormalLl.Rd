@@ -4,11 +4,17 @@
 \alias{fitNullNonNormalLl}
 \title{Fit the null distribution using non-normal log-likelihood approximations}
 \usage{
-fitNullNonNormalLl(likelihoodApproximations)
+fitNullNonNormalLl(likelihoodApproximations, scale = "log relative risk")
 }
 \arguments{
 \item{likelihoodApproximations}{Either a data frame containing normal, skew-normal, or custom parametric likelihood
-approximations, or a list of (adaptive) grid likelihood profiles.}
+approximations, or a list of (adaptive) grid likelihood profiles. Normal
+approximations are identified by the \code{estimate} and \code{se} columns (or the
+deprecated \code{logRr} and \code{seLogRr} columns).}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or
+\code{"risk difference"}. Currently only used when the approximations are
+normal (see details).}
 }
 \value{
 An object containing the parameters of the null distribution.
@@ -19,6 +25,10 @@ An object containing the parameters of the null distribution.
 \details{
 This function fits a Gaussian function to the negative control estimates, using non-normal
 approximations of the per-negative control log likelihood.
+
+Note: for non-normal approximations the optimization starts at a null with mean 0 and standard deviation 1, and
+is not rescaled, so these may not be reliable for estimates on a scale with very small standard errors, such as
+risk differences.
 }
 \examples{
 data(sccs)

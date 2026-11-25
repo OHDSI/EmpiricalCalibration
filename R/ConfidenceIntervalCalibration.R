@@ -24,54 +24,68 @@
 #' distributions are assumed to be linear with respect to the true effect size, and each component is
 #' therefore represented by an intercept and a slope.
 #'
-#' @param logRr                      A numeric vector of effect estimates on the log scale.
-#' @param seLogRr                    The standard error of the log of the effect estimates. Hint: often
-#'                                   the standard error = (log(<lower bound 95 percent confidence
-#'                                   interval>) - log(<effect estimate>))/qnorm(0.025).
-#' @param trueLogRr                  A vector of the true effect sizes.
+#' @param estimate                   A numeric vector of effect estimates. On the log relative risk scale
+#'                                   these are log relative risks.
+#' @param se                         The standard error of the effect estimates. Hint: on the log relative
+#'                                   risk scale often the standard error = (log(<lower bound 95 percent
+#'                                   confidence interval>) - log(<effect estimate>))/qnorm(0.025).
+#' @param trueEffect                 A vector of the true effect sizes (on the same scale as `estimate`).
 #' @param estimateCovarianceMatrix   Should a covariance matrix be computed? If so, confidence
 #'                                   intervals for the model parameters will be available.
 #' @param legacy                     If true, a legacy error model will be fitted, meaning standard
 #'                                   deviation is linear on the log scale. If false, standard deviation
-#'                                   is assumed to be simply linear.
+#'                                   is assumed to be simply linear. The legacy model is not supported for the
+#'                                   risk difference scale.
+#' @param logRr                      DEPRECATED. Use `estimate` instead.
+#' @param seLogRr                    DEPRECATED. Use `se` instead.
+#' @param trueLogRr                  DEPRECATED. Use `trueEffect` instead.
 #'
 #' @return
 #' An object of type `systematicErrorModel`.
 #'
 #' @examples
-#' controls <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' model <- fitSystematicErrorModel(controls$logRr, controls$seLogRr, controls$trueLogRr)
+#' controls <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' model <- fitSystematicErrorModel(controls$estimate, controls$se, controls$trueEffect)
 #' model
 #'
 #' @export
-fitSystematicErrorModel <- function(logRr,
-                                    seLogRr,
-                                    trueLogRr,
+fitSystematicErrorModel <- function(estimate,
+                                    se,
+                                    trueEffect,
                                     estimateCovarianceMatrix = FALSE,
-                                    legacy = FALSE) {
-  if (any(is.infinite(seLogRr))) {
+                                    legacy = FALSE,
+                                    logRr = NULL,
+                                    seLogRr = NULL,
+                                    trueLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr", "trueLogRr"), c("estimate", "se", "trueEffect"))
+    estimate <- logRr
+    se <- seLogRr
+    trueEffect <- trueLogRr
+  }
+  if (any(is.infinite(se))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
-    trueLogRr <- trueLogRr[!is.infinite(seLogRr)]
-    logRr <- logRr[!is.infinite(seLogRr)]
-    seLogRr <- seLogRr[!is.infinite(seLogRr)]
+    trueEffect <- trueEffect[!is.infinite(se)]
+    estimate <- estimate[!is.infinite(se)]
+    se <- se[!is.infinite(se)]
   }
-  if (any(is.infinite(logRr))) {
-    warning("Estimate(s) with infinite logRr detected. Removing before fitting error model")
-    trueLogRr <- trueLogRr[!is.infinite(logRr)]
-    seLogRr <- seLogRr[!is.infinite(logRr)]
-    logRr <- logRr[!is.infinite(logRr)]
+  if (any(is.infinite(estimate))) {
+    warning("Estimate(s) with infinite estimate detected. Removing before fitting error model")
+    trueEffect <- trueEffect[!is.infinite(estimate)]
+    se <- se[!is.infinite(estimate)]
+    estimate <- estimate[!is.infinite(estimate)]
   }
-  if (any(is.na(seLogRr))) {
+  if (any(is.na(se))) {
     warning("Estimate(s) with NA standard error detected. Removing before fitting error model")
-    trueLogRr <- trueLogRr[!is.na(seLogRr)]
-    logRr <- logRr[!is.na(seLogRr)]
-    seLogRr <- seLogRr[!is.na(seLogRr)]
+    trueEffect <- trueEffect[!is.na(se)]
+    estimate <- estimate[!is.na(se)]
+    se <- se[!is.na(se)]
   }
-  if (any(is.na(logRr))) {
-    warning("Estimate(s) with NA logRr detected. Removing before fitting error model")
-    trueLogRr <- trueLogRr[!is.na(logRr)]
-    seLogRr <- seLogRr[!is.na(logRr)]
-    logRr <- logRr[!is.na(logRr)]
+  if (any(is.na(estimate))) {
+    warning("Estimate(s) with NA estimate detected. Removing before fitting error model")
+    trueEffect <- trueEffect[!is.na(estimate)]
+    se <- se[!is.na(estimate)]
+    estimate <- estimate[!is.na(estimate)]
   }
   
   if (legacy) {
@@ -84,11 +98,12 @@ fitSystematicErrorModel <- function(logRr,
     parscale <- c(1, 1, 1, 1)
   }
   
+  # Mean intercept and sd intercept are in units of the estimates:
   fit <- optim(theta,
                logLikelihood,
-               logRr = logRr,
-               seLogRr = seLogRr,
-               trueLogRr = trueLogRr,
+               logRr = estimate,
+               seLogRr = se,
+               trueLogRr = trueEffect,
                method = "BFGS",
                hessian = TRUE,
                control = list(parscale = parscale)
@@ -101,6 +116,7 @@ fitSystematicErrorModel <- function(logRr,
   }
   if (estimateCovarianceMatrix) {
     fisher_info <- solve(fit$hessian)
+    fisher_info <- fisher_info 
     prop_sigma <- sqrt(diag(fisher_info))
     attr(model, "CovarianceMatrix") <- fisher_info
     attr(model, "LB95CI") <- fit$par + qnorm(0.025) * prop_sigma
@@ -115,27 +131,47 @@ fitSystematicErrorModel <- function(logRr,
 #' @details
 #' Compute calibrated confidence intervals based on a model of the systematic error.
 #'
-#' @param logRr     A numeric vector of effect estimates on the log scale.
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025).
+#' @param estimate  A numeric vector of effect estimates. On the log relative risk scale these are
+#'                  log relative risks.
+#' @param se        The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                  often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                  log(<effect estimate>))/qnorm(0.025).
 #' @param ciWidth   The width of the confidence interval. Typically this would be .95, for the 95
 #'                  percent confidence interval.
 #' @param model     An object of type `systematicErrorModel` as created by the
 #'                  [fitSystematicErrorModel()] function.
+#' @template Scale
+#' @param logRr     DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr   DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
 #'
 #' @return
-#' A data frame with calibrated confidence intervals and point estimates.
+#' A data frame with calibrated confidence intervals and point estimates, on the same scale as the
+#' provided estimates (so for example on the log scale for log relative risks). The data frame has columns
+#' `estimate`, `lb`, `ub`, and `se`. For backwards compatibility it also contains the deprecated columns
+#' `logRr`, `logLb95Rr`, `logUb95Rr`, and `seLogRr` with identical values.
 #'
 #' @examples
-#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' model <- fitSystematicErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
-#' newData <- simulateControls(n = 15, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-#' result <- calibrateConfidenceInterval(newData$logRr, newData$seLogRr, model)
+#' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' model <- fitSystematicErrorModel(data$estimate, data$se, data$trueEffect)
+#' newData <- simulateControls(n = 15, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+#' result <- calibrateConfidenceInterval(newData$estimate, newData$se, model)
 #' result
 #'
 #' @export
-calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
+calibrateConfidenceInterval <- function(estimate,
+                                        se,
+                                        model,
+                                        ciWidth = 0.95,
+                                        scale = "log relative risk",
+                                        logRr = NULL,
+                                        seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
   opt <- function(x,
                   z,
                   logRr,
@@ -246,9 +282,13 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
         return(NA)
       }
     }
+    # Root finding tolerance is in units of the estimates, so needs to follow the magnitude of the
+    # standard error for absolute scales:
+    tol <- ifelse(scale == RISK_DIFFERENCE, 1e-4 * max(se, 1e-10), .Machine$double.eps^0.25)
     return(uniroot(
       f = opt,
       interval = c(lower, upper),
+      tol = tol,
       z = z,
       logRr = logRr,
       se = se,
@@ -260,42 +300,45 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
     )$root)
   }
   
+  if (names(model)[3] == "logSdIntercept" && scale == RISK_DIFFERENCE) {
+    stop("The legacy error model is only supported for the log relative risk scale")
+  }
   legacy <- (names(model)[3] == "logSdIntercept")
-  result <- data.frame(logRr = rep(as.numeric(NA), length(logRr)), logLb95Rr = as.numeric(NA), logUb95Rr = as.numeric(NA))
+  result <- data.frame(estimate = rep(as.numeric(NA), length(estimate)), lb = as.numeric(NA), ub = as.numeric(NA))
   if (!is.na(model[1])) {
     for (i in 1:nrow(result)) {
-      if (is.infinite(logRr[i]) || is.na(logRr[i]) || is.infinite(seLogRr[i]) || is.na(seLogRr[i])) {
-        result$logRr[i] <- NA
-        result$logLb95Rr[i] <- NA
-        result$logUb95Rr[i] <- NA
+      if (is.infinite(estimate[i]) || is.na(estimate[i]) || is.infinite(se[i]) || is.na(se[i])) {
+        result$estimate[i] <- NA
+        result$lb[i] <- NA
+        result$ub[i] <- NA
       } else {
-        result$logRr[i] <- logBound(
+        result$estimate[i] <- logBound(
           0,
           TRUE,
-          logRr[i],
-          seLogRr[i],
+          estimate[i],
+          se[i],
           model[1],
           model[2],
           model[3],
           model[4],
           legacy
         )
-        result$logLb95Rr[i] <- logBound(
+        result$lb[i] <- logBound(
           ciWidth,
           TRUE,
-          logRr[i],
-          seLogRr[i],
+          estimate[i],
+          se[i],
           model[1],
           model[2],
           model[3],
           model[4],
           legacy
         )
-        result$logUb95Rr[i] <- logBound(
+        result$ub[i] <- logBound(
           ciWidth,
           FALSE,
-          logRr[i],
-          seLogRr[i],
+          estimate[i],
+          se[i],
           model[1],
           model[2],
           model[3],
@@ -305,25 +348,35 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
       }
     }
   }
-  result$seLogRr <- (result$logLb95Rr - result$logUb95Rr) / (2 * qnorm((1 - ciWidth) / 2))
+  result$se <- (result$lb - result$ub) / (2 * qnorm((1 - ciWidth) / 2))
+  result$logRr <- result$estimate
+  result$logLb95Rr <- result$lb
+  result$logUb95Rr <- result$ub
+  result$seLogRr <- result$se
   return(result)
 }
 
 #' Compute the (traditional) confidence interval
 #'
 #' @description
-#' `computeTraditionalCi` computes the traditional confidence interval based on the log of the
-#' relative risk and the standard error of the log of the relative risk.
+#' `computeTraditionalCi` computes the traditional confidence interval based on the effect estimate
+#' (for example the log of the relative risk) and its standard error.
 #'
-#' @param logRr     A numeric vector of one or more effect estimates on the log scale
-#' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
-#'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-#'                  estimate>))/qnorm(0.025)
+#' @param estimate  A numeric vector of one or more effect estimates. On the log relative risk scale these
+#'                  are log relative risks.
+#' @param se        The standard error of the effect estimates. Hint: on the log relative risk scale
+#'                  often the standard error = (log(<lower bound 95 percent confidence interval>) -
+#'                  log(<effect estimate>))/qnorm(0.025)
 #' @param ciWidth   The width of the confidence interval. Typically this would be .95, for the 95
 #'                  percent confidence interval.
+#' @template Scale
+#' @param logRr     DEPRECATED. Use `estimate` with `scale = "log relative risk"` instead.
+#' @param seLogRr   DEPRECATED. Use `se` with `scale = "log relative risk"` instead.
 #'
 #' @return
-#' The point estimate and confidence interval
+#' The point estimate and confidence interval, in a data frame with columns `rr`, `lb`, and `ub` (all
+#' exponentiated, so on the relative risk scale) when `scale = "log relative risk"`, or columns `estimate`, `lb`,
+#' and `ub` when `scale = "risk difference"`.
 #'
 #' @examples
 #' data(sccs)
@@ -331,12 +384,26 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
 #' computeTraditionalCi(positive$logRr, positive$seLogRr)
 #'
 #' @export
-computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
-  return(data.frame(
-    rr = exp(logRr),
-    lb = exp(logRr + qnorm((1 - ciWidth) / 2) * seLogRr),
-    ub = exp(logRr - qnorm((1 - ciWidth) / 2) * seLogRr)
-  ))
+computeTraditionalCi <- function(estimate,
+                                 se,
+                                 ciWidth = .95,
+                                 scale = "log relative risk",
+                                 logRr = NULL,
+                                 seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+    scale <- LOG_RELATIVE_RISK
+  }
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  lb <- estimate + qnorm((1 - ciWidth) / 2) * se
+  ub <- estimate - qnorm((1 - ciWidth) / 2) * se
+  if (scale == LOG_RELATIVE_RISK) {
+    return(data.frame(rr = exp(estimate), lb = exp(lb), ub = exp(ub)))
+  } else {
+    return(data.frame(estimate = estimate, lb = lb, ub = ub))
+  }
 }
 
 #' Convert empirical null distribution to systematic error model

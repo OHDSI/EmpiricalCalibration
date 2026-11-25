@@ -8,22 +8,32 @@ simulateControls(
   n = 50,
   mean = 0,
   sd = 0.1,
-  seLogRr = runif(n, min = 0.01, max = 0.2),
-  trueLogRr = 0
+  se = runif(n, min = 0.01, max = 0.2),
+  trueEffect = 0,
+  seLogRr = NULL,
+  trueLogRr = NULL
 )
 }
 \arguments{
 \item{n}{Number of controls to simulate.}
 
-\item{mean}{The mean of the error distribution (on the log RR scale).}
+\item{mean}{The mean of the error distribution (on the scale of the effect estimates).}
 
-\item{sd}{The standard deviation of the error distribution (on the log RR scale).}
+\item{sd}{The standard deviation of the error distribution (on the scale of the effect estimates).}
 
-\item{seLogRr}{The standard error of the log of the relative risk. This is recycled for the
+\item{se}{The standard error of the effect estimates. This is recycled for the
 controls. The default is to sample these from a uniform distribution.}
 
-\item{trueLogRr}{The true relative risk (on the log scale) used to generate these controls.  This
-is recycled for the controls.}
+\item{trueEffect}{The true effect (on the scale of the effect estimates, for example the log relative risk)
+used to generate these controls. This is recycled for the controls.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} instead.}
+
+\item{trueLogRr}{DEPRECATED. Use \code{trueEffect} instead.}
+}
+\value{
+A data frame with columns \code{estimate}, \code{se}, and \code{trueEffect}. For backwards compatibility the data frame also
+contains the deprecated columns \code{logRr}, \code{seLogRr}, and \code{trueLogRr} with identical values.
 }
 \description{
 Simulate (negative) controls
@@ -32,7 +42,7 @@ Simulate (negative) controls
 Generate point estimates given known true effect sizes and standard errors
 }
 \examples{
-data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-plotTrueAndObserved(data$logRr, data$seLogRr, data$trueLogRr)
+data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+plotTrueAndObserved(data$estimate, data$se, data$trueEffect)
 
 }

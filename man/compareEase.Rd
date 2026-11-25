@@ -5,26 +5,38 @@
 \title{Compare EASE of correlated sets of estimates}
 \usage{
 compareEase(
-  logRr1,
-  seLogRr1,
-  logRr2,
-  seLogRr2,
+  estimate1,
+  se1,
+  estimate2,
+  se2,
   alpha = 0.05,
-  sampleSize = 1000
+  sampleSize = 1000,
+  logRr1 = NULL,
+  seLogRr1 = NULL,
+  logRr2 = NULL,
+  seLogRr2 = NULL
 )
 }
 \arguments{
-\item{logRr1}{A numeric vector of effect estimates generated using the first method on the log scale.}
+\item{estimate1}{A numeric vector of effect estimates generated using the first method (for example log relative risks).}
 
-\item{seLogRr1}{The standard error of the log of the effect estimates generated using the first method.}
+\item{se1}{The standard error of the effect estimates generated using the first method.}
 
-\item{logRr2}{A numeric vector of effect estimates generated using the second method on the log scale.}
+\item{estimate2}{A numeric vector of effect estimates generated using the second method (on the same scale as \code{estimate1}).}
 
-\item{seLogRr2}{The standard error of the log of the effect estimates generated using the second method.}
+\item{se2}{The standard error of the effect estimates generated using the second method.}
 
 \item{alpha}{The expected type I error for computing confidence intervals and p-values.}
 
 \item{sampleSize}{The number of samples in the bootstraps.}
+
+\item{logRr1}{DEPRECATED. Use \code{estimate1} instead.}
+
+\item{seLogRr1}{DEPRECATED. Use \code{se1} instead.}
+
+\item{logRr2}{DEPRECATED. Use \code{estimate2} instead.}
+
+\item{seLogRr2}{DEPRECATED. Use \code{se2} instead.}
 }
 \value{
 A data frame with 4 columns: the point estimate, confidence interval lower bound, and upper bound for the difference
@@ -42,7 +54,7 @@ Compare EASE of correlated sets of estimates
 \details{
 Compare the expected absolute systematic error (EASE) of two sets of estimates for the same set of negative controls.
 
-Important: the two sets of estimates (logRr1 + seLogRr1 and logRr2 + seLogRr2) should be in identical order, so that for
+Important: the two sets of estimates (estimate1 + se1 and estimate2 + se2) should be in identical order, so that for
 example the first item in each vector corresponds to the same negative control.
 }
 \examples{
@@ -51,13 +63,13 @@ ncs1 <- simulateControls(n = 50)
 
 # Simulate second method to be more biased:
 ncs2 <- ncs1
-ncs2$logRr <- ncs2$logRr + rnorm(nrow(ncs2), mean = 0.1, sd = 0.1)
+ncs2$estimate <- ncs2$estimate + rnorm(nrow(ncs2), mean = 0.1, sd = 0.1)
 
 delta <- compareEase(
-  logRr1 = ncs1$logRr,
-  seLogRr1 = ncs1$seLogRr,
-  logRr2 = ncs2$logRr,
-  seLogRr2 = ncs2$seLogRr
+  estimate1 = ncs1$estimate,
+  se1 = ncs1$se,
+  estimate2 = ncs2$estimate,
+  se2 = ncs2$se
 )
 delta
 attr(delta, "ease1")

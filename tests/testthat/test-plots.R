@@ -44,7 +44,7 @@ test_that("output of plotCalibration", {
       c(negatives$logRr, Inf),
       c(negatives$seLogRr, 0)
     ),
-    "infinite logRr"
+    "infinite estimate"
   )
 
   expect_warning(
@@ -60,7 +60,7 @@ test_that("output of plotCalibration", {
       c(negatives$logRr, NA),
       c(negatives$seLogRr, 0)
     ),
-    "NA logRr"
+    "NA estimate"
   )
 
   expect_warning(

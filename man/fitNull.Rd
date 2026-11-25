@@ -4,14 +4,19 @@
 \alias{fitNull}
 \title{Fit the null distribution}
 \usage{
-fitNull(logRr, seLogRr)
+fitNull(estimate, se, logRr = NULL, seLogRr = NULL)
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale these are
+log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025)}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} instead.}
 }
 \value{
 An object containing the parameters of the null distribution.

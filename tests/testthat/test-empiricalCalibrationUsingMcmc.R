@@ -14,7 +14,7 @@ test_that("fitMcmcNull requirements", {
       logRr     = logRr,
       seLogRr   = seLogRr
     ),
-    regexp = ".*infinite logRr.*"
+    regexp = ".*infinite estimate.*"
   )
 
   # Infinite seLogRr
@@ -36,7 +36,7 @@ test_that("fitMcmcNull requirements", {
       logRr     = logRr,
       seLogRr   = seLogRr
     ),
-    regexp = ".*NA logRr.*"
+    regexp = ".*NA estimate.*"
   )
 
   # NA seLogRr

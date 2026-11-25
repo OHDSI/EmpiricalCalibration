@@ -20,7 +20,9 @@
 #' `calibrateLlr` computes calibrated log likelihood ratio using the fitted null distribution
 #'
 #' @param likelihoodApproximation Either a data frame containing normal, skew-normal, or custom parametric likelihood
-#'                                approximations, or a list of (adaptive) grid likelihood profiles.
+#'                                approximations, or a list of (adaptive) grid likelihood profiles. Normal
+#'                                approximations are identified by the `estimate` and `se` columns (or the
+#'                                deprecated `logRr` and `seLogRr` columns).
 #' @param null      An object of class `null` created using the `fitNull` function or an
 #'                  object of class `mcmcNull` created using the `fitMcmcNull` function.
 #' @param twoSided  Compute two-sided (TRUE) or one-sided (FALSE) p-value?
@@ -42,8 +44,11 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
     stop("Currently only one-sided upper LLRs are supported")
   }
 
+  if (is.data.frame(likelihoodApproximation)) {
+    likelihoodApproximation <- renameLegacyNormalColumns(likelihoodApproximation)
+  }
   if (is.data.frame(likelihoodApproximation) || is.numeric(likelihoodApproximation)) {
-    if ("logRr" %in% colnames(likelihoodApproximation)) {
+    if ("estimate" %in% colnames(likelihoodApproximation)) {
       message("Detected data following normal distribution")
       type <- "normal"
       logLikelihood <- normalLlApproximaton
@@ -98,13 +103,13 @@ calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper 
       mle <- parameters$point[idx]
       ml <- parameters$value[idx]
     } else if (type == "normal") {
-      if (is.na(parameters$logRr) ||
-        is.na(parameters$seLogRr) ||
-        is.infinite(parameters$logRr) ||
-        is.infinite(parameters$seLogRr)) {
+      if (is.na(parameters$estimate) ||
+        is.na(parameters$se) ||
+        is.infinite(parameters$estimate) ||
+        is.infinite(parameters$se)) {
         return(NA)
       }
-      mle <- parameters$logRr
+      mle <- parameters$estimate
       ml <- logLikelihood(mle, parameters = parameters)
     } else {
       optimum <- suppressWarnings(optim(0, function(x) -logLikelihood(x = x, parameters = parameters)))

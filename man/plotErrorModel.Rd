@@ -5,32 +5,46 @@
 \title{Plot the systematic error model}
 \usage{
 plotErrorModel(
-  logRr,
-  seLogRr,
-  trueLogRr,
+  estimate,
+  se,
+  trueEffect,
+  scale = "log relative risk",
   title,
   legacy = FALSE,
-  fileName = NULL
+  fileName = NULL,
+  logRr = NULL,
+  seLogRr = NULL,
+  trueLogRr = NULL
 )
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale.}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale
+these are log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the
-standard error = (log(<lower bound 95 percent confidence interval>) -
-log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative
+risk scale often the standard error = (log(<lower bound 95 percent
+confidence interval>) - log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
 
-\item{trueLogRr}{The true log relative risk.}
+\item{trueEffect}{The true effect (on the same scale as \code{estimate}).}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
 
 \item{title}{Optional: the main title for the plot}
 
 \item{legacy}{If true, a legacy error model will be fitted, meaning standard
 deviation is linear on the log scale. If false, standard deviation
-is assumed to be simply linear.}
+is assumed to be simply linear. The legacy model is not supported for the
+risk difference scale.}
 
 \item{fileName}{Name of the file where the plot should be saved, for example 'plot.png'.
 See the function \code{ggsave} in the ggplot2 package for supported file
 formats.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} with \code{scale = "log relative risk"} instead.}
+
+\item{trueLogRr}{DEPRECATED. Use \code{trueEffect} with \code{scale = "log relative risk"} instead.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -40,10 +54,11 @@ A Ggplot object. Use the \code{ggsave} function to save to file.
 }
 \details{
 Creates a plot with the true effect size on the x-axis, and the mean plus and minus the standard
-deviation shown on the y-axis. Also shown are simple error models fitted at each true relative
-risk in the input.
+deviation shown on the y-axis. Also shown are simple error models fitted at each true effect
+size in the input. For the log relative risk scale both axes show relative risks on a log scale, for the
+risk difference scale both axes are linear.
 }
 \examples{
-data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-plotErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
+data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+plotErrorModel(data$estimate, data$se, data$trueEffect)
 }

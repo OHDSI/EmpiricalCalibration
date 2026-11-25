@@ -4,23 +4,41 @@
 \alias{calibrateConfidenceInterval}
 \title{Calibrate confidence intervals}
 \usage{
-calibrateConfidenceInterval(logRr, seLogRr, model, ciWidth = 0.95)
+calibrateConfidenceInterval(
+  estimate,
+  se,
+  model,
+  ciWidth = 0.95,
+  scale = "log relative risk",
+  logRr = NULL,
+  seLogRr = NULL
+)
 }
 \arguments{
-\item{logRr}{A numeric vector of effect estimates on the log scale.}
+\item{estimate}{A numeric vector of effect estimates. On the log relative risk scale these are
+log relative risks.}
 
-\item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
-estimate>}}))/qnorm(0.025).}
+\item{se}{The standard error of the effect estimates. Hint: on the log relative risk scale
+often the standard error = (log(<lower bound 95 percent confidence interval>) -
+log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025).}
 
 \item{model}{An object of type \code{systematicErrorModel} as created by the
 \code{\link[=fitSystematicErrorModel]{fitSystematicErrorModel()}} function.}
 
 \item{ciWidth}{The width of the confidence interval. Typically this would be .95, for the 95
 percent confidence interval.}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
+
+\item{logRr}{DEPRECATED. Use \code{estimate} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRr}{DEPRECATED. Use \code{se} with \code{scale = "log relative risk"} instead.}
 }
 \value{
-A data frame with calibrated confidence intervals and point estimates.
+A data frame with calibrated confidence intervals and point estimates, on the same scale as the
+provided estimates (so for example on the log scale for log relative risks). The data frame has columns
+\code{estimate}, \code{lb}, \code{ub}, and \code{se}. For backwards compatibility it also contains the deprecated columns
+\code{logRr}, \code{logLb95Rr}, \code{logUb95Rr}, and \code{seLogRr} with identical values.
 }
 \description{
 Calibrate confidence intervals
@@ -29,10 +47,10 @@ Calibrate confidence intervals
 Compute calibrated confidence intervals based on a model of the systematic error.
 }
 \examples{
-data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-model <- fitSystematicErrorModel(data$logRr, data$seLogRr, data$trueLogRr)
-newData <- simulateControls(n = 15, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
-result <- calibrateConfidenceInterval(newData$logRr, newData$seLogRr, model)
+data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+model <- fitSystematicErrorModel(data$estimate, data$se, data$trueEffect)
+newData <- simulateControls(n = 15, mean = 0.25, sd = 0.25, trueEffect = log(c(1, 2, 4)))
+result <- calibrateConfidenceInterval(newData$estimate, newData$se, model)
 result
 
 }
