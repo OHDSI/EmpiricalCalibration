@@ -171,6 +171,13 @@ fitMcmcNull <- function(estimate,
     estimate <- logRr
     se <- seLogRr
   }
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertCount(iter, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (any(is.infinite(se))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     estimate <- estimate[!is.infinite(se)]
@@ -261,7 +268,7 @@ calibrateP.mcmcNull <- function(null,
                                 se,
                                 twoSided = TRUE,
                                 upper = TRUE,
-                                pValueOnly,
+                                pValueOnly = NULL,
                                 ...,
                                 logRr = NULL,
                                 seLogRr = NULL) {
@@ -270,6 +277,15 @@ calibrateP.mcmcNull <- function(null,
     estimate <- logRr
     se <- seLogRr
   }
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertClass(null, classes = "mcmcNull", add = errorMessages)
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertLogical(twoSided, len = 1, add = errorMessages)
+  checkmate::assertLogical(upper, len = 1, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   mcmc <- attr(null, "mcmc")
   adjustedP <- data.frame(p = rep(as.numeric(NA), length(estimate)), lb95ci = as.numeric(NA), ub95ci = as.numeric(NA))
   if (!is.na(null[1])) {
@@ -296,7 +312,7 @@ calibrateP.mcmcNull <- function(null,
       }
     }
   }
-  if (missing(pValueOnly) || pValueOnly == FALSE) {
+  if (is.null(pValueOnly) || pValueOnly == FALSE) {
     attr(adjustedP, "mcmc") <- mcmc
     return(adjustedP)
   } else {

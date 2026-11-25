@@ -63,6 +63,16 @@ fitSystematicErrorModel <- function(estimate,
     se <- seLogRr
     trueEffect <- trueLogRr
   }
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(trueEffect, min.len = 1, add = errorMessages)
+  checkmate::assertLogical(estimateCovarianceMatrix, len = 1, add = errorMessages)
+  checkmate::assertLogical(legacy, len = 1, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(trueLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (any(is.infinite(se))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting error model")
     trueEffect <- trueEffect[!is.infinite(se)]
@@ -171,7 +181,16 @@ calibrateConfidenceInterval <- function(estimate,
     se <- seLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertClass(model, classes = "systematicErrorModel", add = errorMessages)
+  checkmate::assertNumber(ciWidth, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
+
   opt <- function(x,
                   z,
                   logRr,
@@ -396,7 +415,15 @@ computeTraditionalCi <- function(estimate,
     se <- seLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumber(ciWidth, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
+
   lb <- estimate + qnorm((1 - ciWidth) / 2) * se
   ub <- estimate - qnorm((1 - ciWidth) / 2) * se
   if (scale == LOG_RELATIVE_RISK) {
@@ -440,6 +467,10 @@ computeTraditionalCi <- function(estimate,
 #'
 #' @export
 convertNullToErrorModel <- function(null, meanSlope = 1, sdSlope = 0) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumber(meanSlope, add = errorMessages)
+  checkmate::assertNumber(sdSlope, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (is(null, "mcmcNull")) {
     model <- c(null[1], meanSlope, 1 / sqrt(null[2]), sdSlope)
   } else if (is(null, "null")) {

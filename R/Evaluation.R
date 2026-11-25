@@ -77,7 +77,19 @@ evaluateCiCalibration <- function(estimate,
     trueEffect <- trueLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(trueEffect, min.len = 1, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertFactor(strata, null.ok = TRUE, add = errorMessages)
+  checkmate::assertVector(crossValidationGroup, len = length(estimate), add = errorMessages)
+  checkmate::assertLogical(legacy, len = 1, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(trueLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
+
   if (!is.null(strata) && !is.factor(strata)) {
     stop("Strata argument should be a factor (or null)")
   }

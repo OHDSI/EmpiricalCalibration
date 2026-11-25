@@ -10,7 +10,7 @@ plotCalibration(
   scale = "log relative risk",
   useMcmc = FALSE,
   legendPosition = "right",
-  title,
+  title = NULL,
   fileName = NULL,
   logRr = NULL,
   seLogRr = NULL

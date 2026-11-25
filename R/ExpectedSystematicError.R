@@ -54,6 +54,10 @@ closedFormIntegeralAbsolute <- function(mu, sigma) {
 #' computeExpectedAbsoluteSystematicError(null)
 #' @export
 computeExpectedAbsoluteSystematicError <- function(null, alpha = 0.05) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertClass(null, classes = "null", add = errorMessages)
+  checkmate::assertNumber(alpha, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   UseMethod("computeExpectedAbsoluteSystematicError")
 }
 
@@ -170,6 +174,18 @@ compareEase <- function(estimate1,
     estimate2 <- logRr2
     se2 <- seLogRr2
   }
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate1, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se1, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(estimate2, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se2, min.len = 1, add = errorMessages)
+  checkmate::assertNumber(alpha, add = errorMessages)
+  checkmate::assertCount(sampleSize, add = errorMessages)
+  checkmate::assertNumeric(logRr1, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr1, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRr2, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr2, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (length(unique(c(length(estimate1), length(se1), length(estimate2), length(se2)))) != 1) {
     stop("Arguments estimate1, se1, estimate2, and se2 should be of equal length.")
   }

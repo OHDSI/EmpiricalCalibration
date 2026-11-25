@@ -54,6 +54,12 @@ fitNull <- function(estimate, se, logRr = NULL, seLogRr = NULL) {
     estimate <- logRr
     se <- seLogRr
   }
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (any(is.infinite(se))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     estimate <- estimate[!is.infinite(se)]
@@ -139,6 +145,20 @@ print.null <- function(x, ...) {
 #'
 #' @export
 calibrateP <- function(null, estimate, se, twoSided = TRUE, upper = TRUE, ..., logRr = NULL, seLogRr = NULL) {
+  if (!is.null(logRr)) {
+    warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
+    estimate <- logRr
+    se <- seLogRr
+  }
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertClass(null, classes = "null", add = errorMessages)
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertLogical(twoSided, len = 1, add = errorMessages)
+  checkmate::assertLogical(upper, len = 1, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   UseMethod("calibrateP")
 }
 
@@ -208,6 +228,14 @@ computeTraditionalP <- function(estimate, se, twoSided = TRUE, upper = TRUE, log
     estimate <- logRr
     se <- seLogRr
   }
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertLogical(twoSided, len = 1, add = errorMessages)
+  checkmate::assertLogical(upper, len = 1, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   z <- estimate / se
   pUpperBound <- 1 - pnorm(z)
   pLowerBound <- pnorm(z)
@@ -253,6 +281,12 @@ computeTraditionalP <- function(estimate, se, twoSided = TRUE, upper = TRUE, log
 #'
 #' @export
 fitNullNonNormalLl <- function(likelihoodApproximations, scale = "log relative risk") {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assert(is.data.frame(likelihoodApproximations) ||
+                     is.matrix(likelihoodApproximations) ||
+                     is.list(likelihoodApproximations), add = errorMessages)
+  checkmate::assertString(scale, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (is.data.frame(likelihoodApproximations)) {
     likelihoodApproximations <- renameLegacyNormalColumns(likelihoodApproximations)
     if ("estimate" %in% colnames(likelihoodApproximations)) {

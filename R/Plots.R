@@ -57,7 +57,7 @@ plotForest <- function(estimate,
                        names,
                        scale = "log relative risk",
                        xLabel = NULL,
-                       title,
+                       title = NULL,
                        fileName = NULL,
                        logRr = NULL,
                        seLogRr = NULL) {
@@ -67,8 +67,17 @@ plotForest <- function(estimate,
     se <- seLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
-  checkmate::assertString(xLabel, null.ok = TRUE)
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertVector(names, len = length(estimate), add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertString(xLabel, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (is.null(xLabel)) {
     xLabel <- if (scale == LOG_RELATIVE_RISK) "Relative risk" else "Risk difference"
   }
@@ -134,7 +143,7 @@ plotForest <- function(estimate,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
     )
-  if (!missing(title)) {
+  if (!is.null(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
@@ -469,7 +478,7 @@ plotCalibration <- function(estimate,
                             scale = "log relative risk",
                             useMcmc = FALSE,
                             legendPosition = "right",
-                            title,
+                            title = NULL,
                             fileName = NULL,
                             logRr = NULL,
                             seLogRr = NULL) {
@@ -479,7 +488,17 @@ plotCalibration <- function(estimate,
     se <- seLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertLogical(useMcmc, len = 1, add = errorMessages)
+  checkmate::assertString(legendPosition, add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (any(is.infinite(se))) {
     warning("Estimate(s) with infinite standard error detected. Removing before fitting null distribution")
     estimate <- estimate[!is.infinite(se)]
@@ -573,7 +592,7 @@ plotCalibration <- function(estimate,
       strip.background = ggplot2::element_blank(),
       legend.position = legendPosition
     )
-  if (!missing(title)) {
+  if (!is.null(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
@@ -640,9 +659,9 @@ plotCiCalibration <- function(estimate,
                               strata = as.factor(trueEffect),
                               crossValidationGroup = 1:length(estimate),
                               legacy = FALSE,
-                              evaluation,
+                              evaluation = NULL,
                               legendPosition = "top",
-                              title,
+                              title = NULL,
                               fileName = NULL,
                               logRr = NULL,
                               seLogRr = NULL,
@@ -654,7 +673,23 @@ plotCiCalibration <- function(estimate,
     trueEffect <- trueLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  if (missing(evaluation) || is.null(evaluation)) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(trueEffect, min.len = 1, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertFactor(strata, null.ok = TRUE, add = errorMessages)
+  checkmate::assertVector(crossValidationGroup, len = length(estimate), add = errorMessages)
+  checkmate::assertLogical(legacy, len = 1, add = errorMessages)
+  checkmate::assertDataFrame(evaluation, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(legendPosition, add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(trueLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
+  if (is.null(evaluation)) {
     evaluation <- evaluateCiCalibration(
       estimate = estimate,
       se = se,
@@ -704,7 +739,7 @@ plotCiCalibration <- function(estimate,
       strip.background = ggplot2::element_blank(),
       legend.position = legendPosition
     )
-  if (!missing(title)) {
+  if (!is.null(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
@@ -753,7 +788,7 @@ plotTrueAndObserved <- function(estimate,
                                 trueEffect,
                                 scale = "log relative risk",
                                 xLabel = NULL,
-                                title,
+                                title = NULL,
                                 fileName = NULL,
                                 logRr = NULL,
                                 seLogRr = NULL,
@@ -765,8 +800,18 @@ plotTrueAndObserved <- function(estimate,
     trueEffect <- trueLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
-  checkmate::assertString(xLabel, null.ok = TRUE)
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(trueEffect, min.len = 1, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertString(xLabel, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(trueLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (is.null(xLabel)) {
     xLabel <- if (scale == LOG_RELATIVE_RISK) "Relative risk" else "Risk difference"
   }
@@ -832,7 +877,7 @@ plotTrueAndObserved <- function(estimate,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
     )
-  if (!missing(title)) {
+  if (!is.null(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
@@ -860,6 +905,10 @@ plotTrueAndObserved <- function(estimate,
 #' }
 #' @export
 plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertClass(mcmcNull, classes = "mcmcNull", add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   mcmc <- attr(mcmcNull, "mcmc")
   dataMean <- data.frame(x = 1:nrow(mcmc$chain), trace = as.numeric(ts(mcmc$chain[
     ,
@@ -939,9 +988,9 @@ plotCiCoverage <- function(estimate,
                            strata = as.factor(trueEffect),
                            crossValidationGroup = 1:length(estimate),
                            legacy = FALSE,
-                           evaluation,
+                           evaluation = NULL,
                            legendPosition = "top",
-                           title,
+                           title = NULL,
                            fileName = NULL,
                            logRr = NULL,
                            seLogRr = NULL,
@@ -953,7 +1002,23 @@ plotCiCoverage <- function(estimate,
     trueEffect <- trueLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  if (missing(evaluation) || is.null(evaluation)) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(trueEffect, min.len = 1, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertFactor(strata, null.ok = TRUE, add = errorMessages)
+  checkmate::assertVector(crossValidationGroup, len = length(estimate), add = errorMessages)
+  checkmate::assertLogical(legacy, len = 1, add = errorMessages)
+  checkmate::assertDataFrame(evaluation, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(legendPosition, add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(trueLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
+  if (is.null(evaluation)) {
     evaluation <- evaluateCiCalibration(
       estimate = estimate,
       se = se,
@@ -1009,7 +1074,7 @@ plotCiCoverage <- function(estimate,
       legend.title = ggplot2::element_blank(),
       legend.text = theme
     )
-  if (!missing(title)) {
+  if (!is.null(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
@@ -1060,7 +1125,7 @@ plotErrorModel <- function(estimate,
                            se,
                            trueEffect,
                            scale = "log relative risk",
-                           title,
+                           title = NULL,
                            legacy = FALSE,
                            fileName = NULL,
                            logRr = NULL,
@@ -1073,7 +1138,18 @@ plotErrorModel <- function(estimate,
     trueEffect <- trueLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(trueEffect, min.len = 1, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertLogical(legacy, len = 1, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(trueLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   model <- fitSystematicErrorModel(
     estimate = estimate,
     se = se,
@@ -1162,7 +1238,7 @@ plotErrorModel <- function(estimate,
       plot.title = ggplot2::element_text(hjust = 0.5),
       legend.position = "none"
     )
-  if (!missing(title)) {
+  if (!is.null(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
@@ -1171,7 +1247,15 @@ plotErrorModel <- function(estimate,
   return(plot)
 }
 
-plotIsobars <- function(null, alpha, xLabel = "Relative risk", sePositives, scale = LOG_RELATIVE_RISK, maxSe = 1) {
+plotIsobars <- function(null, alpha, xLabel = "Relative risk", sePositives = NULL, scale = LOG_RELATIVE_RISK, maxSe = 1) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertClass(null, classes = "null", add = errorMessages)
+  checkmate::assertNumber(alpha, add = errorMessages)
+  checkmate::assertString(xLabel, add = errorMessages)
+  checkmate::assertNumeric(sePositives, min.len = 1, null.ok = TRUE, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertNumber(maxSe, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (is(null, "mcmcNull")) {
     null <- c(null[1], 1 / sqrt(null[2]))
   }
@@ -1272,7 +1356,7 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", sePositives, scal
                          data = labelData
       )
   }
-  if (!missing(sePositives)) {
+  if (!is.null(sePositives)) {
     plot <- plot + ggplot2::geom_hline(yintercept = sePositives)
   }
   return(plot)
@@ -1325,12 +1409,12 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", sePositives, scal
 #' @export
 plotExpectedType1Error <- function(estimateNegatives,
                                    seNegatives,
-                                   sePositives,
+                                   sePositives = NULL,
                                    scale = "log relative risk",
                                    alpha = 0.05,
                                    null = NULL,
                                    xLabel = NULL,
-                                   title,
+                                   title = NULL,
                                    showCis = FALSE,
                                    showEffectSizes = FALSE,
                                    fileName = NULL,
@@ -1349,8 +1433,22 @@ plotExpectedType1Error <- function(estimateNegatives,
     }
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
-  checkmate::assertString(xLabel, null.ok = TRUE)
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimateNegatives, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(seNegatives, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(sePositives, min.len = 1, null.ok = TRUE, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertNumber(alpha, add = errorMessages)
+  checkmate::assertClass(null, classes = "null", null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(xLabel, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertLogical(showCis, len = 1, add = errorMessages)
+  checkmate::assertLogical(showEffectSizes, len = 1, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRrNegatives, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRrNegatives, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRrPositives, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (is.null(xLabel)) {
     xLabel <- if (scale == LOG_RELATIVE_RISK) "Relative risk" else "Risk difference"
   }
@@ -1368,7 +1466,7 @@ plotExpectedType1Error <- function(estimateNegatives,
   if (scale == LOG_RELATIVE_RISK) {
     maxSe <- 1
   } else {
-    maxSe <- max(c(quantile(seNegatives, 0.9, na.rm = TRUE), if (!missing(sePositives)) sePositives), na.rm = TRUE) * 1.25
+    maxSe <- max(c(quantile(seNegatives, 0.9, na.rm = TRUE), if (!is.null(sePositives)) sePositives), na.rm = TRUE) * 1.25
   }
   se <- maxSe * (0:100) / 100
   if (is(null, "mcmcNull")) {
@@ -1460,7 +1558,7 @@ plotExpectedType1Error <- function(estimateNegatives,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
     )
-  if (!missing(sePositives)) {
+  if (!is.null(sePositives)) {
     yPos <- sapply(sePositives, FUN = function(x) {
       type1Error[which.min(abs(x - se))]
     })
@@ -1486,7 +1584,7 @@ plotExpectedType1Error <- function(estimateNegatives,
       axis.text.y = ggplot2::element_blank(),
       axis.title.y = ggplot2::element_blank()
     )
-    plot2 <- if (missing(sePositives)) {
+    plot2 <- if (is.null(sePositives)) {
       plotIsobars(null = null, alpha = alpha, xLabel = xLabel, scale = scale, maxSe = maxSe)
     } else {
       plotIsobars(null = null, alpha = alpha, xLabel = xLabel, sePositives = sePositives, scale = scale, maxSe = maxSe)
@@ -1501,15 +1599,12 @@ plotExpectedType1Error <- function(estimateNegatives,
     for (i in 1:length(grobs)) {
       grobs[[i]]$heights[6:9] <- as.list(maxHeight)
     }
-    if (missing(title)) {
-      title <- NULL
-    }
     plot <- gridExtra::grid.arrange(grobs[[1]], grobs[[2]], nrow = 1, ncol = 2, widths = c(2, 1), top = title)
     if (!is.null(fileName)) {
       ggplot2::ggsave(fileName, plot, width = 10, height = 5, dpi = 400)
     }
   } else {
-    if (!missing(title)) {
+    if (!is.null(title)) {
       plot <- plot + ggplot2::ggtitle(title)
     }
     if (!is.null(fileName)) {
@@ -1565,7 +1660,7 @@ plotCiCalibrationEffect <- function(estimate,
                                     legacy = FALSE,
                                     model = NULL,
                                     xLabel = NULL,
-                                    title,
+                                    title = NULL,
                                     fileName = NULL,
                                     logRr = NULL,
                                     seLogRr = NULL,
@@ -1577,8 +1672,20 @@ plotCiCalibrationEffect <- function(estimate,
     trueEffect <- trueLogRr
     scale <- LOG_RELATIVE_RISK
   }
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE))
-  checkmate::assertString(xLabel, null.ok = TRUE)
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(trueEffect, min.len = 1, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertLogical(legacy, len = 1, add = errorMessages)
+  checkmate::assertClass(model, classes = "systematicErrorModel", null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(xLabel, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(trueLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (is.null(xLabel)) {
     xLabel <- if (scale == LOG_RELATIVE_RISK) "Relative risk" else "Risk difference"
   }
@@ -1706,7 +1813,7 @@ plotCiCalibrationEffect <- function(estimate,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
     )
-  if (!missing(title)) {
+  if (!is.null(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {

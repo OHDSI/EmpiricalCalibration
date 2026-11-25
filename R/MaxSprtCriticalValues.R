@@ -46,6 +46,14 @@
 #'
 #' @export
 computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6, nullMean = 0, nullSd = 0) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(groupSizes, min.len = 1, add = errorMessages)
+  checkmate::assertNumber(minimumEvents, add = errorMessages)
+  checkmate::assertNumber(alpha, add = errorMessages)
+  checkmate::assertNumber(sampleSize, add = errorMessages)
+  checkmate::assertNumber(nullMean, add = errorMessages)
+  checkmate::assertNumber(nullSd, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (any(groupSizes < 0)) {
     stop("Group sizes should be positive")
   }
@@ -118,6 +126,15 @@ computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sample
 #'
 #' @export
 computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6, nullMean = 0, nullSd = 0) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(groupSizes, min.len = 1, add = errorMessages)
+  if (!missing(z)) checkmate::assertNumber(z, add = errorMessages)
+  checkmate::assertNumber(minimumEvents, add = errorMessages)
+  checkmate::assertNumber(alpha, add = errorMessages)
+  checkmate::assertNumber(sampleSize, add = errorMessages)
+  checkmate::assertNumber(nullMean, add = errorMessages)
+  checkmate::assertNumber(nullSd, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (any(groupSizes < 0)) {
     stop("Group sizes should be positive")
   }
@@ -188,6 +205,13 @@ computeCvBinomial <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sa
 #'
 #' @export
 computeCvPoissonRegression <- function(groupSizes, z, minimumEvents = 1, alpha = 0.05, sampleSize = 1e6) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(groupSizes, min.len = 1, add = errorMessages)
+  checkmate::assertNumber(z, add = errorMessages)
+  checkmate::assertNumber(minimumEvents, add = errorMessages)
+  checkmate::assertNumber(alpha, add = errorMessages)
+  checkmate::assertNumber(sampleSize, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (any(groupSizes < 0)) {
     stop("Group sizes should be positive")
   }

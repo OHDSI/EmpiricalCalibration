@@ -35,7 +35,7 @@ calibrateP(
   se,
   twoSided = TRUE,
   upper = TRUE,
-  pValueOnly,
+  pValueOnly = NULL,
   ...,
   logRr = NULL,
   seLogRr = NULL

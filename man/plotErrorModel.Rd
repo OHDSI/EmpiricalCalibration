@@ -9,7 +9,7 @@ plotErrorModel(
   se,
   trueEffect,
   scale = "log relative risk",
-  title,
+  title = NULL,
   legacy = FALSE,
   fileName = NULL,
   logRr = NULL,

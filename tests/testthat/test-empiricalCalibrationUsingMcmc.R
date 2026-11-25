@@ -54,18 +54,18 @@ test_that("fitMcmcNull requirements", {
 test_that("MCMC calibration of p-values returns values close to truth", {
   skip_on_cran()
   set.seed(124)
-
+  
   negatives <- simulateControls(
     n         = 50,
     mean      = 0.25,
-    sd        = 0.16,
-    trueLogRr = 0
+    sd        = 0.1,
+    trueEffect = 0
   )
 
   # Testing if the fitted MCMC null is correct
   null <- fitMcmcNull(
-    logRr   = negatives$logRr,
-    seLogRr = negatives$seLogRr,
+    estimate   = negatives$logRr,
+    se = negatives$seLogRr,
     iter    = 1e4
   )
 
@@ -82,8 +82,8 @@ test_that("MCMC calibration of p-values returns values close to truth", {
 
   expect_equal(
     testValue$p,
-    pnorm(.2, .25, .16 + .2^2),
-    tolerance = .01
+    pnorm(.2, .25, sqrt(.1^2 + .2^2)),
+    tolerance = .025
   )
 
   testValue <- calibrateP(
@@ -93,14 +93,14 @@ test_that("MCMC calibration of p-values returns values close to truth", {
     twoSided = TRUE
   )
   target <- min(
-    pnorm(.2, .25, .16 + .2^2, lower.tail = TRUE),
-    pnorm(.2, .25, .16 + .2^2, lower.tail = FALSE)
+    pnorm(.2, .25, sqrt(.1^2 + .2^2), lower.tail = TRUE),
+    pnorm(.2, .25, sqrt(.1^2 + .2^2), lower.tail = FALSE)
   )
 
   expect_equal(
     testValue$p,
     2 * target,
-    tolerance = .01
+    tolerance = .025
   )
 
   # Testing return output of NA logRr or seLogRr

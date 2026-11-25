@@ -12,7 +12,7 @@ plotCiCalibrationEffect(
   legacy = FALSE,
   model = NULL,
   xLabel = NULL,
-  title,
+  title = NULL,
   fileName = NULL,
   logRr = NULL,
   seLogRr = NULL,

@@ -10,7 +10,7 @@ plotTrueAndObserved(
   trueEffect,
   scale = "log relative risk",
   xLabel = NULL,
-  title,
+  title = NULL,
   fileName = NULL,
   logRr = NULL,
   seLogRr = NULL,

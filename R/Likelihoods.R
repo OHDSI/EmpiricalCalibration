@@ -46,7 +46,7 @@ logLikelihoodNullMcmc <- function(theta, logRr, seLogRr, priorScale) {
   result <- logLikelihoodNull(theta, logRr, seLogRr)
 
   # Add weak prior for when precision becomes very large:
-  result <- result - dgamma(theta[2] / priorScale, shape = 1e-04, rate = 1e-04, log = TRUE)
+  result <- result - dgamma(theta[2] / priorScale, shape = 1e-02, rate = 1e-02, log = TRUE)
   return(result)
 }
 

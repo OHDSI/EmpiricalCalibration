@@ -40,6 +40,14 @@
 #'
 #' @export
 calibrateLlr <- function(null, likelihoodApproximation, twoSided = FALSE, upper = TRUE) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertClass(null, classes = "null", add = errorMessages)
+  checkmate::assert(is.data.frame(likelihoodApproximation) ||
+                     is.matrix(likelihoodApproximation) ||
+                     is.list(likelihoodApproximation), add = errorMessages)
+  checkmate::assertLogical(twoSided, len = 1, add = errorMessages)
+  checkmate::assertLogical(upper, len = 1, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   if (twoSided || !upper) {
     stop("Currently only one-sided upper LLRs are supported")
   }

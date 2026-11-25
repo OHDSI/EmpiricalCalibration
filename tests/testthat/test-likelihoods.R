@@ -57,7 +57,7 @@ test_that("logLikelihoodNullMcmc - result", {
   theta <- c(1, 2)
   logRr <- c(1, 2)
   seLogRr <- c(0.01, 0.1)
-  result1 <- (0 - log(gaussianProduct(1, 1, 0.01, 1 / sqrt(2))) - log(gaussianProduct(2, 1, 0.1, 1 / sqrt(2))) - dgamma(2, 1e-04, 1e-04, log = TRUE))
+  result1 <- (0 - log(gaussianProduct(1, 1, 0.01, 1 / sqrt(2))) - log(gaussianProduct(2, 1, 0.1, 1 / sqrt(2))) - dgamma(2, 1e-02, 1e-02, log = TRUE))
   result <- logLikelihoodNullMcmc(theta, logRr, seLogRr, priorScale = 1)
   expect_equal(result, result1)
 })

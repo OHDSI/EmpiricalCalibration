@@ -57,6 +57,15 @@ simulateControls <- function(n = 50,
       trueEffect <- trueLogRr
     }
   }
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertCount(n, add = errorMessages)
+  checkmate::assertNumber(mean, add = errorMessages)
+  checkmate::assertNumber(sd, add = errorMessages)
+  checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(trueEffect, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(seLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(trueLogRr, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   theta <- rnorm(n, mean = mean, sd = sd)
   estimate <- rnorm(n, mean = trueEffect + theta, sd = se)
   data <- data.frame(estimate = estimate, se = se, trueEffect = trueEffect)
@@ -114,6 +123,19 @@ simulateMaxSprtData <- function(n = 10000,
                                 numberOfNegativeControls = 50,
                                 numberOfPositiveControls = 1,
                                 positiveControlEffectSize = 4) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertCount(n, add = errorMessages)
+  checkmate::assertNumber(pExposure, add = errorMessages)
+  checkmate::assertNumber(backgroundHazard, add = errorMessages)
+  checkmate::assertNumber(tar, add = errorMessages)
+  checkmate::assertNumber(nullMu, add = errorMessages)
+  checkmate::assertNumber(nullSigma, add = errorMessages)
+  checkmate::assertNumber(maxT, add = errorMessages)
+  checkmate::assertCount(looks, add = errorMessages)
+  checkmate::assertCount(numberOfNegativeControls, add = errorMessages)
+  checkmate::assertCount(numberOfPositiveControls, add = errorMessages)
+  checkmate::assertNumber(positiveControlEffectSize, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
   simulateOutcome <- function(trueEffectSize) {
     computeAtT <- function(t) {
       truncatedTime <- time
