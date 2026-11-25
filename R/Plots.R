@@ -316,11 +316,11 @@ plotCalibrationEffect <- function(estimateNegatives,
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
   plot <- ggplot2::ggplot(vizData, ggplot2::aes(x = .data$x, y = .data$y)) +
-    ggplot2::geom_vline(xintercept = 0, size = 1) +
+    ggplot2::geom_vline(xintercept = 0, linewidth = 0.5) +
     ggplot2::geom_area(
       fill = rgb(1, 0.5, 0, alpha = 0.5),
       color = rgb(1, 0.5, 0),
-      size = 1,
+      linewidth = 0.5,
       alpha = 0.5
     )
   
@@ -332,11 +332,11 @@ plotCalibrationEffect <- function(estimateNegatives,
       ), fill = rgb(0.8, 0.2, 0.2), alpha = 0.3) +
       ggplot2::geom_line(ggplot2::aes(y = yLb),
                          colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
-                         size = 1
+                         linewidth = 0.5
       ) +
       ggplot2::geom_line(ggplot2::aes(y = yUb),
                          colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
-                         size = 1
+                         linewidth = 0.5
       )
   }
   if (showExpectedAbsoluteSystematicError) {
@@ -371,7 +371,7 @@ plotCalibrationEffect <- function(estimateNegatives,
     ggplot2::geom_line(ggplot2::aes(y = .data$seTheoretical),
                        colour = rgb(0, 0, 0),
                        linetype = "dashed",
-                       size = 1,
+                       linewidth = 0.5,
                        alpha = 0.5
     ) +
     ggplot2::geom_point(
