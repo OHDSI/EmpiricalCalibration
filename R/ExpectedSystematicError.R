@@ -34,15 +34,15 @@ closedFormIntegeralAbsolute <- function(mu, sigma) {
 #' Taking the absolute value of the expected systematic error we can express both mean and spread of the
 #' estimated null distribution.
 #'
-#' @param null      An object of class \code{null} created using the \code{fitNull} function or an
-#'                  object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.
+#' @param null      An object of class `null` created using the `fitNull` function or an
+#'                  object of class `mcmcNull` created using the `fitMcmcNull` function.
 #' @param alpha     The expected type I error for computing the credible interval.
 #'
 #' @return
-#' The expected absolute systematic error. If the provided \code{null} argument is of type \code{mcmcNull},
-#' the credible interval (defined by \code{alpha}) is also returned.
+#' The expected absolute systematic error. If the provided `null` argument is of type `mcmcNull`,
+#' the credible interval (defined by `alpha`) is also returned.
 #'
-#' @seealso \code{\link{compareEase}} for comparing the expected absolute systematic error of two sets of estimates for the same negative controls.
+#' @seealso [compareEase()] for comparing the expected absolute systematic error of two sets of estimates for the same negative controls.
 #'
 #' @examples
 #' data(sccs)
@@ -142,7 +142,7 @@ computeEaseBoostrap <- function(logRr, seLogRr, alpha, sampleSize) {
 #'
 #' The data frame has two attributes: ease1 and ease2, providing the EASE estimates (and confidence intervals) for the
 #' two sets, computed using bootstrapping. Note that these estimates may somewhat different from those generated using
-#' \code{\link{computeExpectedAbsoluteSystematicError}}, because a different approach is used to compute the confidence
+#' [computeExpectedAbsoluteSystematicError()], because a different approach is used to compute the confidence
 #' interval. The approach used here will more closely align with the computation of the difference in EASE.
 #'
 #' @export

@@ -42,10 +42,15 @@ simulateMaxSprtData(
 \item{positiveControlEffectSize}{The true effect size of the positive controls.}
 }
 \value{
-A data frame with 5 variables: \describe{ \item{time}{Time from index date to either the event or
-end of observation, whichever came first} \item{outcome}{Whether the outcome occurred (1) or not (0)} \item{exposure}{Whether
-the subject was exposed (TRUE) or not (FALSE)} \item{lookTime}{The time point when the look occurred. } \item{outcomeId}{A unique
-identifier for data corresponding to a single outcome. Lower IDs indicate negative controls, higher IDs indicate the positive control} }
+A data frame with 5 variables:
+\itemize{
+\item \code{time}: Time from index date to either the event or end of observation, whichever came first
+\item \code{outcome}: Whether the outcome occurred (1) or not (0)
+\item \code{exposure}: Whether the subject was exposed (\code{TRUE}) or not (\code{FALSE})
+\item \code{lookTime}: The time point when the look occurred
+\item \code{outcomeId}: A unique identifier for data corresponding to a single outcome. Lower IDs indicate
+negative controls, higher IDs indicate the positive control
+}
 }
 \description{
 Simulate survival data for MaxSPRT computation

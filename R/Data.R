@@ -39,10 +39,12 @@
 #' @usage
 #' data(sccs)
 #' @format
-#' A data frame with 46 rows and 4 variables: \describe{ \item{drugName}{Name of the drug}
-#' \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control} \item{logRr}{The log
-#' of the incidence rate ratio} \item{seLogRr}{The standard error of the log of the incidence rate
-#' ratio} }
+#' A data frame with 46 rows and 4 variables:
+#'
+#' * `drugName`: Name of the drug
+#' * `groundTruth`: Whether the drug is a positive (1) or negative (0) control
+#' * `logRr`: The log of the incidence rate ratio
+#' * `seLogRr`: The standard error of the log of the incidence rate ratio
 #' @references
 #' Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
 #' empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
@@ -70,10 +72,12 @@ NULL
 #' @usage
 #' data(caseControl)
 #' @format
-#' A data frame with 47 rows and 4 variables: \describe{ \item{drugName}{Name of the drug}
-#' \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control} \item{logRr}{The log
-#' of the incidence rate ratio} \item{seLogRr}{The standard error of the log of the incidence rate
-#' ratio} }
+#' A data frame with 47 rows and 4 variables:
+#'
+#' * `drugName`: Name of the drug
+#' * `groundTruth`: Whether the drug is a positive (1) or negative (0) control
+#' * `logRr`: The log of the incidence rate ratio
+#' * `seLogRr`: The standard error of the log of the incidence rate ratio
 #' @references
 #' Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
 #' empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
@@ -109,10 +113,12 @@ NULL
 #' @usage
 #' data(cohortMethod)
 #' @format
-#' A data frame with 31 rows and 4 variables: \describe{ \item{drugName}{Name of the drug}
-#' \item{groundTruth}{Whether the drug is a positive (1) or negative (0) control} \item{logRr}{The log
-#' of the incidence rate ratio} \item{seLogRr}{The standard error of the log of the incidence rate
-#' ratio} }
+#' A data frame with 31 rows and 4 variables:
+#'
+#' * `drugName`: Name of the drug
+#' * `groundTruth`: Whether the drug is a positive (1) or negative (0) control
+#' * `logRr`: The log of the incidence rate ratio
+#' * `seLogRr`: The standard error of the log of the incidence rate ratio
 #' @references
 #' Schuemie MJ, Ryan PB, Dumouchel W, Suchard MA, Madigan D. Interpreting observational studies: why
 #' empirical calibration is needed to correct p-values. Statistics in Medicine 33(2):209-18,2014
@@ -139,10 +145,13 @@ NULL
 #' @usage
 #' data(southworthReplication)
 #' @format
-#' A data frame with 174 rows and 4 variables: \describe{ \item{outcomeName}{Name of the outcome}
-#' \item{trueLogRr}{The log of the true effect size. Only provided for negative and positive controls,
-#' is NA for the outcome of interest (GI bleeding).} \item{logRr}{The log of the incidence rate ratio} \item{seLogRr}{
-#' The standard error of the log of the incidence rate ratio} }
+#' A data frame with 174 rows and 4 variables:
+#'
+#' * `outcomeName`: Name of the outcome
+#' * `trueLogRr`: The log of the true effect size. Only provided for negative and positive controls,
+#'   and is `NA` for the outcome of interest (GI bleeding).
+#' * `logRr`: The log of the incidence rate ratio
+#' * `seLogRr`: The standard error of the log of the incidence rate ratio
 #'
 #' @references
 #' Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA. Empirical confidence interval calibration
@@ -179,10 +188,13 @@ NULL
 #' @usage
 #' data(grahamReplication)
 #' @format
-#' A data frame with 126 rows and 4 variables: \describe{ \item{outcomeName}{Name of the outcome}
-#' \item{trueLogRr}{The log of the true effect size. Only provided for negative and positive controls,
-#' is NA for the outcome of interest (GI bleeding).} \item{logRr}{The log of the incidence rate ratio} \item{seLogRr}{
-#' The standard error of the log of the incidence rate ratio} }
+#' A data frame with 126 rows and 4 variables:
+#'
+#' * `outcomeName`: Name of the outcome
+#' * `trueLogRr`: The log of the true effect size. Only provided for negative and positive controls,
+#'   and is `NA` for the outcome of interest (GI bleeding).
+#' * `logRr`: The log of the incidence rate ratio
+#' * `seLogRr`: The standard error of the log of the incidence rate ratio
 #'
 #' @references
 #' Schuemie MJ, Hripcsak G, Ryan PB, Madigan D, Suchard MA. Empirical confidence interval calibration

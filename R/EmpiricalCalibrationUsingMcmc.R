@@ -130,7 +130,7 @@ binarySearchSigma <- function(modeMu,
 #' Fit the null distribution using MCMC
 #'
 #' @description
-#' \code{fitNull} fits the null distribution to a set of negative controls using Markov Chain Monte
+#' `fitNull` fits the null distribution to a set of negative controls using Markov Chain Monte
 #' Carlo (MCMC).
 #'
 #' @details
@@ -144,7 +144,7 @@ binarySearchSigma <- function(modeMu,
 #' @param iter      Number of iterations of the MCMC.
 #'
 #' @return
-#' An object of type \code{mcmcNull} containing the mean and standard deviation (both on the log
+#' An object of type `mcmcNull` containing the mean and standard deviation (both on the log
 #' scale) of the null distribution, as well as the MCMC trace.
 #'
 #' @examples

@@ -9,8 +9,8 @@ plotCalibrationEffect(
   seNegatives,
   estimatePositives = NULL,
   sePositives = NULL,
-  scale = "log relative risk",
   null = NULL,
+  scale = "log relative risk",
   alpha = 0.05,
   xLabel = "Effect estimate",
   title = NULL,
@@ -34,11 +34,11 @@ plotCalibrationEffect(
 
 \item{sePositives}{Optional: The standard error of the effect estimates of the positive controls.}
 
-\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
-
 \item{null}{An object representing the fitted null distribution as created by the
 \code{fitNull} or \code{fitMcmcNull} functions. If not provided, a null
 will be fitted before plotting.}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
 
 \item{alpha}{The alpha for the hypothesis test.}
 

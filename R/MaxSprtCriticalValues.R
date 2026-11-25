@@ -26,7 +26,7 @@
 #' Instead, this function will select the least conservative critical value having an alpha below
 #' the one specified, so the sequential analysis is conservative.
 #'
-#' This function is a re-implementation of the \code{CV.Poisson} function in the \code{Sequential}
+#' This function is a re-implementation of the `CV.Poisson` function in the `Sequential`
 #' package, using Monte-Carlo.
 #'
 #' @param groupSizes    Vector containing the expected number of events under H0 for each test.
@@ -95,7 +95,7 @@ computeCvPoisson <- function(groupSizes, minimumEvents = 1, alpha = 0.05, sample
 #' Instead, this function will select the least conservative critical value having an alpha below
 #' the one specified, so the sequential analysis is conservative.
 #'
-#' This function is a re-implementation of the \code{CV.Binomial} function in the \code{Sequential}
+#' This function is a re-implementation of the `CV.Binomial` function in the `Sequential`
 #' package, using Monte-Carlo.
 #'
 #' @param groupSizes    Vector containing the expected number of events under H0 for each test.

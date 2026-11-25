@@ -5,10 +5,13 @@
 \alias{caseControl}
 \title{Odds ratios from a case-control design}
 \format{
-A data frame with 47 rows and 4 variables: \describe{ \item{drugName}{Name of the drug}
-\item{groundTruth}{Whether the drug is a positive (1) or negative (0) control} \item{logRr}{The log
-of the incidence rate ratio} \item{seLogRr}{The standard error of the log of the incidence rate
-ratio} }
+A data frame with 47 rows and 4 variables:
+\itemize{
+\item \code{drugName}: Name of the drug
+\item \code{groundTruth}: Whether the drug is a positive (1) or negative (0) control
+\item \code{logRr}: The log of the incidence rate ratio
+\item \code{seLogRr}: The standard error of the log of the incidence rate ratio
+}
 }
 \usage{
 data(caseControl)

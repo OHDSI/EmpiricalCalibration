@@ -19,7 +19,7 @@
 #' Create a forest plot
 #'
 #' @description
-#' \code{plotForest} creates a forest plot of effect size estimates.
+#' `plotForest` creates a forest plot of effect size estimates.
 #'
 #' @details
 #' Creates a forest plot of effect size estimates (ratios). Estimates that are significantly different
@@ -35,9 +35,9 @@
 #' @param title      Optional: the main title for the plot
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
-#'                   function \code{ggsave} in the ggplot2 package for supported file formats.
+#'                   function `ggsave` in the ggplot2 package for supported file formats.
 #'
 #' @examples
 #' data(sccs)
@@ -111,7 +111,7 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' Plot the effect of the calibration
 #'
 #' @description
-#' \code{plotCalibrationEffect} creates a plot showing the effect of the calibration.
+#' `plotCalibrationEffect` creates a plot showing the effect of the calibration.
 #'
 #' @details
 #' Creates a plot with the effect estimate on the x-axis and the standard error on the y-axis.
@@ -125,16 +125,16 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' @param sePositives        Optional: The standard error of the effect estimates of the positive controls.
 #' @template Scale
 #' @param null               An object representing the fitted null distribution as created by the
-#'                           \code{fitNull} or \code{fitMcmcNull} functions. If not provided, a null
+#'                           `fitNull` or `fitMcmcNull` functions. If not provided, a null
 #'                           will be fitted before plotting.
 #' @param alpha              The alpha for the hypothesis test.
 #' @param xLabel             The label on the x-axis: the name of the effect estimate.
 #' @param title              Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the calibrated p = alpha boundary.
-#' @param showExpectedAbsoluteSystematicError  Show the expected absolute systematic error. If \code{null} is of
-#'                           type \code{mcmcNull} the 95 percent credible interval will also be shown.
+#' @param showExpectedAbsoluteSystematicError  Show the expected absolute systematic error. If `null` is of
+#'                           type `mcmcNull` the 95 percent credible interval will also be shown.
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
-#'                           See the function \code{ggsave} in the ggplot2 package for supported file
+#'                           See the function `ggsave` in the ggplot2 package for supported file
 #'                           formats.
 #' @param xLimits            Vector of length 2 for limits of the plot x axis - defaults to 0.25, 10
 #' @param yLimits            Vector of length 2 for size limits of the y axis - defaults to 0, 1.5
@@ -144,7 +144,7 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' @param seLogRrPositives   DEPRECATED. Use `sePositives` with `scale = "log relative risk"` instead.
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' data(sccs)
@@ -157,8 +157,8 @@ plotCalibrationEffect <- function(estimateNegatives,
                                   seNegatives,
                                   estimatePositives = NULL,
                                   sePositives = NULL,
-                                  scale = "log relative risk",
                                   null = NULL,
+                                  scale = "log relative risk",
                                   alpha = 0.05,
                                   xLabel = "Effect estimate",
                                   title = NULL,
@@ -383,7 +383,7 @@ checkWithinLimits <- function(limits, values, label) {
 #' Create a calibration plot
 #'
 #' @description
-#' \code{plotCalibration} creates a plot showing the calibration of our calibration procedure
+#' `plotCalibration` creates a plot showing the calibration of our calibration procedure
 #'
 #' @details
 #' Creates a calibration plot showing the number of effects with p < alpha for every level of alpha.
@@ -401,11 +401,11 @@ checkWithinLimits <- function(limits, values, label) {
 #'                         "top")
 #' @param title            Optional: the main title for the plot
 #' @param fileName         Name of the file where the plot should be saved, for example 'plot.png'. See
-#'                         the function \code{ggsave} in the ggplot2 package for supported file
+#'                         the function `ggsave` in the ggplot2 package for supported file
 #'                         formats.
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' data(sccs)
@@ -524,7 +524,7 @@ plotCalibration <- function(logRr,
 #' Create a confidence interval calibration plot
 #'
 #' @description
-#' \code{plotCalibration} creates a plot showing the calibration of our confidence interval
+#' `plotCalibration` creates a plot showing the calibration of our confidence interval
 #' calibration procedure
 #'
 #' @details
@@ -539,12 +539,12 @@ plotCalibration <- function(logRr,
 #'                               standard error = (log(<lower bound 95 percent confidence interval>) -
 #'                               log(<effect estimate>))/qnorm(0.025).
 #' @param trueLogRr              The true log relative risk.
-#' @param strata                 Variable used to stratify the plot. Set \code{strata = NULL} for no
+#' @param strata                 Variable used to stratify the plot. Set `strata = NULL` for no
 #'                               stratification.
 #' @param legacy                 If true, a legacy error model will be fitted, meaning standard
 #'                               deviation is linear on the log scale. If false, standard deviation
 #'                               is assumed to be simply linear.
-#' @param evaluation             A data frame as generated by the \code{\link{evaluateCiCalibration}}
+#' @param evaluation             A data frame as generated by the [evaluateCiCalibration()]
 #'                               function. If provided, the logRr, seLogRr, trueLogRr, strata, and legacy
 #'                               arguments will be ignored.
 #' @param crossValidationGroup   What should be the unit for the cross-validation? By default the unit
@@ -555,11 +555,11 @@ plotCalibration <- function(logRr,
 #'                               "bottom", "top").
 #' @param title                  Optional: the main title for the plot
 #' @param fileName               Name of the file where the plot should be saved, for example
-#'                               'plot.png'. See the function \code{ggsave} in the ggplot2 package for
+#'                               'plot.png'. See the function `ggsave` in the ggplot2 package for
 #'                               supported file formats.
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' \dontrun{
@@ -654,10 +654,10 @@ plotCiCalibration <- function(logRr,
 #' @param xLabel      The label on the x-axis: the name of the effect estimate.
 #' @param title       Optional: the main title for the plot
 #' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
-#'                    function \code{ggsave} in the ggplot2 package for supported file formats.
+#'                    function `ggsave` in the ggplot2 package for supported file formats.
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
@@ -734,10 +734,10 @@ plotTrueAndObserved <- function(logRr,
 #' @details
 #' Plot the trace of the MCMC for diagnostics purposes.
 #'
-#' @param mcmcNull   An object of type \code{mcmcNull} as generated using the \code{fitMcmcNull}
+#' @param mcmcNull   An object of type `mcmcNull` as generated using the `fitMcmcNull`
 #'                   function.
 #' @param fileName   Name of the file where the plot should be saved, for example 'plot.png'. See the
-#'                   function \code{ggsave} in the ggplot2 package for supported file formats.
+#'                   function `ggsave` in the ggplot2 package for supported file formats.
 #'
 #' @examples
 #' \dontrun{
@@ -773,7 +773,7 @@ plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
 #' Create a confidence interval coverage plot
 #'
 #' @description
-#' \code{plotCiCoverage} creates a plot showing the coverage before and after confidence interval
+#' `plotCiCoverage` creates a plot showing the coverage before and after confidence interval
 #' calibration at various widths of the confidence interval.
 #'
 #' @details
@@ -787,12 +787,12 @@ plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
 #'                               standard error = (log(<lower bound 95 percent confidence interval>) -
 #'                               log(<effect estimate>))/qnorm(0.025).
 #' @param trueLogRr              The true log relative risk.
-#' @param strata                 Variable used to stratify the plot. Set \code{strata = NULL} for no
+#' @param strata                 Variable used to stratify the plot. Set `strata = NULL` for no
 #'                               stratification.
 #' @param legacy                 If true, a legacy error model will be fitted, meaning standard
 #'                               deviation is linear on the log scale. If false, standard deviation
 #'                               is assumed to be simply linear.
-#' @param evaluation             A data frame as generated by the \code{\link{evaluateCiCalibration}}
+#' @param evaluation             A data frame as generated by the [evaluateCiCalibration()]
 #'                               function. If provided, the logRr, seLogRr, trueLogRr, strata, and legacy
 #'                               arguments will be ignored.
 #' @param crossValidationGroup   What should be the unit for the cross-validation? By default the unit
@@ -803,11 +803,11 @@ plotMcmcTrace <- function(mcmcNull, fileName = NULL) {
 #'                               "bottom", "top").
 #' @param title                  Optional: the main title for the plot
 #' @param fileName               Name of the file where the plot should be saved, for example
-#'                               'plot.png'. See the function \code{ggsave} in the ggplot2 package for
+#'                               'plot.png'. See the function `ggsave` in the ggplot2 package for
 #'                               supported file formats.
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' \dontrun{
@@ -894,7 +894,7 @@ plotCiCoverage <- function(logRr,
 #' Plot the systematic error model
 #'
 #' @description
-#' \code{plotErrorModel} creates a plot showing the systematic error model.
+#' `plotErrorModel` creates a plot showing the systematic error model.
 #'
 #' @details
 #' Creates a plot with the true effect size on the x-axis, and the mean plus and minus the standard
@@ -911,11 +911,11 @@ plotCiCoverage <- function(logRr,
 #'                               is assumed to be simply linear.
 #' @param title              Optional: the main title for the plot
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
-#'                           See the function \code{ggsave} in the ggplot2 package for supported file
+#'                           See the function `ggsave` in the ggplot2 package for supported file
 #'                           formats.
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
@@ -1085,7 +1085,7 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
 #' Plot the expected type 1 error as a function of standard error
 #'
 #' @description
-#' \code{plotExpectedType1Error} creates a plot showing the expected type 1 error as a function of standard error.
+#' `plotExpectedType1Error` creates a plot showing the expected type 1 error as a function of standard error.
 #'
 #' @details
 #' Creates a plot with the standard error on the x-axis and the expected type 1 error on the y-axis. The
@@ -1104,18 +1104,18 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
 #'                           controls.
 #' @param alpha              The alpha (nominal type 1 error) to be used.
 #' @param null               An object representing the fitted null distribution as created by the
-#'                           \code{fitNull} function. If not provided, a null will be fitted before
+#'                           `fitNull` function. If not provided, a null will be fitted before
 #'                           plotting.
 #' @param xLabel             If showing effect sizes, what label should be used for the effect size axis?
 #' @param title              Optional: the main title for the plot
 #' @param showCis            Show 95 percent credible intervals for the expected type 1 error.
 #' @param showEffectSizes    Show the expected effect sizes alongside the expected type 1 error?
 #' @param fileName           Name of the file where the plot should be saved, for example 'plot.png'.
-#'                           See the function \code{ggsave} in the ggplot2 package for supported file
+#'                           See the function `ggsave` in the ggplot2 package for supported file
 #'                           formats.
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' data(sccs)
@@ -1310,10 +1310,10 @@ plotExpectedType1Error <- function(logRrNegatives,
 #' @param xLabel      The label on the x-axis: the name of the effect estimate.
 #' @param title       Optional: the main title for the plot
 #' @param fileName    Name of the file where the plot should be saved, for example 'plot.png'. See the
-#'                    function \code{ggsave} in the ggplot2 package for supported file formats.
+#'                    function `ggsave` in the ggplot2 package for supported file formats.
 #'
 #' @return
-#' A Ggplot object. Use the \code{ggsave} function to save to file.
+#' A Ggplot object. Use the `ggsave` function to save to file.
 #'
 #' @examples
 #' data <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))

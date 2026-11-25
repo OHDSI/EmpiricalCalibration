@@ -17,12 +17,12 @@
 #' Calibrate the log likelihood ratio
 #'
 #' @description
-#' \code{calibrateLlr} computes calibrated log likelihood ratio using the fitted null distribution
+#' `calibrateLlr` computes calibrated log likelihood ratio using the fitted null distribution
 #'
 #' @param likelihoodApproximation Either a data frame containing normal, skew-normal, or custom parametric likelihood
 #'                                approximations, or a list of (adaptive) grid likelihood profiles.
-#' @param null      An object of class \code{null} created using the \code{fitNull} function or an
-#'                  object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.
+#' @param null      An object of class `null` created using the `fitNull` function or an
+#'                  object of class `mcmcNull` created using the `fitMcmcNull` function.
 #' @param twoSided  Compute two-sided (TRUE) or one-sided (FALSE) p-value?
 #' @param upper     If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?
 #'

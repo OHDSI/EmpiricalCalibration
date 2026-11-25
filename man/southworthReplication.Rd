@@ -5,10 +5,14 @@
 \alias{southworthReplication}
 \title{Relative risks from an unadjusted new-user cohort design}
 \format{
-A data frame with 174 rows and 4 variables: \describe{ \item{outcomeName}{Name of the outcome}
-\item{trueLogRr}{The log of the true effect size. Only provided for negative and positive controls,
-is NA for the outcome of interest (GI bleeding).} \item{logRr}{The log of the incidence rate ratio} \item{seLogRr}{
-The standard error of the log of the incidence rate ratio} }
+A data frame with 174 rows and 4 variables:
+\itemize{
+\item \code{outcomeName}: Name of the outcome
+\item \code{trueLogRr}: The log of the true effect size. Only provided for negative and positive controls,
+and is \code{NA} for the outcome of interest (GI bleeding).
+\item \code{logRr}: The log of the incidence rate ratio
+\item \code{seLogRr}: The standard error of the log of the incidence rate ratio
+}
 }
 \usage{
 data(southworthReplication)

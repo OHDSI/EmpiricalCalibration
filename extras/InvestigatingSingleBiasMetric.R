@@ -109,12 +109,12 @@ ggplot(data.frame(dist = dist2), aes(x = dist)) +
 data(sccs)
 negatives <- sccs[sccs$groundTruth == 0, ]
 null <- fitMcmcNull(negatives$logRr, negatives$seLogRr)
-plotCalibrationEffect(negatives$logRr, negatives$seLogRr, showCis = TRUE, showExpectedSystematicError = TRUE)
+plotCalibrationEffect(negatives$logRr, negatives$seLogRr, showCis = TRUE, showExpectedAbsoluteSystematicError = TRUE)
 
 
 data <- simulateControls(n = 50, mean = 0, sd = 0, runif(50, min = 0.1, max = 1))
-plotCalibrationEffect(data$logRr, data$seLogRr, showCis = F, showExpectedSystematicError = TRUE)
-plotCalibrationEffect(data$logRr, data$seLogRr, showCis = T, showExpectedSystematicError = TRUE)
+plotCalibrationEffect(data$logRr, data$seLogRr, showCis = F, showExpectedAbsoluteSystematicError = TRUE)
+plotCalibrationEffect(data$logRr, data$seLogRr, showCis = T, showExpectedAbsoluteSystematicError = TRUE)
 
 
 negatives <- simulateControls(n = 25, mean = 0, sd = 0, seLogRr = runif(25, 0.1, 0.2))

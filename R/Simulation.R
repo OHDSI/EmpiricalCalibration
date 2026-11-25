@@ -72,10 +72,14 @@ simulateControls <- function(n = 50,
 #' head(data)
 #'
 #' @return
-#' A data frame with 5 variables: \describe{ \item{time}{Time from index date to either the event or
-#' end of observation, whichever came first} \item{outcome}{Whether the outcome occurred (1) or not (0)} \item{exposure}{Whether
-#' the subject was exposed (TRUE) or not (FALSE)} \item{lookTime}{The time point when the look occurred. } \item{outcomeId}{A unique
-#' identifier for data corresponding to a single outcome. Lower IDs indicate negative controls, higher IDs indicate the positive control} }
+#' A data frame with 5 variables:
+#'
+#' * `time`: Time from index date to either the event or end of observation, whichever came first
+#' * `outcome`: Whether the outcome occurred (1) or not (0)
+#' * `exposure`: Whether the subject was exposed (`TRUE`) or not (`FALSE`)
+#' * `lookTime`: The time point when the look occurred
+#' * `outcomeId`: A unique identifier for data corresponding to a single outcome. Lower IDs indicate
+#'   negative controls, higher IDs indicate the positive control
 #'
 #' @export
 simulateMaxSprtData <- function(n = 10000,

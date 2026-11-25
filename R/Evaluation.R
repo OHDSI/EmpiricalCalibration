@@ -19,7 +19,7 @@
 #' Evaluate confidence interval calibration
 #'
 #' @description
-#' \code{evaluateCiCalibration} performs a leave-one-out cross-validation to evaluate the calibration
+#' `evaluateCiCalibration` performs a leave-one-out cross-validation to evaluate the calibration
 #' confidence intervals.
 #'
 #' @details
@@ -31,7 +31,7 @@
 #'                               standard error = (log(<lower bound 95 percent confidence interval>) -
 #'                               log(<effect estimate>))/qnorm(0.025).
 #' @param trueLogRr              The true log relative risk.
-#' @param strata                 Variable used to stratify the plot. Set \code{strata = NULL} for no
+#' @param strata                 Variable used to stratify the plot. Set `strata = NULL` for no
 #'                               stratification.
 #' @param crossValidationGroup   What should be the unit for the cross-validation? By default the unit
 #'                               is a single control, but a different grouping can be provided, for

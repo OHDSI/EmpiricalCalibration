@@ -33,7 +33,7 @@ same for the two sets.
 
 The data frame has two attributes: ease1 and ease2, providing the EASE estimates (and confidence intervals) for the
 two sets, computed using bootstrapping. Note that these estimates may somewhat different from those generated using
-\code{\link{computeExpectedAbsoluteSystematicError}}, because a different approach is used to compute the confidence
+\code{\link[=computeExpectedAbsoluteSystematicError]{computeExpectedAbsoluteSystematicError()}}, because a different approach is used to compute the confidence
 interval. The approach used here will more closely align with the computation of the difference in EASE.
 }
 \description{

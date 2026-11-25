@@ -12,3 +12,4 @@ ReverseDependencyCheckFunctions.R
 ^CRAN-SUBMISSION$
 ^\.positai$
 ^\.claude$
+^man-roxygen

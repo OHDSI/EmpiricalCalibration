@@ -111,7 +111,7 @@ plotCalibrationEffect(negatives$logRr,
                       negatives$seLogRr, 
                       drugOfInterest$logRr, 
                       drugOfInterest$seLogRr, 
-                      null)
+                      null = null)
 ```
 
 In this plot we see that, even though the drug of interest (the yellow diamond) has a high relative risk, it is indistinguishable from our negative controls.
@@ -151,7 +151,7 @@ plotCalibrationEffect(negatives$logRr,
                       negatives$seLogRr, 
                       drugOfInterest$logRr, 
                       drugOfInterest$seLogRr, 
-                      null,
+                      null = null,
                       showCis = TRUE)
 ```
 

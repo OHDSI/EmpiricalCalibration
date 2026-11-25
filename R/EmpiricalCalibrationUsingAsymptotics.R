@@ -19,7 +19,7 @@
 #' Fit the null distribution
 #'
 #' @description
-#' \code{fitNull} fits the null distribution to a set of negative controls
+#' `fitNull` fits the null distribution to a set of negative controls
 #'
 #' @details
 #' This function fits a Gaussian function to the negative control estimates as described in Schuemie
@@ -97,7 +97,7 @@ print.null <- function(x, ...) {
 #' Calibrate the p-value
 #'
 #' @description
-#' \code{calibrateP} computes calibrated p-values using the fitted null distribution
+#' `calibrateP` computes calibrated p-values using the fitted null distribution
 #'
 #' @details
 #' This function computes a calibrated two-sided p-value as described in Schuemie et al (2014).
@@ -106,8 +106,8 @@ print.null <- function(x, ...) {
 #' @param seLogRr   The standard error of the log of the effect estimates. Hint: often the standard
 #'                  error = (log(<lower bound 95 percent confidence interval>) - log(<effect
 #'                  estimate>))/qnorm(0.025)
-#' @param null      An object of class \code{null} created using the \code{fitNull} function or an
-#'                  object of class \code{mcmcNull} created using the \code{fitMcmcNull} function.
+#' @param null      An object of class `null` created using the `fitNull` function or an
+#'                  object of class `mcmcNull` created using the `fitMcmcNull` function.
 #' @param twoSided  Compute two-sided (TRUE) or one-sided (FALSE) p-value?
 #' @param upper     If one-sided: compute p-value for upper (TRUE) or lower (FALSE) bound?
 #' @param ...       Any additional parameters (currently none).
@@ -165,7 +165,7 @@ calibrateP.null <- function(null, logRr, seLogRr, twoSided = TRUE, upper = TRUE,
 #' Compute the (traditional) p-value
 #'
 #' @description
-#' \code{computeTraditionalP} computes the traditional two-sided p-value based on the log of the
+#' `computeTraditionalP` computes the traditional two-sided p-value based on the log of the
 #' relative risk and the standard error of the log of the relative risk.
 #'
 #' @param logRr     A numeric vector of one or more effect estimates on the log scale
@@ -201,7 +201,7 @@ computeTraditionalP <- function(logRr, seLogRr, twoSided = TRUE, upper = TRUE) {
 #' Fit the null distribution using non-normal log-likelihood approximations
 #'
 #' @description
-#' \code{fitNullNonNormalLl} fits the null distribution to a set of negative controls
+#' `fitNullNonNormalLl` fits the null distribution to a set of negative controls
 #'
 #' @details
 #' This function fits a Gaussian function to the negative control estimates, using non-normal

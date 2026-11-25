@@ -36,7 +36,7 @@
 #'                                   is assumed to be simply linear.
 #'
 #' @return
-#' An object of type \code{systematicErrorModel}.
+#' An object of type `systematicErrorModel`.
 #'
 #' @examples
 #' controls <- simulateControls(n = 50 * 3, mean = 0.25, sd = 0.25, trueLogRr = log(c(1, 2, 4)))
@@ -121,8 +121,8 @@ fitSystematicErrorModel <- function(logRr,
 #'                  estimate>))/qnorm(0.025).
 #' @param ciWidth   The width of the confidence interval. Typically this would be .95, for the 95
 #'                  percent confidence interval.
-#' @param model     An object of type \code{systematicErrorModel} as created by the
-#'                  \code{\link{fitSystematicErrorModel}} function.
+#' @param model     An object of type `systematicErrorModel` as created by the
+#'                  [fitSystematicErrorModel()] function.
 #'
 #' @return
 #' A data frame with calibrated confidence intervals and point estimates.
@@ -312,7 +312,7 @@ calibrateConfidenceInterval <- function(logRr, seLogRr, model, ciWidth = 0.95) {
 #' Compute the (traditional) confidence interval
 #'
 #' @description
-#' \code{computeTraditionalCi} computes the traditional confidence interval based on the log of the
+#' `computeTraditionalCi` computes the traditional confidence interval based on the log of the
 #' relative risk and the standard error of the log of the relative risk.
 #'
 #' @param logRr     A numeric vector of one or more effect estimates on the log scale
@@ -346,22 +346,22 @@ computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
 #' into a systematic error distribution that can be used to calibrate confidence intervals in addition to
 #' p-values.
 #'
-#' Whereas the \code{\link{fitSystematicErrorModel}} uses positive controls to determine how the error
+#' Whereas the [fitSystematicErrorModel()] uses positive controls to determine how the error
 #' distribution changes with true effect size, this function requires the user to make an assumption. The
-#' default assumption, \code{meanSlope = 1} and \code{sdSlope = 0}, specify a belief that the error
+#' default assumption, `meanSlope = 1` and `sdSlope = 0`, specify a belief that the error
 #' distribution is the same for all true effect sizes. In many cases this assumption is likely to be correct,
 #' however, if an estimation method is biased towards the null this assumption will be violated, causing the
 #' calibrated confidence intervals to have lower than nominal coverage.
 #'
-#' @param null         The empirical null distribution fitted using either the \code{\link{fitNull}}
-#'                     or the \code{\link{fitMcmcNull}} function.
+#' @param null         The empirical null distribution fitted using either the [fitNull()]
+#'                     or the [fitMcmcNull()] function.
 #' @param meanSlope    The slope for the mean of the error distribution. A slope of 1 means the error
 #'                     is the same for different values of the true relative risk.
 #' @param sdSlope   The slope for the log of the standard deviation of the error distribution. A slope
 #'                     of 0 means the standard deviation is the same for different values of the true
 #'                     relative risk.
 #'
-#' @return An object of type \code{systematicErrorModel}.
+#' @return An object of type `systematicErrorModel`.
 #'
 #' @examples
 #' data(sccs)
