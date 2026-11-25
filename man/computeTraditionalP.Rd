@@ -10,8 +10,8 @@ computeTraditionalP(logRr, seLogRr, twoSided = TRUE, upper = TRUE)
 \item{logRr}{A numeric vector of one or more effect estimates on the log scale}
 
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-estimate>))/qnorm(0.025)}
+error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
+estimate>}}))/qnorm(0.025)}
 
 \item{twoSided}{Compute two-sided (TRUE) or one-sided (FALSE) p-value?}
 

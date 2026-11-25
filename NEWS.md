@@ -1,3 +1,14 @@
+EmpiricalCalibration 4.0.0
+==========================
+
+This major version introduces the ability to handle absolute effect estimates. Specific changes:
+
+1. The `fitMcmcNull()` function now automatically estimates the scale of the prior on the precision. 
+
+2. Changing `logRr` and `seLogRr` to `estimate` and `se` throughout, with a `scale` argument where needed. Supported scales are "log relative risk" and "risk difference". The old arguments are deprecated.
+
+
+
 EmpiricalCalibration 3.1.4
 ==========================
 

@@ -10,3 +10,5 @@ _pkgdown.yml
 docs
 ReverseDependencyCheckFunctions.R
 ^CRAN-SUBMISSION$
+^\.positai$
+^\.claude$

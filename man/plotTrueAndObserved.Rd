@@ -17,8 +17,8 @@ plotTrueAndObserved(
 \item{logRr}{A numeric vector of effect estimates on the log scale.}
 
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-estimate>))/qnorm(0.025).}
+error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
+estimate>}}))/qnorm(0.025).}
 
 \item{trueLogRr}{A vector of the true effect sizes.}
 

@@ -27,3 +27,6 @@
 #' @importFrom rlang .data
 #' @useDynLib EmpiricalCalibration
 NULL
+
+LOG_RELATIVE_RISK <- "log relative risk"
+RISK_DIFFERENCE <- "risk difference"

@@ -42,11 +42,11 @@ gaussianProduct <- function(mu1, mu2, sd1, sd2) {
 #   result
 # }
 
-logLikelihoodNullMcmc <- function(theta, logRr, seLogRr) {
+logLikelihoodNullMcmc <- function(theta, logRr, seLogRr, priorScale) {
   result <- logLikelihoodNull(theta, logRr, seLogRr)
 
   # Add weak prior for when precision becomes very large:
-  result <- result - dgamma(theta[2], shape = 1e-04, rate = 1e-04, log = TRUE)
+  result <- result - dgamma(theta[2] / priorScale, shape = 1e-04, rate = 1e-04, log = TRUE)
   return(result)
 }
 

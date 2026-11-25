@@ -10,8 +10,8 @@ fitMcmcNull(logRr, seLogRr, iter = 1e+05)
 \item{logRr}{A numeric vector of effect estimates on the log scale}
 
 \item{seLogRr}{The standard error of the log of the effect estimates. Hint: often the standard
-error = (log(<lower bound 95 percent confidence interval>) - log(<effect
-estimate>))/qnorm(0.025)}
+error = (log(<lower bound 95 percent confidence interval>) - log(\if{html}{\out{<effect
+estimate>}}))/qnorm(0.025)}
 
 \item{iter}{Number of iterations of the MCMC.}
 }

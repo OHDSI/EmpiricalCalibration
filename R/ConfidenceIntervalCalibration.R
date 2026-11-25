@@ -373,10 +373,10 @@ computeTraditionalCi <- function(logRr, seLogRr, ciWidth = .95) {
 #'
 #' @export
 convertNullToErrorModel <- function(null, meanSlope = 1, sdSlope = 0) {
-  if (is(null, "null")) {
-    model <- c(null[1], meanSlope, null[2], sdSlope)
-  } else if (is(null, "mcmcNull")) {
+  if (is(null, "mcmcNull")) {
     model <- c(null[1], meanSlope, 1 / sqrt(null[2]), sdSlope)
+  } else if (is(null, "null")) {
+    model <- c(null[1], meanSlope, null[2], sdSlope)
   } else {
     stop("Null argument should be of type 'null' or 'mcmcNull'")
   }

@@ -80,10 +80,10 @@ test_that("output of plotCalibration", {
 test_that("output of plotCalibrationEffect", {
   expect_error(
     plotCalibrationEffect(
-      logRrNegatives   = negatives$logRr,
-      seLogRrNegatives = negatives$seLogRr,
-      logRrPositives   = positives$logRr,
-      seLogRrPositives = positives$seLogRr,
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
+      estimatePositives = positives$logRr,
+      sePositives = positives$seLogRr,
       showCis          = TRUE,
       null             = null
     ),
@@ -92,20 +92,20 @@ test_that("output of plotCalibrationEffect", {
 
   expect_is(
     plotCalibrationEffect(
-      logRrNegatives   = negatives$logRr,
-      seLogRrNegatives = negatives$seLogRr,
-      logRrPositives   = positives$logRr,
-      seLogRrPositives = positives$seLogRr
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
+      estimatePositives = positives$logRr,
+      sePositives = positives$seLogRr,
     ),
     "ggplot"
   )
 
   expect_is(
     plotCalibrationEffect(
-      logRrNegatives                      = negatives$logRr,
-      seLogRrNegatives                    = negatives$seLogRr,
-      logRrPositives                      = positives$logRr,
-      seLogRrPositives                    = positives$seLogRr,
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
+      estimatePositives = positives$logRr,
+      sePositives = positives$seLogRr,
       showExpectedAbsoluteSystematicError = TRUE
     ),
     "ggplot"
@@ -113,10 +113,10 @@ test_that("output of plotCalibrationEffect", {
 
   expect_is(
     plotCalibrationEffect(
-      logRrNegatives                      = negatives$logRr,
-      seLogRrNegatives                    = negatives$seLogRr,
-      logRrPositives                      = positives$logRr,
-      seLogRrPositives                    = positives$seLogRr,
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
+      estimatePositives = positives$logRr,
+      sePositives = positives$seLogRr,
       showExpectedAbsoluteSystematicError = TRUE,
       null                                = null
     ),
@@ -125,10 +125,10 @@ test_that("output of plotCalibrationEffect", {
 
   expect_is(
     plotCalibrationEffect(
-      logRrNegatives   = negatives$logRr,
-      seLogRrNegatives = negatives$seLogRr,
-      logRrPositives   = positives$logRr,
-      seLogRrPositives = positives$seLogRr,
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
+      estimatePositives = positives$logRr,
+      sePositives = positives$seLogRr,
       null             = null
     ),
     "ggplot"
@@ -136,8 +136,8 @@ test_that("output of plotCalibrationEffect", {
 
   expect_is(
     plotCalibrationEffect(
-      logRrNegatives   = negatives$logRr,
-      seLogRrNegatives = negatives$seLogRr,
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
       null             = null
     ),
     "ggplot"
@@ -145,10 +145,10 @@ test_that("output of plotCalibrationEffect", {
 
   expect_is(
     plotCalibrationEffect(
-      logRrNegatives   = negatives$logRr,
-      seLogRrNegatives = negatives$seLogRr,
-      logRrPositives   = positives$logRr,
-      seLogRrPositives = positives$seLogRr,
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
+      estimatePositives = positives$logRr,
+      sePositives = positives$seLogRr,
       showCis          = TRUE
     ),
     "ggplot"
@@ -157,20 +157,20 @@ test_that("output of plotCalibrationEffect", {
   # Custom x and y limits
   expect_warning(
     plotCalibrationEffect(
-      logRrNegatives = negatives$logRr,
-      seLogRrNegatives = negatives$seLogRr,
-      logRrPositives = c(-3, -2, 11),
-      seLogRrPositives = c(0.1, 1.2, 2.5)
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
+      estimatePositives = c(-3, -2, 11),
+      sePositives = c(0.1, 1.2, 2.5)
     ),
     regexp = "xLimits"
   )
 
   expect_warning(
     plotCalibrationEffect(
-      logRrNegatives = negatives$logRr,
-      seLogRrNegatives = negatives$seLogRr,
-      logRrPositives = c(-3, -2, 2),
-      seLogRrPositives = c(0.1, 1.2, 2.5)
+      estimateNegatives = negatives$logRr,
+      seNegatives = negatives$seLogRr,
+      estimatePositives = c(-3, -2, 2),
+      sePositives = c(0.1, 1.2, 2.5)
     ),
     regexp = "yLimits"
   )

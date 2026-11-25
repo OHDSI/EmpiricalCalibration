@@ -5,33 +5,36 @@
 \title{Plot the effect of the calibration}
 \usage{
 plotCalibrationEffect(
-  logRrNegatives,
-  seLogRrNegatives,
-  logRrPositives = NULL,
-  seLogRrPositives = NULL,
+  estimateNegatives,
+  seNegatives,
+  estimatePositives = NULL,
+  sePositives = NULL,
+  scale = "log relative risk",
   null = NULL,
   alpha = 0.05,
-  xLabel = "Relative risk",
-  title,
+  xLabel = "Effect estimate",
+  title = NULL,
   showCis = FALSE,
   showExpectedAbsoluteSystematicError = FALSE,
   fileName = NULL,
-  xLimits = c(0.25, 10),
-  yLimits = c(0, 1.5)
+  xLimits = NULL,
+  yLimits = NULL,
+  logRrNegatives = NULL,
+  seLogRrNegatives = NULL,
+  logRrPositives = NULL,
+  seLogRrPositives = NULL
 )
 }
 \arguments{
-\item{logRrNegatives}{A numeric vector of effect estimates of the negative controls on the log
-scale.}
+\item{estimateNegatives}{A numeric vector of effect estimates of the negative controls.}
 
-\item{seLogRrNegatives}{The standard error of the log of the effect estimates of the negative
-controls.}
+\item{seNegatives}{The standard error of the effect estimates of the negative controls.}
 
-\item{logRrPositives}{Optional: A numeric vector of effect estimates of the positive controls on the log
-scale.}
+\item{estimatePositives}{Optional: A numeric vector of effect estimates of the positive controls.}
 
-\item{seLogRrPositives}{Optional: The standard error of the log of the effect estimates of the positive
-controls.}
+\item{sePositives}{Optional: The standard error of the effect estimates of the positive controls.}
+
+\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
 
 \item{null}{An object representing the fitted null distribution as created by the
 \code{fitNull} or \code{fitMcmcNull} functions. If not provided, a null
@@ -55,6 +58,14 @@ formats.}
 \item{xLimits}{Vector of length 2 for limits of the plot x axis - defaults to 0.25, 10}
 
 \item{yLimits}{Vector of length 2 for size limits of the y axis - defaults to 0, 1.5}
+
+\item{logRrNegatives}{DEPRECATED. Use \code{estimateNegatives} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRrNegatives}{DEPRECATED. Use \code{seNegatives} with \code{scale = "log relative risk"} instead..}
+
+\item{logRrPositives}{DEPRECATED. Use \code{estimatePositives} with \code{scale = "log relative risk"} instead.}
+
+\item{seLogRrPositives}{DEPRECATED. Use \code{sePositives} with \code{scale = "log relative risk"} instead.}
 }
 \value{
 A Ggplot object. Use the \code{ggsave} function to save to file.

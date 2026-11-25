@@ -26,20 +26,20 @@ proposalFunction <- function(param, scale) {
   return(draw)
 }
 
-runMetropolisMcmc <- function(startValue, iterations, scale, logRr, seLogRr) {
+runMetropolisMcmc <- function(startValue, iterations, scale, logRr, seLogRr, priorScale) {
   dim <- length(startValue)
   chain <- array(dim = c(iterations + 1, dim))
   logLik <- array(dim = c(iterations + 1, 1))
   acc <- array(dim = c(iterations + 1, 1))
   
-  logLik[1] <- -logLikelihoodNullMcmc(startValue, logRr, seLogRr)
+  logLik[1] <- -logLikelihoodNullMcmc(startValue, logRr, seLogRr, priorScale = priorScale)
   chain[1, ] <- c(startValue)
   acc[1] <- 1
   
   for (i in 1:iterations) {
     # print(paste('itr =', i))
     proposal <- proposalFunction(chain[i, ], scale = scale)
-    newLogLik <- tryCatch(-logLikelihoodNullMcmc(proposal, logRr, seLogRr), error = function(e) {
+    newLogLik <- tryCatch(-logLikelihoodNullMcmc(proposal, logRr, seLogRr, priorScale = priorScale), error = function(e) {
       -1e+10
     })
     
@@ -62,16 +62,17 @@ runMetropolisMcmc <- function(startValue, iterations, scale, logRr, seLogRr) {
 binarySearchMu <- function(modeMu,
                            modeSigma,
                            alpha = 0.1,
-                           logRrNegatives = logRrNegatives,
-                           seLogRrNegatives = seLogRrNegatives,
-                           precision = 1e-07) {
+                           logRrNegatives,
+                           seLogRrNegatives,
+                           precision = 1e-07,
+                           priorScale) {
   q <- qchisq(1 - alpha, 1) / 2
   L <- modeMu
   H <- 10
-  llMode <- -logLikelihoodNullMcmc(c(modeMu, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
+  llMode <- -logLikelihoodNullMcmc(c(modeMu, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives, priorScale = priorScale)
   while (H >= L) {
     M <- L + (H - L) / 2
-    llM <- -logLikelihoodNullMcmc(c(M, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
+    llM <- -logLikelihoodNullMcmc(c(M, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives, priorScale = priorScale)
     metric <- llMode - llM - q
     # writeLines(paste('M =', M, 'Metric = ',metric))
     if (metric > precision) {
@@ -90,15 +91,16 @@ binarySearchMu <- function(modeMu,
 binarySearchSigma <- function(modeMu,
                               modeSigma,
                               alpha = 0.1,
-                              logRrNegatives = logRrNegatives,
-                              seLogRrNegatives = seLogRrNegatives,
-                              precision = 1e-07) {
+                              logRrNegatives,
+                              seLogRrNegatives,
+                              precision = 1e-07,
+                              priorScale) {
   q <- qchisq(1 - alpha, 1) / 2
-  llMode <- -logLikelihoodNullMcmc(c(modeMu, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
+  llMode <- -logLikelihoodNullMcmc(c(modeMu, modeSigma), logRr = logRrNegatives, seLogRr = seLogRrNegatives, priorScale = priorScale)
   L <- modeSigma
   for (i in 1:10) {
     H <- modeSigma + exp(i)
-    llM <- -logLikelihoodNullMcmc(c(modeMu, H), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
+    llM <- -logLikelihoodNullMcmc(c(modeMu, H), logRr = logRrNegatives, seLogRr = seLogRrNegatives, priorScale = priorScale)
     metric <- llMode - llM - q
     if (metric > 0) {
       break
@@ -109,7 +111,7 @@ binarySearchSigma <- function(modeMu,
   }
   while (H >= L) {
     M <- L + (H - L) / 2
-    llM <- -logLikelihoodNullMcmc(c(modeMu, M), logRr = logRrNegatives, seLogRr = seLogRrNegatives)
+    llM <- -logLikelihoodNullMcmc(c(modeMu, M), logRr = logRrNegatives, seLogRr = seLogRrNegatives, priorScale = priorScale)
     metric <- llMode - llM - q
     # writeLines(paste('M =', M, 'Metric = ',metric))
     if (metric > precision) {
@@ -186,26 +188,29 @@ fitMcmcNull <- function(logRr, seLogRr, iter = 100000) {
     warning("No valid estimates left. Returning undefined null distribution")
     mcmc <- list(chain = matrix(c(NA,NA), nrow = 1, ncol = 2))
   } else {
-    fit <- optim(c(0, 1), logLikelihoodNullMcmc, logRr = logRr, seLogRr = seLogRr)
+    priorScale <-  1/median(seLogRr, na.rm = TRUE)^2
+    
+    
+    fit <- optim(c(0, 1), logLikelihoodNullMcmc, logRr = logRr, seLogRr = seLogRr, priorScale = priorScale)
     
     # Profile likelihood for roughly correct scale:
     scale <- binarySearchMu(fit$par[1],
                             fit$par[2],
                             logRrNegatives = logRr,
-                            seLogRrNegatives = seLogRr
-    )
+                            seLogRrNegatives = seLogRr,
+                            priorScale = priorScale)
     scale <- c(scale, binarySearchSigma(fit$par[1],
                                         fit$par[2],
                                         logRrNegatives = logRr,
-                                        seLogRrNegatives = seLogRr
-    ))
+                                        seLogRrNegatives = seLogRr,
+                                        priorScale = priorScale))
     
     # writeLines(paste('Scale:', paste(scale,collapse=',')))
-    mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr)
+    mcmc <- runMetropolisMcmc(fit$par, iterations = iter, scale, logRr, seLogRr, priorScale)
   }
   result <- c(median(mcmc$chain[, 1]), median(mcmc$chain[, 2]))
   attr(result, "mcmc") <- mcmc
-  class(result) <- "mcmcNull"
+  class(result) <- c("mcmcNull", "null")
   return(result)
 }
 

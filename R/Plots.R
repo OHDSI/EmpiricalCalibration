@@ -119,14 +119,11 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' dashed line indicated estimates with p < 0.05. The orange area indicates estimates with calibrated
 #' p < 0.05.
 #'
-#' @param logRrNegatives     A numeric vector of effect estimates of the negative controls on the log
-#'                           scale.
-#' @param seLogRrNegatives   The standard error of the log of the effect estimates of the negative
-#'                           controls.
-#' @param logRrPositives     Optional: A numeric vector of effect estimates of the positive controls on the log
-#'                           scale.
-#' @param seLogRrPositives   Optional: The standard error of the log of the effect estimates of the positive
-#'                           controls.
+#' @param estimateNegatives  A numeric vector of effect estimates of the negative controls.
+#' @param seNegatives        The standard error of the effect estimates of the negative controls.
+#' @param estimatePositives  Optional: A numeric vector of effect estimates of the positive controls.
+#' @param sePositives        Optional: The standard error of the effect estimates of the positive controls.
+#' @template Scale
 #' @param null               An object representing the fitted null distribution as created by the
 #'                           \code{fitNull} or \code{fitMcmcNull} functions. If not provided, a null
 #'                           will be fitted before plotting.
@@ -141,6 +138,10 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #'                           formats.
 #' @param xLimits            Vector of length 2 for limits of the plot x axis - defaults to 0.25, 10
 #' @param yLimits            Vector of length 2 for size limits of the y axis - defaults to 0, 1.5
+#' @param logRrNegatives     DEPRECATED. Use `estimateNegatives` with `scale = "log relative risk"` instead.
+#' @param seLogRrNegatives   DEPRECATED. Use `seNegatives` with `scale = "log relative risk"` instead..
+#' @param logRrPositives     DEPRECATED. Use `estimatePositives` with `scale = "log relative risk"` instead.
+#' @param seLogRrPositives   DEPRECATED. Use `sePositives` with `scale = "log relative risk"` instead.
 #'
 #' @return
 #' A Ggplot object. Use the \code{ggsave} function to save to file.
@@ -152,76 +153,128 @@ logRrtoSE <- function(logRr, alpha, mu, sigma) {
 #' plotCalibrationEffect(negatives$logRr, negatives$seLogRr, positive$logRr, positive$seLogRr)
 #'
 #' @export
-plotCalibrationEffect <- function(logRrNegatives,
-                                  seLogRrNegatives,
-                                  logRrPositives = NULL,
-                                  seLogRrPositives = NULL,
+plotCalibrationEffect <- function(estimateNegatives,
+                                  seNegatives,
+                                  estimatePositives = NULL,
+                                  sePositives = NULL,
+                                  scale = "log relative risk",
                                   null = NULL,
                                   alpha = 0.05,
-                                  xLabel = "Relative risk",
-                                  title,
+                                  xLabel = "Effect estimate",
+                                  title = NULL,
                                   showCis = FALSE,
                                   showExpectedAbsoluteSystematicError = FALSE,
                                   fileName = NULL,
-                                  xLimits = c(0.25, 10),
-                                  yLimits = c(0, 1.5)) {
+                                  xLimits = NULL,
+                                  yLimits = NULL,
+                                  logRrNegatives = NULL,
+                                  seLogRrNegatives = NULL,
+                                  logRrPositives = NULL,
+                                  seLogRrPositives = NULL) {
+  errorMessages <- checkmate::makeAssertCollection()
+  checkmate::assertNumeric(estimateNegatives, min.len = 1, add = errorMessages)
+  checkmate::assertNumeric(seNegatives, min.len = 1, lower = 0, add = errorMessages)
+  checkmate::assertNumeric(estimatePositives, min.len = 1, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(sePositives, min.len = 1, lower = 0, null.ok = TRUE, add = errorMessages)
+  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
+  checkmate::assertClass(null, classes = c("null"), null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumber(alpha, lower = 0, upper = 1, add = errorMessages)
+  checkmate::assertString(xLabel, add = errorMessages)
+  checkmate::assertString(title, null.ok = TRUE, add = errorMessages)
+  checkmate::assertLogical(showCis, len = 1, add = errorMessages)
+  checkmate::assertLogical(showExpectedAbsoluteSystematicError, len = 1, add = errorMessages)
+  checkmate::assertString(fileName, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(xLimits, len = 2, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(yLimits, len = 2, null.ok = TRUE, lower = 0, add = errorMessages)
+  checkmate::assertNumeric(logRrNegatives, min.len = 1, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRrNegatives, min.len = 1, lower = 0, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(logRrPositives, min.len = 1, null.ok = TRUE, add = errorMessages)
+  checkmate::assertNumeric(seLogRrPositives, min.len = 1, lower = 0, null.ok = TRUE, add = errorMessages)
+  checkmate::reportAssertions(collection = errorMessages)
+  if (!is.null(logRrNegatives)) {
+    warning("The logRrNegatives etc. arguments are deprecated.",
+            "Use `estimateNegatives` etc. with `scale = \"log relative risk\"` instead.")
+    estimateNegatives <- logRrNegatives
+    seNegatives <- seLogRrNegatives
+    estimatePositives <- logRrPositives
+    sePositives <- seLogRrPositives
+    scale = "log relative risk"
+  }
   if (is.null(null)) {
     if (showCis) {
-      null <- fitMcmcNull(logRrNegatives, seLogRrNegatives)
+      null <- fitMcmcNull(estimateNegatives, seNegatives)
     } else {
-      null <- fitNull(logRrNegatives, seLogRrNegatives)
+      null <- fitNull(estimateNegatives, seNegatives)
     }
   }
-  if (showCis && is(null, "null")) {
+  if (showCis && !is(null, "mcmcNull")) {
     stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
   }
-
-  if (!is.vector(xLimits) | !length(xLimits) >= 2) {
-    stop("xLimits must be a vector of length 2")
-  }
-  if (!is.vector(yLimits) | !length(yLimits) >= 2) {
-    stop("yLimits must be a vector of length 2")
-  }
-
-  x <- exp(seq(log(xLimits[1]), log(xLimits[2]), length.out = 400))
-  if (is(null, "null")) {
-    y <- logRrtoSE(log(x), alpha, null[1], null[2])
+  if (scale == LOG_RELATIVE_RISK) {
+    if (is.null(xLimits)) {
+      xLimits <- c(log(0.1), log(10))
+    }
+    if (is.null(yLimits)) {
+      yLimits <- c(0, 1.5)
+    }
+    breakLabels <- c(0.1, 0.25, 0.5, 1, 2 * (1:ceiling(exp(xLimits[2]) / 2.0)))
+    breaks <- log(breakLabels)
+    breakIdx <- breaks >= xLimits[1] & breaks <= xLimits[2]
+    breakLabels <- breakLabels[breakIdx]
+    breaks <- breaks[breakIdx]
   } else {
+    # scale == RISK_DIFFERENCE
+    if (is.null(xLimits)) {
+      maxAbsEstimate <- quantile(abs(estimateNegatives), 0.9, na.rm = TRUE)
+      if (!is.null(estimatePositives)) {
+        maxAbsEstimate <- max(c(maxAbsEstimate, abs(estimatePositives)), na.rm = TRUE)
+      }
+      xLimits <- c(-maxAbsEstimate * 1.25, maxAbsEstimate * 1.25)
+    }
+    if (is.null(yLimits)) {
+      maxSe <- quantile(seNegatives, 0.9, na.rm = TRUE)
+      if (!is.null(sePositives)) {
+        maxSe <- max(c(maxSe, sePositives), na.rm = TRUE)
+      }
+      yLimits <- c(0, maxSe * 1.10)
+    }
+    # Let ggplot figure out the breaks:
+    breaks <- ggplot2::waiver()
+    breakLabels <- ggplot2::waiver() 
+  }
+  
+  
+  x <- seq(xLimits[1], xLimits[2], length.out = 400)
+  if (is(null, "mcmcNull")) {
     chain <- attr(null, "mcmc")$chain
-    matrix <- apply(chain, 1, function(null) logRrtoSE(log(x), alpha, null[1], 1 / sqrt(null[2])))
+    matrix <- apply(chain, 1, function(null) logRrtoSE(x, alpha, null[1], 1 / sqrt(null[2])))
     ys <- apply(matrix, 1, function(se) quantile(se, c(0.025, 0.50, 0.975), na.rm = TRUE))
     rm(matrix)
     y <- ys[2, ]
     yLb <- ys[1, ]
     yUb <- ys[3, ]
-  }
+  } else {
+    y <- logRrtoSE(x, alpha, null[1], null[2])
+  } 
   seTheoretical <- sapply(x, FUN = function(x) {
-    abs(log(x)) / qnorm(1 - alpha / 2)
+    abs(x) / qnorm(1 - alpha / 2)
   })
-
-  breaks <- c(0.25, 0.5, 1, 2 * (1:ceiling(xLimits[2] / 2.0)))
-  if (xLimits[1] < 1) {
-    breaks <- c(0.125, breaks)
-  }
-
-  checkWithinLimits(yLimits, c(seLogRrNegatives, seLogRrPositives), "yLimits")
-  checkWithinLimits(log(xLimits), c(logRrNegatives, logRrPositives), "xLimits")
-
+  vizData <- data.frame(x = x, y = y, seTheoretical = seTheoretical)
+  
+  checkWithinLimits(yLimits, c(seNegatives, sePositives), "yLimits")
+  checkWithinLimits(xLimits, c(estimateNegatives, estimatePositives), "xLimits")
+  
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
-  plot <- ggplot2::ggplot(
-    data.frame(x, y, seTheoretical),
-    ggplot2::aes(x = .data$x, y = .data$y)
-  ) +
-    ggplot2::geom_vline(xintercept = breaks, colour = "#AAAAAA", lty = 1, size = 0.5) +
-    ggplot2::geom_vline(xintercept = 1, size = 1) +
+  plot <- ggplot2::ggplot(vizData, ggplot2::aes(x = .data$x, y = .data$y)) +
+    ggplot2::geom_vline(xintercept = 0, size = 1) +
     ggplot2::geom_area(
       fill = rgb(1, 0.5, 0, alpha = 0.5),
       color = rgb(1, 0.5, 0),
       size = 1,
       alpha = 0.5
     )
-
+  
   if (showCis) {
     plot <- plot +
       ggplot2::geom_ribbon(ggplot2::aes(
@@ -229,17 +282,17 @@ plotCalibrationEffect <- function(logRrNegatives,
         ymax = yUb
       ), fill = rgb(0.8, 0.2, 0.2), alpha = 0.3) +
       ggplot2::geom_line(ggplot2::aes(y = yLb),
-        colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
-        size = 1
+                         colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                         size = 1
       ) +
       ggplot2::geom_line(ggplot2::aes(y = yUb),
-        colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
-        size = 1
+                         colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                         size = 1
       )
   }
   if (showExpectedAbsoluteSystematicError) {
     ease <- computeExpectedAbsoluteSystematicError(null)
-    if (is(null, "null")) {
+    if (!is(null, "mcmcNull")) {
       label <- sprintf("Expected absolute systematic error = %0.2f", ease)
     } else {
       label <- sprintf(
@@ -252,40 +305,41 @@ plotCalibrationEffect <- function(logRrNegatives,
     dummy <- data.frame(text = label)
     plot <- plot + ggplot2::geom_label(x = log10(0.26), y = 1.49, hjust = "left", vjust = "top", alpha = 0.9, ggplot2::aes(label = .data$text), data = dummy, size = 3.5)
   }
-
+  
   plot <- plot +
     ggplot2::geom_area(ggplot2::aes(y = .data$seTheoretical),
-      fill = rgb(0, 0, 0),
-      colour = rgb(0, 0, 0, alpha = 0.1),
-      alpha = 0.1
+                       fill = rgb(0, 0, 0),
+                       colour = rgb(0, 0, 0, alpha = 0.1),
+                       alpha = 0.1
     ) +
     ggplot2::geom_line(ggplot2::aes(y = .data$seTheoretical),
-      colour = rgb(0, 0, 0),
-      linetype = "dashed",
-      size = 1,
-      alpha = 0.5
+                       colour = rgb(0, 0, 0),
+                       linetype = "dashed",
+                       size = 1,
+                       alpha = 0.5
     ) +
     ggplot2::geom_point(
       shape = 16,
       ggplot2::aes(x, y),
-      data = data.frame(x = exp(logRrNegatives), y = seLogRrNegatives),
+      data = data.frame(x = estimateNegatives, y = seNegatives),
       size = 2,
       alpha = 0.5,
       color = rgb(0, 0, 0.8)
     ) +
     ggplot2::geom_hline(yintercept = 0) +
     ggplot2::scale_x_continuous(xLabel,
-      trans = "log10",
-      limits = xLimits,
-      breaks = breaks,
-      labels = breaks
+                                # trans = "log10",
+                                limits = xLimits,
+                                breaks = breaks,
+                                labels = breakLabels
     ) +
     ggplot2::scale_y_continuous("Standard Error") +
     ggplot2::coord_cartesian(ylim = yLimits) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_rect(fill = "#FAFAFA", colour = NA),
-      panel.grid.major = ggplot2::element_blank(),
+      panel.grid.major.y = ggplot2::element_blank(),
+      panel.grid.major.x = ggplot2::element_line(colour = "#AAAAAA"),
       axis.ticks = ggplot2::element_blank(),
       axis.text.y = themeRA,
       axis.text.x = theme,
@@ -295,20 +349,20 @@ plotCalibrationEffect <- function(logRrNegatives,
       strip.background = ggplot2::element_blank(),
       legend.position = "none"
     )
-  if (!missing(logRrPositives)) {
+  if (!missing(estimatePositives)) {
     plot <- plot + ggplot2::geom_point(
       shape = 23,
       ggplot2::aes(x = .data$x, y = .data$y),
       data = data.frame(
-        x = exp(logRrPositives),
-        y = seLogRrPositives
+        x = estimatePositives,
+        y = sePositives
       ),
       size = 4,
       fill = rgb(1, 1, 0),
       alpha = 0.8
     )
   }
-  if (!missing(title)) {
+  if (!is.null(title)) {
     plot <- plot + ggplot2::ggtitle(title)
   }
   if (!is.null(fileName)) {
@@ -385,14 +439,14 @@ plotCalibration <- function(logRr,
     seLogRr <- seLogRr[!is.na(logRr)]
     logRr <- logRr[!is.na(logRr)]
   }
-
+  
   data <- data.frame(logRr = logRr, SE = seLogRr)
   data$Z <- data$logRr / data$SE
   data$P <- 2 * pmin(pnorm(data$Z), 1 - pnorm(data$Z)) # 2-sided p-value
   data$Y <- sapply(data$P, function(x) {
     sum(data$P < x) / nrow(data)
   })
-
+  
   data$calibratedP <- vector(length = nrow(data))
   for (i in 1:nrow(data)) {
     dataLeaveOneOut <- data[seq(1, nrow(data)) != i, ]
@@ -407,7 +461,7 @@ plotCalibration <- function(logRr,
   data$AdjustedY <- sapply(data$calibratedP, function(x) {
     sum(data$calibratedP < x) / nrow(data)
   })
-
+  
   catData <- data.frame(
     x = c(data$P, data$calibratedP),
     y = c(data$Y, data$AdjustedY),
@@ -417,9 +471,9 @@ plotCalibration <- function(logRr,
     ))
   )
   catData$label <- factor(catData$label, levels = c("Empirical", "Theoretical"))
-
+  
   names(catData) <- c("x", "y", "P-value calculation")
-
+  
   breaks <- c(0, 0.25, 0.5, 0.75, 1)
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
@@ -883,8 +937,8 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, legacy = FALSE, fil
   simpleModels$y <- exp(simpleModels$mean)
   simpleModels$ymin <- exp(simpleModels$mean - simpleModels$sd)
   simpleModels$ymax <- exp(simpleModels$mean + simpleModels$sd)
-
-
+  
+  
   breaks <- c(0.25, 0.5, 1, 2, 4, 6, 8, 10)
   x <- exp(seq(log(0.25), log(10), by = 0.01))
   y <- exp(model[1] + model[2] * log(x))
@@ -913,14 +967,14 @@ plotErrorModel <- function(logRr, seLogRr, trueLogRr, title, legacy = FALSE, fil
     ggplot2::geom_line(color = rgb(0, 0, 0.8)) +
     ggplot2::geom_errorbar(ggplot2::aes(x = .data$trueRr), width = 0.1, size = 1, color = rgb(0, 0, 0.8), data = simpleModels) +
     ggplot2::scale_x_continuous("True effect size",
-      trans = "log10",
-      breaks = breaks,
-      labels = breaks
+                                trans = "log10",
+                                breaks = breaks,
+                                labels = breaks
     ) +
     ggplot2::scale_y_continuous("Systematic error mean (plus and minus one SD)",
-      trans = "log10",
-      breaks = breaks,
-      labels = breaks
+                                trans = "log10",
+                                breaks = breaks,
+                                labels = breaks
     ) +
     ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0.25, 10)) +
     ggplot2::theme(
@@ -972,9 +1026,9 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
       alpha = 0.5
     ) +
     ggplot2::scale_x_continuous(xLabel,
-      trans = "log10",
-      breaks = breaks,
-      labels = breaks
+                                trans = "log10",
+                                breaks = breaks,
+                                labels = breaks
     ) +
     ggplot2::scale_y_continuous("Standard Error") +
     ggplot2::coord_cartesian(xlim = c(0.25, 10), ylim = c(0, 1)) +
@@ -1015,11 +1069,11 @@ plotIsobars <- function(null, alpha, xLabel = "Relative risk", seLogRrPositives)
         data = isoBar
       ) +
       ggplot2::geom_label(ggplot2::aes(label = .data$label),
-        color = rgb(1, 0.5, 0),
-        data = labelData
+                          color = rgb(1, 0.5, 0),
+                          data = labelData
       ) +
       ggplot2::geom_text(ggplot2::aes(label = .data$label),
-        data = labelData
+                         data = labelData
       )
   }
   if (!missing(seLogRrPositives)) {
@@ -1087,17 +1141,12 @@ plotExpectedType1Error <- function(logRrNegatives,
       null <- fitNull(logRrNegatives, seLogRrNegatives)
     }
   }
-  if (showCis && is(null, "null")) {
+  if (showCis && !is(null, "mcmcNull")) {
     stop("Cannot show credible intervals when using asymptotic null. Please use 'fitMcmcNull' to fit the null")
   }
-
+  
   se <- (0:100) / 100
-  if (is(null, "null")) {
-    mean <- null[1]
-    sd <- sqrt(se^2 + null[2]^2)
-    type1Error <- pnorm(qnorm(1 - alpha / 2, 0, se), mean, sd, lower.tail = FALSE) +
-      pnorm(qnorm(alpha / 2, 0, se), mean, sd, lower.tail = TRUE)
-  } else {
+  if (is(null, "mcmcNull")) {
     computeExpected <- function(se, chain) {
       mean <- chain[, 1]
       sd <- sqrt(se^2 + (1 / sqrt(chain[, 2]))^2)
@@ -1110,7 +1159,12 @@ plotExpectedType1Error <- function(logRrNegatives,
     type1Error <- estimates[2, ]
     lb <- estimates[1, ]
     ub <- estimates[3, ]
-  }
+  } else {
+    mean <- null[1]
+    sd <- sqrt(se^2 + null[2]^2)
+    type1Error <- pnorm(qnorm(1 - alpha / 2, 0, se), mean, sd, lower.tail = FALSE) +
+      pnorm(qnorm(alpha / 2, 0, se), mean, sd, lower.tail = TRUE)
+  } 
   breaks <- 0:4 / 4
   theme <- ggplot2::element_text(colour = "#000000", size = 12)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 12, hjust = 1)
@@ -1132,7 +1186,7 @@ plotExpectedType1Error <- function(logRrNegatives,
       size = 1,
       alpha = 0.5
     )
-
+  
   if (showCis) {
     plot <- plot +
       ggplot2::geom_ribbon(ggplot2::aes(
@@ -1140,12 +1194,12 @@ plotExpectedType1Error <- function(logRrNegatives,
         ymax = ub
       ), fill = rgb(0.8, 0.2, 0.2), alpha = 0.3) +
       ggplot2::geom_line(ggplot2::aes(y = lb),
-        colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
-        size = 1
+                         colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                         size = 1
       ) +
       ggplot2::geom_line(ggplot2::aes(y = ub),
-        colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
-        size = 1
+                         colour = rgb(0.8, 0.2, 0.2, alpha = 0.2),
+                         size = 1
       )
   }
   plot <- plot + ggplot2::geom_label(
@@ -1157,14 +1211,14 @@ plotExpectedType1Error <- function(logRrNegatives,
     parse = TRUE
   ) +
     ggplot2::scale_x_continuous("Standard error",
-      limits = c(0, 1),
-      breaks = breaks,
-      labels = breaks
+                                limits = c(0, 1),
+                                breaks = breaks,
+                                labels = breaks
     ) +
     ggplot2::scale_y_continuous("Expected type 1 error",
-      limits = c(0, 1),
-      breaks = breaks,
-      labels = breaks
+                                limits = c(0, 1),
+                                breaks = breaks,
+                                labels = breaks
     ) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
@@ -1188,7 +1242,7 @@ plotExpectedType1Error <- function(logRrNegatives,
       y = yPos
     )
     plot <- plot + ggplot2::geom_vline(ggplot2::aes(xintercept = .data$x),
-      data = posData
+                                       data = posData
     ) +
       ggplot2::geom_point(
         shape = 23,
@@ -1301,7 +1355,7 @@ plotCiCalibrationEffect <- function(logRr,
   }
   d$Group <- as.factor(d$trueRr)
   d$Significant <- d$logCi95lb > d$trueLogRr | d$logCi95ub < d$trueLogRr
-
+  
   temp1 <- aggregate(Significant ~ trueRr, data = d, length)
   temp2 <- aggregate(Significant ~ trueRr, data = d, mean)
   temp1$nLabel <- paste0(formatC(temp1$Significant, big.mark = ","), " estimates")
@@ -1313,14 +1367,14 @@ plotCiCalibrationEffect <- function(logRr,
   )
   temp2$Significant <- NULL
   dd <- merge(temp1, temp2)
-
+  
   breaks <- c(0.1, 0.25, 0.5, 1, 2, 4, 6, 8, 10)
   theme <- ggplot2::element_text(colour = "#000000", size = 10)
   themeRA <- ggplot2::element_text(colour = "#000000", size = 10, hjust = 1)
-
+  
   d$Group <- paste("True", tolower(xLabel), "=", d$trueRr)
   dd$Group <- paste("True", tolower(xLabel), "=", dd$trueRr)
-
+  
   x <- seq(log(0.1), log(10), by = 0.01)
   calBounds <- data.frame()
   for (i in 1:nrow(dd)) {

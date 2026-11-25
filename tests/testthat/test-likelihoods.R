@@ -49,8 +49,8 @@ test_that("logLikelihoodNull - result is infinite", {
 
 # test logLikelihoodNullMcmc
 test_that("logLikelihoodNullMcmc - logRr and seLogRr input", {
-  expect_equal(logLikelihoodNullMcmc(theta = c(1, 2), logRr = c(NaN, 2), seLogRr = c(1, 0.1)), NaN)
-  expect_equal(logLikelihoodNullMcmc(theta = c(1, 2), logRr = c(1, 2), seLogRr = c(1, NaN)), NaN)
+  expect_equal(logLikelihoodNullMcmc(theta = c(1, 2), logRr = c(NaN, 2), seLogRr = c(1, 0.1), priorScale = 1), NaN)
+  expect_equal(logLikelihoodNullMcmc(theta = c(1, 2), logRr = c(1, 2), seLogRr = c(1, NaN), priorScale = 1), NaN)
 })
 # calculations are straightforward
 test_that("logLikelihoodNullMcmc - result", {
@@ -58,7 +58,7 @@ test_that("logLikelihoodNullMcmc - result", {
   logRr <- c(1, 2)
   seLogRr <- c(0.01, 0.1)
   result1 <- (0 - log(gaussianProduct(1, 1, 0.01, 1 / sqrt(2))) - log(gaussianProduct(2, 1, 0.1, 1 / sqrt(2))) - dgamma(2, 1e-04, 1e-04, log = TRUE))
-  result <- logLikelihoodNullMcmc(theta, logRr, seLogRr)
+  result <- logLikelihoodNullMcmc(theta, logRr, seLogRr, priorScale = 1)
   expect_equal(result, result1)
 })
 
