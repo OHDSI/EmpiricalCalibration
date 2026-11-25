@@ -453,7 +453,6 @@ checkWithinLimits <- function(limits, values, label) {
 #' @param se               The standard error of the effect estimates. Hint: on the log relative risk
 #'                         scale often the standard error = (log(<lower bound 95 percent confidence
 #'                         interval>) - log(<effect estimate>))/qnorm(0.025)
-#' @template Scale
 #' @param useMcmc          Use MCMC to estimate the calibrated P-value?
 #' @param legendPosition   Where should the legend be positioned? ("none", "left", "right", "bottom",
 #'                         "top")
@@ -475,7 +474,6 @@ checkWithinLimits <- function(limits, values, label) {
 #' @export
 plotCalibration <- function(estimate,
                             se,
-                            scale = "log relative risk",
                             useMcmc = FALSE,
                             legendPosition = "right",
                             title = NULL,
@@ -486,12 +484,10 @@ plotCalibration <- function(estimate,
     warnDeprecatedArguments(c("logRr", "seLogRr"), c("estimate", "se"))
     estimate <- logRr
     se <- seLogRr
-    scale <- LOG_RELATIVE_RISK
   }
   errorMessages <- checkmate::makeAssertCollection()
   checkmate::assertNumeric(estimate, min.len = 1, add = errorMessages)
   checkmate::assertNumeric(se, min.len = 1, add = errorMessages)
-  checkmate::assertChoice(scale, choices = c(LOG_RELATIVE_RISK, RISK_DIFFERENCE), add = errorMessages)
   checkmate::assertLogical(useMcmc, len = 1, add = errorMessages)
   checkmate::assertString(legendPosition, add = errorMessages)
   checkmate::assertString(title, null.ok = TRUE, add = errorMessages)

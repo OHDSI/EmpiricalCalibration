@@ -7,7 +7,6 @@
 plotCalibration(
   estimate,
   se,
-  scale = "log relative risk",
   useMcmc = FALSE,
   legendPosition = "right",
   title = NULL,
@@ -23,8 +22,6 @@ are log relative risks.}
 \item{se}{The standard error of the effect estimates. Hint: on the log relative risk
 scale often the standard error = (log(<lower bound 95 percent confidence
 interval>) - log(\if{html}{\out{<effect estimate>}}))/qnorm(0.025)}
-
-\item{scale}{The scale of the effect estimates. Can be \code{"log relative risk"} or \code{"risk difference"}.}
 
 \item{useMcmc}{Use MCMC to estimate the calibrated P-value?}
 
